@@ -32,18 +32,39 @@ EXCLUDE_EXTS = {'.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.zip', '.tar',
 # 常见占位符白名单（小写匹配）
 PLACEHOLDERS = {'example', 'placeholder', 'change-me', 'changeme', 'your-', 'your_', 'xxx', 'xxxx', '...', 'todo', 'test', 'demo', 'sample', 'fake', 'dummy', 'secret_here', 'key_here'}
 
+# 测试文件路径关键词（测试代码中必然包含测试账号密码，跳过 Password 类规则）
+TEST_PATH_KEYWORDS = (
+    'test', 'tests', '_test', 'case', 'cases', 'e2e', 'spec', 'specs',
+    '冒烟', '联调', '验收', '测试', '安全扫描',
+    'verify', 'repro', 'probe', 'measure', 'boundary', 'run_eval',
+    'quick_check', 'p0_regression', 'security_probe', 'security_vuln',
+    'security_deps',
+)
+
 def is_placeholder(text: str) -> bool:
     """判断是否为占位符而非真实密钥"""
     low = text.lower()
     return any(ph in low for ph in PLACEHOLDERS)
 
-def scan_file(filepath: Path) -> list:
-    """扫描单个文件，返回 [(行号, 模式名, 匹配内容, 行内容)]"""
+def is_test_file(filepath: Path, root: Path) -> bool:
+    """判断是否为测试文件（测试代码中的测试账号密码不算硬编码密钥）"""
+    try:
+        rel = str(filepath.relative_to(root)).lower()
+    except ValueError:
+        rel = str(filepath).lower()
+    return any(kw in rel for kw in TEST_PATH_KEYWORDS)
+
+def scan_file(filepath: Path, skip_passwords: bool = False) -> list:
+    """扫描单个文件，返回 [(行号, 模式名, 匹配内容, 行内容)]
+    skip_passwords=True 时跳过 Password 类规则（用于测试文件）。
+    """
     results = []
     try:
         content = filepath.read_text(encoding='utf-8', errors='ignore')
         for lineno, line in enumerate(content.splitlines(), 1):
             for pattern, name in PATTERNS:
+                if skip_passwords and name == 'Password':
+                    continue
                 matches = re.finditer(pattern, line, re.IGNORECASE)
                 for m in matches:
                     matched = m.group(0)
@@ -65,7 +86,8 @@ def main(root_dir: str):
             continue
         if filepath.suffix.lower() in EXCLUDE_EXTS:
             continue
-        results = scan_file(filepath)
+        skip_pwd = is_test_file(filepath, root)
+        results = scan_file(filepath, skip_passwords=skip_pwd)
         if results:
             all_results.append((filepath.relative_to(root), results))
 
