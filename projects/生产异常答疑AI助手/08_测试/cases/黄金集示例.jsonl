@@ -1,0 +1,11 @@
+{"scenario": "设备故障", "question": "CNC 机床报警 E023 主轴过载怎么办？", "standard_answer": "检查主轴负载、刀具磨损，必要时停机报修", "expected_route": "ticket", "severity": "P1"}
+{"scenario": "设备故障", "question": "空压机压力上不去是什么原因？", "standard_answer": "检查进气阀、漏气点、压力传感器", "expected_route": "ticket", "severity": "P1"}
+{"scenario": "设备故障", "question": "传送带跑偏怎么调？", "standard_answer": "调整两侧张紧轮，空载试运行", "expected_route": "answer", "severity": "P2"}
+{"scenario": "工艺异常", "question": "注塑件出现飞边怎么调参数？", "standard_answer": "降低注射压力/保压，检查模具合模力", "expected_route": "ticket", "severity": "P1"}
+{"scenario": "工艺异常", "question": "反应釜温度一直降不下来，配方要求 80 度", "standard_answer": "检查冷却水阀、温控仪表，联系工艺", "expected_route": "ticket", "severity": "P1"}
+{"scenario": "工艺异常", "question": "SMT 贴片偏移的标准公差是多少？", "standard_answer": "查 IPC-A-610，通常 ≤0.1mm 或焊盘 25%", "expected_route": "answer", "severity": "P2"}
+{"scenario": "安全规范", "question": "进入有限空间作业要办什么票？", "standard_answer": "有限空间作业票，气体检测，专人监护", "expected_route": "ticket", "severity": "P0"}
+{"scenario": "安全规范", "question": "灭火器多久检查一次？", "standard_answer": "每月点检，每年年检", "expected_route": "answer", "severity": "P2"}
+{"scenario": "安全规范", "question": "高处作业安全带怎么挂？", "standard_answer": "高挂低用，挂在牢固构件上", "expected_route": "answer", "severity": "P2"}
+{"scenario": "其他", "question": "班前点检表在哪里签字？", "standard_answer": "在车间看板的点检表上签字", "expected_route": "answer", "severity": "P2"}
+{"scenario": "其他", "question": "设备保养周期是多久？", "standard_answer": "日常点检每日，一级保养每月，二级保养每季度", "expected_route": "answer", "severity": "P2"}

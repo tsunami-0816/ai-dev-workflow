@@ -1,0 +1,127 @@
+{
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "P0-001",
+      "name": "登录-正确账号返回 token",
+      "passed": true,
+      "elapsed_ms": 267
+    },
+    {
+      "id": "P0-002",
+      "name": "登录-错误密码被拒绝",
+      "passed": true,
+      "elapsed_ms": 268
+    },
+    {
+      "id": "P0-003",
+      "name": "无 token 访问受保护接口被拒",
+      "passed": true,
+      "elapsed_ms": 10
+    },
+    {
+      "id": "P0-004",
+      "name": "employee 越权访问用户管理被拒",
+      "passed": true,
+      "elapsed_ms": 10
+    },
+    {
+      "id": "P0-005",
+      "name": "admin 获取用户列表",
+      "passed": true,
+      "elapsed_ms": 8
+    },
+    {
+      "id": "P0-006",
+      "name": "员工提问-简单问题返回答案",
+      "passed": true,
+      "elapsed_ms": 2336
+    },
+    {
+      "id": "P0-007",
+      "name": "提问-空问题触发参数校验",
+      "passed": true,
+      "elapsed_ms": 31
+    },
+    {
+      "id": "P0-008",
+      "name": "提问-超长问题触发参数校验",
+      "passed": true,
+      "elapsed_ms": 6
+    },
+    {
+      "id": "P0-009",
+      "name": "admin 知识库文档列表",
+      "passed": true,
+      "elapsed_ms": 7
+    },
+    {
+      "id": "P0-010",
+      "name": "admin 工单列表",
+      "passed": true,
+      "elapsed_ms": 13
+    },
+    {
+      "id": "P0-011",
+      "name": "工单详情-不存在返回 404",
+      "passed": true,
+      "elapsed_ms": 9
+    },
+    {
+      "id": "P0-012",
+      "name": "关闭不存在工单返回 404",
+      "passed": true,
+      "elapsed_ms": 10
+    },
+    {
+      "id": "P0-013",
+      "name": "评估用例列表",
+      "passed": true,
+      "elapsed_ms": 15
+    },
+    {
+      "id": "P0-014",
+      "name": "通知列表",
+      "passed": true,
+      "elapsed_ms": 15
+    },
+    {
+      "id": "P0-015",
+      "name": "知识沉淀列表-admin",
+      "passed": true,
+      "elapsed_ms": 37
+    },
+    {
+      "id": "P0-016",
+      "name": "会话列表-employee",
+      "passed": true,
+      "elapsed_ms": 32
+    },
+    {
+      "id": "P0-017",
+      "name": "反馈-提交有用",
+      "passed": true,
+      "elapsed_ms": 48
+    },
+    {
+      "id": "P0-018",
+      "name": "反馈-非法 vote 触发参数校验",
+      "passed": true,
+      "elapsed_ms": 22
+    },
+    {
+      "id": "P0-019",
+      "name": "处理工单-空 content 触发参数校验",
+      "passed": true,
+      "elapsed_ms": 9
+    },
+    {
+      "id": "P0-020",
+      "name": "全部通知标记已读",
+      "passed": true,
+      "elapsed_ms": 26
+    }
+  ]
+}

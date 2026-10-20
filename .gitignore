@@ -1,0 +1,33 @@
+# ===== 运行时数据（不入库）=====
+**/runtime/
+**/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ===== 日志 =====
+*.log
+**/logs/
+
+# ===== 敏感配置 =====
+.env
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ===== 系统 =====
+.DS_Store
+Thumbs.db
+.screenshots/

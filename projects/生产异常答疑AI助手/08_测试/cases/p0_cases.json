@@ -1,0 +1,244 @@
+{
+  "auth": {
+    "admin": {
+      "url": "http://127.0.0.1:8000/api/auth/login",
+      "body": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "token_path": "access_token"
+    },
+    "employee": {
+      "url": "http://127.0.0.1:8000/api/auth/login",
+      "body": {
+        "username": "employee",
+        "password": "employee123"
+      },
+      "token_path": "access_token"
+    }
+  },
+  "cases": [
+    {
+      "id": "P0-001",
+      "name": "登录-正确账号返回 token",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/auth/login",
+      "body": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "expect_status": 200,
+      "expect_json_contains": [
+        "access_token"
+      ]
+    },
+    {
+      "id": "P0-002",
+      "name": "登录-错误密码被拒绝",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/auth/login",
+      "body": {
+        "username": "admin",
+        "password": "wrong-pwd"
+      },
+      "expect_status": 401,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-003",
+      "name": "无 token 访问受保护接口被拒",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/tickets",
+      "headers": {
+        "Authorization": ""
+      },
+      "expect_status": 401,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-004",
+      "name": "employee 越权访问用户管理被拒",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/users",
+      "auth_as": "employee",
+      "expect_status": 403,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-005",
+      "name": "admin 获取用户列表",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/users",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": [
+        "username"
+      ]
+    },
+    {
+      "id": "P0-006",
+      "name": "员工提问-简单问题返回答案",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/chat/ask",
+      "auth_as": "employee",
+      "body": {
+        "question": "你好，请介绍一下"
+      },
+      "expect_status": 200,
+      "expect_json_contains": [
+        "answer"
+      ]
+    },
+    {
+      "id": "P0-007",
+      "name": "提问-空问题触发参数校验",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/chat/ask",
+      "auth_as": "employee",
+      "body": {
+        "question": ""
+      },
+      "expect_status": 422,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-008",
+      "name": "提问-超长问题触发参数校验",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/chat/ask",
+      "auth_as": "employee",
+      "body": {
+        "question": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expect_status": 422,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-009",
+      "name": "admin 知识库文档列表",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/documents",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-010",
+      "name": "admin 工单列表",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/tickets",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": [
+        "list"
+      ]
+    },
+    {
+      "id": "P0-011",
+      "name": "工单详情-不存在返回 404",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/tickets/T00000000-0000",
+      "auth_as": "admin",
+      "expect_status": 404,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-012",
+      "name": "关闭不存在工单返回 404",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/tickets/T00000000-0000/close",
+      "auth_as": "admin",
+      "body": {
+        "solution": "x",
+        "archive": false
+      },
+      "expect_status": 404,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-013",
+      "name": "评估用例列表",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/eval/cases",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-014",
+      "name": "通知列表",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/notifications",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": [
+        "list"
+      ]
+    },
+    {
+      "id": "P0-015",
+      "name": "知识沉淀列表-admin",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/knowledge",
+      "auth_as": "admin",
+      "expect_status": 200,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-016",
+      "name": "会话列表-employee",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/api/conversations",
+      "auth_as": "employee",
+      "expect_status": 200,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-017",
+      "name": "反馈-提交有用",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/chat/feedback",
+      "auth_as": "employee",
+      "body": {
+        "trace_id": "p0-test",
+        "vote": "up"
+      },
+      "expect_status": 200,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-018",
+      "name": "反馈-非法 vote 触发参数校验",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/chat/feedback",
+      "auth_as": "employee",
+      "body": {
+        "trace_id": "p0-test",
+        "vote": "bad"
+      },
+      "expect_status": 422,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-019",
+      "name": "处理工单-空 content 触发参数校验",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/tickets/T00000000-0000/handle",
+      "auth_as": "admin",
+      "body": {
+        "content": ""
+      },
+      "expect_status": 422,
+      "expect_json_contains": []
+    },
+    {
+      "id": "P0-020",
+      "name": "全部通知标记已读",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/notifications/read-all",
+      "auth_as": "employee",
+      "expect_status": 200,
+      "expect_json_contains": []
+    }
+  ]
+}
