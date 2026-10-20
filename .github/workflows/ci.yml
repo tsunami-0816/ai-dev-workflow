@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHONIOENCODING: utf-8
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Python syntax check
+        run: |
+          find . -name "*.py" -not -path "./.git/*" -not -path "*/__pycache__/*" -print0 | xargs -0 python -m py_compile
+          echo "✅ All Python files pass syntax check"
+
+      - name: Install workflow CLI
+        run: pip install -e .
+
+      - name: Verify CLI works
+        run: wf --help
+
+      - name: Security scan (hardcoded secrets)
+        run: python scripts/security_scan_secrets.py .
+
+      - name: Dependency check (example project backend)
+        run: python scripts/dependency_checker.py "projects/生产异常答疑AI助手/05_代码/backend"

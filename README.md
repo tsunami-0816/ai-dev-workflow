@@ -1,5 +1,9 @@
 # ai-dev-workflow
 
+![CI](https://github.com/tsunami-0816/ai-dev-workflow/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-3.8%2B-yellow)
+
 > 一套驱动 AI 从 0 到 1 交付项目的标准化工作流：10 步流程 + CLI 工具 + 5 项自动化质量校验，覆盖架构评审、接口契约、安全扫描到 P0 回归全链路。
 
 ---
