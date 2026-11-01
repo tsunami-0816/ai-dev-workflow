@@ -2,17 +2,117 @@
 """
 依赖版本真实性校验脚本（专治 AI 幻觉依赖）
 解析 requirements.txt / package.json / pom.xml，批量查询版本是否真实存在
-使用方法：python scripts/dependency_checker.py <项目根目录>
+使用方法：
+    python scripts/dependency_checker.py <项目根目录>
+    python scripts/dependency_checker.py <项目根目录> --solve   # 追加可解性校验（推荐第 3/6 步都跑）
+
+--solve 说明：单包存在 ≠ 整体能解（版本冲突、传递依赖缺失）。
+    Python 走 `pip install --dry-run --ignore-installed -r requirements.txt`
+    Maven  走 `mvn -B dependency:tree`（失败即视为不可解析）
+工具缺失（无 pip / 无 mvn）时跳过并显式提示，不判失败。
 """
 
+import argparse
 import json
 import re
+import shutil
+import subprocess
 import sys
 import urllib.request
 import urllib.error
 from pathlib import Path
 
 TIMEOUT = 10
+SOLVE_TIMEOUT = 600
+
+SKIP_DIRS = {"node_modules", ".venv", "venv", "target", ".git", "__pycache__", "dist", ".idea"}
+
+
+def find_files(root: Path, filename: str, max_depth: int = 4) -> list:
+    """在项目根下按文件名查找（跳过构建产物/虚拟环境目录，限制层级）"""
+    results = []
+    for p in root.rglob(filename):
+        try:
+            rel = p.relative_to(root)
+        except ValueError:
+            continue
+        if len(rel.parts) - 1 > max_depth:
+            continue
+        if any(part in SKIP_DIRS for part in rel.parts):
+            continue
+        results.append(p)
+    return sorted(results)
+
+
+def _tail(text: str, lines: int = 8) -> str:
+    rows = [r for r in (text or "").strip().splitlines() if r.strip()]
+    return "\n".join(rows[-lines:])
+
+
+def solve_python(req_file: Path) -> tuple:
+    """pip 依赖可解性校验：返回 (ok, message)"""
+    cmd = [sys.executable, "-m", "pip", "install", "--dry-run", "--ignore-installed", "-r", req_file.name]
+    try:
+        proc = subprocess.run(cmd, cwd=str(req_file.parent), capture_output=True,
+                              text=True, timeout=SOLVE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return False, "pip 解析超时（依赖过多或网络慢）"
+    except Exception as e:
+        return False, f"pip 执行异常: {e}"
+    if proc.returncode == 0:
+        return True, ""
+    return False, _tail(proc.stderr or proc.stdout)
+
+
+def solve_maven(pom_file: Path) -> tuple:
+    """Maven 依赖可解性校验：返回 (ok, message)"""
+    mvn = shutil.which("mvn") or shutil.which("mvn.cmd")
+    if not mvn:
+        return None, "未安装 mvn，跳过"
+    cmd = [mvn, "-B", "dependency:tree", "-DoutputType=text"]
+    try:
+        proc = subprocess.run(cmd, cwd=str(pom_file.parent), capture_output=True,
+                              text=True, timeout=SOLVE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return False, "mvn dependency:tree 超时"
+    except Exception as e:
+        return False, f"mvn 执行异常: {e}"
+    if proc.returncode == 0:
+        return True, ""
+    return False, _tail(proc.stderr or proc.stdout)
+
+
+def run_solve(root: Path) -> list:
+    """依赖可解性校验，返回问题列表（空列表=通过）"""
+    problems = []
+    checked = 0
+    print("\n=== 依赖可解性校验（--solve）===")
+
+    for req_file in find_files(root, "requirements.txt"):
+        checked += 1
+        print(f"  → pip: {req_file.relative_to(root)}")
+        ok, msg = solve_python(req_file)
+        if ok:
+            print("    ✅ 依赖可解析")
+        else:
+            problems.append(f"❌ pip 不可解析: {req_file.relative_to(root)}\n    {msg}")
+            print("    ❌ 依赖不可解析")
+
+    for pom_file in find_files(root, "pom.xml"):
+        checked += 1
+        print(f"  → mvn: {pom_file.relative_to(root)}")
+        ok, msg = solve_maven(pom_file)
+        if ok is None:
+            print(f"    ⚠️  {msg}")
+        elif ok:
+            print("    ✅ 依赖可解析")
+        else:
+            problems.append(f"❌ mvn 不可解析: {pom_file.relative_to(root)}\n    {msg}")
+            print("    ❌ 依赖不可解析")
+
+    if checked == 0:
+        print("  ⚠️  未找到 requirements.txt / pom.xml，跳过")
+    return problems
 
 
 def query_pypi(package: str, version: str) -> bool:
@@ -98,15 +198,16 @@ def parse_pom_xml(filepath: Path) -> list:
     return deps
 
 
-def main(root_dir: str):
+def main(root_dir: str, solve: bool = False):
     root = Path(root_dir).resolve()
     problems = []
     checked = 0
+    file_found = False
 
     # Python
-    req = root / "requirements.txt"
-    if req.exists():
-        print("=== 校验 requirements.txt ===")
+    for req in find_files(root, "requirements.txt"):
+        file_found = True
+        print(f"=== 校验 {req.relative_to(root)} ===")
         for name, ver in parse_requirements_txt(req):
             checked += 1
             result = query_pypi(name, ver)
@@ -119,9 +220,9 @@ def main(root_dir: str):
                 print(f"  ⚠️  {name}=={ver} 网络校验失败，请手动确认")
 
     # Node
-    pkg = root / "package.json"
-    if pkg.exists():
-        print("\n=== 校验 package.json ===")
+    for pkg in find_files(root, "package.json"):
+        file_found = True
+        print(f"\n=== 校验 {pkg.relative_to(root)} ===")
         for name, ver in parse_package_json(pkg):
             checked += 1
             result = query_npm(name, ver)
@@ -134,9 +235,9 @@ def main(root_dir: str):
                 print(f"  ⚠️  {name}@{ver} 网络校验失败，请手动确认")
 
     # Maven
-    pom = root / "pom.xml"
-    if pom.exists():
-        print("\n=== 校验 pom.xml ===")
+    for pom in find_files(root, "pom.xml"):
+        file_found = True
+        print(f"\n=== 校验 {pom.relative_to(root)} ===")
         for name, ver in parse_pom_xml(pom):
             if "${" in ver:  # 属性引用，跳过
                 print(f"  ⏭️  {name}:{ver}（属性引用，跳过）")
@@ -152,17 +253,28 @@ def main(root_dir: str):
             else:
                 print(f"  ⚠️  {name}:{ver} 网络校验失败，请手动确认")
 
+    if not file_found:
+        print("⚠️  未找到 requirements.txt / package.json / pom.xml，请确认项目目录")
+
+    # 依赖可解性（可选）
+    if solve:
+        problems.extend(run_solve(root))
+
     print(f"\n{'='*40}")
     print(f"共校验 {checked} 个依赖，发现 {len(problems)} 个问题")
     if problems:
         print("\n".join(problems))
-        print("\n⚠️  发现 AI 幻觉依赖！请在架构评审阶段修复后再进入开发。")
+        print("\n⚠️  存在问题依赖！请在架构评审阶段修复后再进入开发。")
         return 1
     else:
-        print("✅ 全部依赖版本真实存在")
+        print("✅ 全部依赖版本真实存在" + ("，且依赖可解" if solve else ""))
         return 0
 
 
 if __name__ == "__main__":
-    root = sys.argv[1] if len(sys.argv) > 1 else "."
-    sys.exit(main(root))
+    parser = argparse.ArgumentParser(description="依赖版本真实性与可解性校验")
+    parser.add_argument("root", nargs="?", default=".", help="项目根目录")
+    parser.add_argument("--solve", action="store_true",
+                        help="追加依赖可解性校验（pip --dry-run / mvn dependency:tree）")
+    args = parser.parse_args()
+    sys.exit(main(args.root, args.solve))

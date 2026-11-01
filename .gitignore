@@ -13,6 +13,22 @@ __pycache__/
 .venv/
 venv/
 env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+htmlcov/
+.coverage
+
+# ===== 前端构建产物 =====
+node_modules/
+dist/
+build/
+*.local
+
+# ===== Java/Maven 构建产物 =====
+target/
+*.class
 
 # ===== 日志 =====
 *.log
@@ -31,3 +47,12 @@ env/
 .DS_Store
 Thumbs.db
 .screenshots/
+
+# ===== 独立项目（用户其他项目，不计入本工作流仓库）=====
+projects/saas-workflow-agent/
+projects/llm-eval-observability/
+projects/multi-tenant-crm-ticket/
+projects/smart-outbound-platform/
+projects/生产异常答疑AI助手/
+projects/_archive_v1/llm-eval-observability-v1/
+projects/_archive_v1/saas-workflow-agent-v1/
