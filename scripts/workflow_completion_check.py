@@ -80,9 +80,16 @@ def load_steps() -> list:
 
 
 def load_gate_items() -> list:
-    """从 steps.yaml 展开门禁检查项：(路径, 说明, 关键字, 回退步骤)。"""
+    """从 steps.yaml 展开门禁检查项：(路径, 说明, 关键字, 回退步骤)。
+    F0/F1/F2 为翻新线专属步骤，仅当项目看板「路线=翻新」时返回其 artifacts。
+    生产线项目（路线=生产或缺省）自动跳过 F0~F2。"""
     items = []
     for step in load_steps():
+        step_id = str(step["id"])
+        is_refurbish_step = step_id.startswith("F")
+        if is_refurbish_step:
+            # 翻新线步骤的 artifacts 不在此处无条件展开——由 main() 按路线字段二次过滤
+            continue
         for art in step.get("artifacts") or []:
             items.append({
                 "path": art["path"],
@@ -91,8 +98,39 @@ def load_gate_items() -> list:
                 "keywords": art.get("keywords") or [],
                 "launch_date": art.get("launch_date") or step.get("launch_date") or "",
                 "fallback_steps": step.get("fallback") or [step["id"]],
+                "is_refurbish": False,
             })
     return items
+
+
+def load_refurbish_gate_items() -> list:
+    """翻新线专属步骤的 artifacts（F0/F1/F2）。仅当看板「路线=翻新」时才并入 GATE_ITEMS。"""
+    items = []
+    for step in load_steps():
+        step_id = str(step["id"])
+        if not step_id.startswith("F"):
+            continue
+        for art in step.get("artifacts") or []:
+            items.append({
+                "path": art["path"],
+                "alt": art.get("alt") or [],
+                "label": art.get("label", art["path"]),
+                "keywords": art.get("keywords") or [],
+                "launch_date": art.get("launch_date") or step.get("launch_date") or "",
+                "fallback_steps": step.get("fallback") or [step["id"]],
+                "is_refurbish": True,
+            })
+    return items
+
+
+def _read_project_route(project_root: Path) -> str:
+    """读看板「路线」字段。缺失默认 '生产'；显式写 '翻新' 返回 '翻新'。"""
+    board = project_root / "_项目状态.md"
+    if not board.exists():
+        return "生产"
+    text = board.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r"\*\*路线\*\*：\s*(生产|翻新)", text)
+    return m.group(1) if m else "生产"
 
 
 # 必交产物（由 workflow/steps.yaml 生成，改清单请改 yaml）
@@ -404,7 +442,13 @@ def main():
     # 读取项目创建日期（按方案 A 区分台账必查/可选）
     created_date = _read_project_create_date(root)
 
-    results = [check_one(root, item) for item in GATE_ITEMS]
+    # 读看板路线字段：生产线查 GATE_ITEMS；翻新线追加 load_refurbish_gate_items()
+    route = _read_project_route(root)
+    gate_items = list(GATE_ITEMS)  # 生产线全部 items
+    if route == "翻新":
+        gate_items.extend(load_refurbish_gate_items())
+
+    results = [check_one(root, item) for item in gate_items]
     # 追加问题台账收敛检查（按创建日期判断可选/必查）+ 看板一致性检查
     ledger_result = check_ledger(root, created_date)
     board_result = check_board_consistency(root)
@@ -417,11 +461,10 @@ def main():
     failed = [r for r in results
               if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING")]
 
-    # 建议回退到的步骤：第一个失败项按 path 反查 GATE_ITEMS
-    # （results 末尾追加了台账/看板项，长度与 GATE_ITEMS 不一致，不能用下标直接索引）
+    # 建议回退到的步骤：第一个失败项按 path 反查 gate_items（含翻新 items）
     suggested_fallback = None
     if failed:
-        fallback_map = {it["path"]: it["fallback_steps"] for it in GATE_ITEMS}
+        fallback_map = {it["path"]: it["fallback_steps"] for it in gate_items}
         suggested_fallback = failed[0].get("fallback_steps") or fallback_map.get(failed[0]["path"])
 
     summary = {

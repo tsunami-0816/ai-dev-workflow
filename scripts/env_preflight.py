@@ -130,15 +130,16 @@ def find_root(start: Path | None = None) -> Path:
     return Path.cwd()
 
 
-def parse_port_table(project_name: str) -> list[int]:
-    """解析 WORKFLOW_端口分配表.md，返回基础设施端口 + 该项目的后端/前端端口。
-    找不到表或项目时返回空列表（调用方回退到 --ports / 默认）。"""
+def parse_port_table(project_name: str) -> tuple[list[int], bool]:
+    """解析 WORKFLOW_端口分配表.md，返回 (基础设施端口 + 该项目的后端/前端端口, 是否找到项目行)。
+    找不到表或项目行时 found=False（调用方必须报错，禁止静默回退，改进建议 #68）。"""
     root = find_root()
     table = root / "WORKFLOW_端口分配表.md"
     if not table.exists():
-        return []
+        return [], False
     text = table.read_text(encoding="utf-8", errors="ignore")
     ports: set[int] = set()
+    found = False
     infra_markers = ("MySQL", "Redis", "Kafka", "ClickHouse", "RabbitMQ", "Qdrant")
     for line in text.splitlines():
         if not line.startswith("|"):
@@ -151,12 +152,12 @@ def parse_port_table(project_name: str) -> list[int]:
             m = re.search(r"\d+", cells[1])
             if m:
                 ports.add(int(m.group()))
-        # 后端/前端端口池：第 1 列是项目名
+        # 后端/前端端口池：第 1 列是项目名（一格多端口全取，如 "8080(gw) / 8081 / 8082"）
         elif cells[0] == project_name:
-            m = re.search(r"\d+", cells[1])
-            if m:
+            found = True
+            for m in re.finditer(r"\d+", cells[1]):
                 ports.add(int(m.group()))
-    return sorted(ports)
+    return sorted(ports), found
 
 
 # 代码环境变量引用扫描（--env-coverage，改进建议 #69）
@@ -164,6 +165,7 @@ ENV_REF_PATTERNS = [
     # Python
     (re.compile(r'os\.getenv\(\s*["\']([A-Z_][A-Z0-9_]*)["\']'), "py"),
     (re.compile(r'os\.environ(?:\.get)?\(\s*["\']([A-Z_][A-Z0-9_]*)["\']'), "py"),
+    (re.compile(r'os\.environ\[\s*["\']([A-Z_][A-Z0-9_]*)["\']'), "py"),
     # Java
     (re.compile(r'System\.getenv\(\s*["\']([A-Z_][A-Z0-9_]*)["\']'), "java"),
     (re.compile(r'@Value\(\s*"\$\{([A-Z_][A-Z0-9_]*)'), "java"),
@@ -212,7 +214,7 @@ def find_env_files(project_dir: Path, max_depth: int = 4) -> list[Path]:
 
 def parse_env(path: Path) -> dict:
     data = {}
-    for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+    for line in path.read_text(encoding="utf-8-sig", errors="ignore").splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -527,13 +529,13 @@ def main():
 
     print("\n--- 端口占用 ---")
     if args.project:
-        table_ports = parse_port_table(args.project)
-        if table_ports:
-            print(f"  ℹ️  从端口分配表读取 {args.project} 端口：{table_ports}")
-            ports = table_ports
-        else:
-            print(f"  ⚠️  端口分配表未找到 {args.project}，回退到 --ports 默认")
-            ports = [int(p.strip()) for p in args.ports.split(",") if p.strip()]
+        table_ports, found = parse_port_table(args.project)
+        if not found:
+            print(f"  ❌ WORKFLOW_端口分配表.md 中未找到项目「{args.project}」的端口行，无法自动解析。")
+            print(f"     请先在端口分配表登记该项目端口，或改用 --ports 手动指定（不允许静默回退默认端口）。")
+            return 1
+        print(f"  ℹ️  从端口分配表读取 {args.project} 端口：{table_ports}")
+        ports = table_ports
     else:
         ports = [int(p.strip()) for p in args.ports.split(",") if p.strip()]
     for p in ports:

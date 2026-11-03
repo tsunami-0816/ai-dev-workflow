@@ -90,7 +90,7 @@ qa-automation/
    - 权限：普通用户调管理员接口、跨租户访问
    - 幂等：重复提交、并发创建同一条数据
 3. 每条用例函数名：test_xxx_success / test_xxx_unauthorized，docstring 写人话
-4. 断言要具体：不只断言 code==0，还要断言 data 里的关键字段
+4. 断言要具体（硬要求）：不只断言 code==0，还要断言 data 里的关键字段——状态/枚举字段值在合法集合内、关键字段非空、非 mock 假数据（来源：SparrowScheduler 第 9 步，只断 code 导致 3 条展示层缺陷漏到人工验收）
 5. P0 用例同时导出 p0_cases.json（格式见 scripts/p0_regression_test.py docstring），用于冒烟回归
 ```
 

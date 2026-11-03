@@ -190,7 +190,8 @@ def _infer_facts(root: Path, name: str, gate, current_state: str = "") -> dict:
 
 
 def _queue_rows(root: Path):
-    """解析队列表：返回 (文件路径, 原始行, [(行号, 单元格列表)])。计划列 8 列，勿改结构。"""
+    """解析队列表：返回 (文件路径, 原始行, [(行号, 单元格列表)])。
+    9 列：项目名 | 路线 | 业务一句话 | 设计书路径 | 状态 | 来源 JD | 启动日期 | 完成日期 | 当前卡点。"""
     path = root / QUEUE_FILE
     lines = path.read_text(encoding="utf-8").splitlines()
     rows = []
@@ -198,7 +199,7 @@ def _queue_rows(root: Path):
         if not line.strip().startswith("|"):
             continue
         cells = line.split("|")[1:-1]
-        if len(cells) != 8:
+        if len(cells) != 9:
             continue
         name = cells[0].strip()
         if not name or name == "项目名" or set(name) <= set("-: "):
@@ -214,19 +215,21 @@ def cmd_queue(args):
     diffs = []
     for idx, cells in rows:
         name = cells[0].strip()
-        current_state = cells[3].strip() if len(cells) > 3 else ""
+        current_state = cells[4].strip() if len(cells) > 4 else ""
+        if args.check and current_state == "已搁置":
+            continue  # 已搁置是人工判断，--check 不做推导比对（改进建议 #67）
         facts = _infer_facts(root, name, gate, current_state)
         new_cells = list(cells)
         changed = []
-        if cells[3].strip() != facts["state"]:
-            changed.append(("状态", cells[3].strip(), facts["state"]))
-            new_cells[3] = f" {facts['state']} "
-        if facts["date"] and cells[6].strip() != facts["date"]:
-            changed.append(("完成日期", cells[6].strip(), facts["date"]))
-            new_cells[6] = f" {facts['date']} "
-        if facts["checkpoint"] and cells[7].strip() != facts["checkpoint"]:
-            changed.append(("当前卡点", cells[7].strip(), facts["checkpoint"]))
-            new_cells[7] = f" {facts['checkpoint']} "
+        if cells[4].strip() != facts["state"]:
+            changed.append(("状态", cells[4].strip(), facts["state"]))
+            new_cells[4] = f" {facts['state']} "
+        if facts["date"] and cells[7].strip() != facts["date"]:
+            changed.append(("完成日期", cells[7].strip(), facts["date"]))
+            new_cells[7] = f" {facts['date']} "
+        if facts["checkpoint"] and cells[8].strip() != facts["checkpoint"]:
+            changed.append(("当前卡点", cells[8].strip(), facts["checkpoint"]))
+            new_cells[8] = f" {facts['checkpoint']} "
         if changed:
             diffs.append((name, changed))
             if args.sync:
@@ -351,10 +354,10 @@ def cmd_steps(args):
             if not line.strip().startswith("|"):
                 continue
             cells = [c.strip() for c in line.split("|")[1:-1]]
-            if len(cells) != 8:
+            if len(cells) != 9:
                 continue
             name = cells[0].strip()
-            state = cells[3].strip()
+            state = cells[4].strip()
             if not name or name == "项目名" or set(name) <= set("-: "):
                 continue
             if state.startswith("进行中"):

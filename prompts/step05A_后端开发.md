@@ -18,7 +18,7 @@
 3. 接口定义：所有对外接口的请求参数、返回结构、错误码
 4. 接口Mock数据：所有接口的模拟返回数据，供前端联调使用
 5. 依赖版本：所有依赖的组件、Jar包/库的准确版本号（注意：版本号必须真实存在，后续会用 dependency_checker.py 机器校验，编造版本号会被打回）
-6. 接口契约：如使用 FastAPI，必须确保 /openapi.json 可访问；其他框架需输出等价的接口契约文件（供 api_contract_validator.py 校验前端调用）
+6. 接口契约：如使用 FastAPI，必须确保 /openapi.json 可访问；**springdoc（Spring Boot）项目固定用 `/v3/api-docs`（`/openapi.json` 不是 springdoc 的导出地址）**；其他框架需输出等价的接口契约文件（供 api_contract_validator.py 校验前端调用）。**导出落盘前必须校验 paths 数量 > 0，为 0 说明导错地址，禁止用空契约覆盖已有文件**（来源：SparrowScheduler，误导出 0 路径覆盖了有效 openapi.json）
 7. 部署与启动：环境配置、启动命令、配置文件说明
 8. 开发自测：自测方法、自测用例、验证步骤
 要求：代码规范、注释清晰、严格遵循架构设计，不超范围实现。

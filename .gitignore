@@ -56,3 +56,6 @@ projects/smart-outbound-platform/
 projects/生产异常答疑AI助手/
 projects/_archive_v1/llm-eval-observability-v1/
 projects/_archive_v1/saas-workflow-agent-v1/
+
+# ===== 已交付项目（各自独立仓库，不入工作流仓库）=====
+projects/SparrowScheduler/

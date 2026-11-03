@@ -22,8 +22,9 @@
 | saas-workflow-agent | 8085 | ✅ 已完成 | python-agent（FastAPI Agent 运行时，2026-10-28 架构分配） |
 | enterprise-rag-agent | **8084** | ⏸️ 已搁置 | 与本地 enterprise-rag-java 重复，2026-10-31 搁置 |
 | llm-eval-observability | **8086** | 🔨 进行中 | FastAPI 主服务（2026-10-30 启动分配） |
-| 下一个新项目 | **8087** | 待分配 | |
-| 预留 | 8087-8090 | | |
+| SparrowScheduler | 8087 | ✅ 已完成 | 单模块 Spring Boot（sparrow-admin，2026-11-02 翻新线分配；Docker prod 映射 8090） |
+| 下一个新项目 | **8088** | 待分配 | |
+| 预留 | 8088-8090 | | |
 
 ## 前端端口分配池（5173 起递增）
 
@@ -34,7 +35,8 @@
 | saas-workflow-agent | 5177 | ✅ 已完成 |
 | enterprise-rag-agent | **5178** | ⏸️ 已搁置 | 2026-10-31 搁置 |
 | llm-eval-observability | **5179** | 🔨 进行中 |
-| 下一个新项目 | **5180** | 待分配 |
+| SparrowScheduler | 5181 | ✅ 已完成 | Vite dev（2026-11-02 翻新线分配；Docker web 映射 3002） |
+| 下一个新项目 | **5182** | 待分配 |
 
 ## 开工时自动分配规则（env_preflight.py）
 
