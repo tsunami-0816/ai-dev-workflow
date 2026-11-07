@@ -59,3 +59,7 @@ projects/_archive_v1/saas-workflow-agent-v1/
 
 # ===== 已交付项目（各自独立仓库，不入工作流仓库）=====
 projects/SparrowScheduler/
+
+# 已交付项目（各自独立仓库，不入工作流仓库）
+projects/nestjs-agent-workbench/
+projects/shopmate-ai/

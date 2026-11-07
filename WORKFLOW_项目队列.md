@@ -18,6 +18,8 @@
 | enterprise-rag-agent | 生产 | 企业知识库RAG问答Agent（文档上传→向量检索→带引用回答） | `projects/_队列/enterprise-rag-agent/00_项目设计书.md` | 已搁置 | 设计模块产出 | 2026-10-27 | - | 与本地已有 `D:\lg\project\enterprise-rag-java`（Spring Boot+LangChain4j+Qdrant+DashScope 企业级完整版，已在简历）重复；队列版为 Java+Python 双栈阉割 MVP，无简历增量（2026-10-31 搁置） |
 | light-workflow-studio | 生产 | 轻量流程画布（v2 保底版，3种节点线性执行） | `projects/_队列/light-workflow-studio/00_项目设计书.md` | 已搁置 | v1 返厂重做 | 2026-10-28 | - | v1 saas-workflow-agent 已于 2026-10-28 闭环交付（11步全绿/用户验收）；v2 后端为 v1 阉割版，唯一增量是 AntV X6 拖拽画布（v1 为表单式 DSL 配置），增量不足以再做一个项目（2026-10-31 搁置） |
 | llm-trace-dashboard | 生产 | LLM 调用追踪看板（v2 保底版，手动录入+ECharts） | `projects/_队列/llm-trace-dashboard/00_项目设计书.md` | 已搁置 | v1 返厂重做 | 2026-10-28 | - | 与 v1 llm-eval-observability 重复：v1 已于 2026-10-30 闭环交付（含 ECharts 看板/trace 列表/metrics，已推 GitHub public）；v2 砍成手动录入+SQLite，零增量（2026-10-31 搁置） |
+| shopmate-ai | 生产 | ShopMate 电商AI客服运营工作台（LangGraph+RAG+文案生成+反馈闭环） | `projects/_队列/shopmate-ai/00_项目设计书.md` | 已完成 | AI运营含界面设计JD | 2026-11-04 | 2026-11-05 | 无（门禁全绿） |
+| nestjs-agent-workbench | 生产 | Node.js NestJS AI对话工作台（补Node.js缺口，WebSocket流式+JWT/RBAC） | `projects/_队列/nestjs-agent-workbench/00_项目设计书.md` | 进行中（第 1 步 · 项目基线定义（未开始）） | 垦驱智能Agent岗（求职侧设计台） | 2026-11-08 | - | 无（刚启动，等 step1 产出基线后自动过机器闸门） |
 
 ---
 

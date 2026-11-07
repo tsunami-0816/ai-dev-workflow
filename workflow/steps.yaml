@@ -63,7 +63,13 @@ steps:
     owner: agent
     prompt: step05B_前端开发.md
     fallback: ["4", "5A", "5B"]
-    artifacts: []
+    artifacts:
+      # 精修模式下才有（R24）；普通模式不查
+      - path: 05_代码/frontend/设计精修记录.md
+        label: step5B 设计精修记录（精修模式下）
+        keywords: ["设计精修", "第 1 轮", "最终检测结果"]
+        launch_date: "2026-11-04"
+        optional: true
 
   - id: "5.5"
     name: 独立代码 Review（写实现者不得自审）
@@ -87,6 +93,14 @@ steps:
       - path: 06_冒烟/冒烟记录.md
         label: step6 本地冒烟记录
         keywords: ["冒烟", "主流程", "探活", "启动"]
+      - path: 06_冒烟/前端UI质量报告.md
+        label: step6 前端 UI 质量检测报告（R23）
+        keywords: ["error", "warning", "advisory", "对比度", "padding"]
+        launch_date: "2026-11-04"
+      - path: 06_冒烟/taste审美检测报告.md
+        label: step6 taste 审美检测报告（R25）
+        keywords: ["FAIL", "taste", "inspect", "平均值页面"]
+        launch_date: "2026-11-05"
 
   - id: "6.5"
     name: 接口契约校验
@@ -231,16 +245,21 @@ steps:
         keywords: ["实测", "待拍板", "逆向"]
 
   - id: "F2"
-    name: 七维度体检
+    name: 九维度体检
     # 体检报告落盘 F2_体检/；台账+失败日志初始化
+    # 2026-11-04 新增第 9 维度「前端 UI 质量」（R23）
     owner: agent
     prompt: null
     fallback: ["F0", "F1", "F2"]
     artifacts:
       - path: F2_体检/体检报告.md
-        label: F2 七维度体检报告（可运行性/映射/契约/安全/测试/产物/文档）
-        keywords: ["可运行性", "体检报告", "七维度", "P0", "P1"]
+        label: F2 九维度体检报告（可运行性/映射/契约/安全/测试/产物/文档/链路追踪/UI质量）
+        keywords: ["可运行性", "体检报告", "九维度", "P0", "P1"]
         launch_date: "2026-11-02"
+      - path: F2_体检/前端UI质量报告.md
+        label: F2 前端 UI 质量检测报告（R23）
+        keywords: ["error", "warning", "advisory", "对比度"]
+        launch_date: "2026-11-04"
 
   - id: "F3"
     name: 返修

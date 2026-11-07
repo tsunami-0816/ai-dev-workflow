@@ -23,8 +23,9 @@
 | enterprise-rag-agent | **8084** | ⏸️ 已搁置 | 与本地 enterprise-rag-java 重复，2026-10-31 搁置 |
 | llm-eval-observability | **8086** | 🔨 进行中 | FastAPI 主服务（2026-10-30 启动分配） |
 | SparrowScheduler | 8087 | ✅ 已完成 | 单模块 Spring Boot（sparrow-admin，2026-11-02 翻新线分配；Docker prod 映射 8090） |
-| 下一个新项目 | **8088** | 待分配 | |
-| 预留 | 8088-8090 | | |
+| shopmate-ai | **8088** | ✅ 已完成 | FastAPI 主服务（2026-11-04 启动分配） |
+| nestjs-agent-workbench | **8089** | 🔨 进行中 | NestJS 主服务（2026-11-08 启动分配） |
+| 预留 | 8090 | | |
 
 ## 前端端口分配池（5173 起递增）
 
@@ -36,7 +37,8 @@
 | enterprise-rag-agent | **5178** | ⏸️ 已搁置 | 2026-10-31 搁置 |
 | llm-eval-observability | **5179** | 🔨 进行中 |
 | SparrowScheduler | 5181 | ✅ 已完成 | Vite dev（2026-11-02 翻新线分配；Docker web 映射 3002） |
-| 下一个新项目 | **5182** | 待分配 |
+| shopmate-ai | **5182** | ✅ 已完成 | Vite dev（2026-11-04 启动分配） |
+| nestjs-agent-workbench | **5183** | 🔨 进行中 | Vite dev（2026-11-08 启动分配） |
 
 ## 开工时自动分配规则（env_preflight.py）
 

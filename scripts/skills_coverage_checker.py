@@ -156,8 +156,10 @@ def check_sections(text_lower: str, sections: list | None = None) -> tuple[list[
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skills-json", required=True, help="step00.1 输出的 JD 技能点 JSON")
-    ap.add_argument("--design-doc", required=True, help="00_项目设计书.md 路径")
-    ap.add_argument("--portfolio-json", help="可选：00_作品集画像库.json，用于撞车检测")
+    ap.add_argument("--design-doc", help="00_项目设计书.md 路径（--portfolio-mode 时可不填）")
+    ap.add_argument("--portfolio-json", help="00_作品集画像库.json 路径，用于对账和撞车检测")
+    ap.add_argument("--portfolio-mode", action="store_true",
+                    help="对账模式：不看设计书，直接拿 JD 技能点 vs portfolio.json 里所有项目的 tech_stack")
     ap.add_argument("--skip-sections", action="store_true",
                     help="跳过设计书 9 节检查（仅限历史项目补跑，新项目不得跳过）")
     ap.add_argument("--required-sections", default="",
@@ -166,11 +168,65 @@ def main():
     args = ap.parse_args()
 
     skills_data = json.loads(Path(args.skills_json).read_text(encoding="utf-8"))
-    design_text = Path(args.design_doc).read_text(encoding="utf-8", errors="ignore").lower()
-
     hard = skills_data.get("hard_stack", [])
     arch = skills_data.get("architecture_skills", [])
-    must = skills_data.get("must_have") or hard  # 没填 must_have 就把 hard_stack 全算 must
+    must = skills_data.get("must_have") or hard
+
+    # ===== 对账模式：JD vs 已有作品集 =====
+    if args.portfolio_mode:
+        if not args.portfolio_json:
+            print("❌ --portfolio-mode 必须配 --portfolio-json")
+            return 2
+        port = json.loads(Path(args.portfolio_json).read_text(encoding="utf-8"))
+        projects = port.get("projects", [])
+        print("=" * 60)
+        print(f"JD vs 作品集对账：{args.skills_json}")
+        print("=" * 60)
+        print(f"作品集共 {len(projects)} 个项目\n")
+
+        all_skills = [(s, "hard", s in must) for s in hard] + \
+                     [(s, "arch", s in must) for s in arch]
+
+        covered, missing = [], []
+        for skill, cat, is_must in all_skills:
+            hit_projects = []
+            for p in projects:
+                stack_lower = [x.lower() for x in p.get("tech_stack", [])]
+                _, matched = skill_in_text(skill, " ".join(stack_lower))
+                if matched:
+                    hit_projects.append(p.get("project_name", "?"))
+            if hit_projects:
+                covered.append((skill, cat, is_must, hit_projects))
+            else:
+                missing.append((skill, cat, is_must))
+
+        print("✅ 已有项目覆盖：")
+        for s, cat, is_must, projs in covered:
+            flag = " [MUST]" if is_must else ""
+            print(f"  {flag} [{cat}] {s}  ← {', '.join(projs[:3])}")
+
+        print(f"\n❌ 缺口（无项目覆盖）：")
+        for s, cat, is_must in missing:
+            flag = " [MUST]" if is_must else ""
+            print(f"  {flag} [{cat}] {s}")
+
+        must_missing = [s for s, _, is_must in missing if is_must]
+        must_total = len(must)
+        must_covered = must_total - len(must_missing)
+        print(f"\nmust_have 覆盖率: {must_covered}/{must_total} = {must_covered/max(must_total,1)*100:.0f}%")
+
+        if must_missing:
+            print(f"\n→ 缺口技能点: {', '.join(must_missing)}")
+            print("→ 走求职侧设计台补项目，或查硬件豁免清单")
+            return 1
+        print("\n✅ must_have 100% 覆盖，可直接出简历。")
+        return 0
+
+    # ===== 原模式：JD vs 设计书 =====
+    if not args.design_doc:
+        print("❌ 非 --portfolio-mode 必须传 --design-doc")
+        return 2
+    design_text = Path(args.design_doc).read_text(encoding="utf-8", errors="ignore").lower()
 
     all_skills = []
     for s in hard:
@@ -192,7 +248,7 @@ def main():
             missing.append((skill, cat))
 
     must_set = set(must)
-    missing_must = [s for s, _, _ in missing if s in must_set]
+    missing_must = [s for s, _ in missing if s in must_set]
 
     print("=" * 60)
     print(f"JD 技能点对账：{args.design_doc}")

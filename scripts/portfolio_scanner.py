@@ -14,10 +14,15 @@ import re
 import sys
 from pathlib import Path
 
-# 跳过这些目录
+# 跳过这些目录（顶层目录名）
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", ".idea", ".vscode",
-             "archive", "_archive", "工作流测试", ".screenshots", "logs", "runtime",
-             ".cursor", ".trae", ".pytest_cache", ".github"}
+             "_archive", ".screenshots", "logs", "runtime",
+             ".cursor", ".trae", ".pytest_cache", ".github", "skills", "docs"}
+
+# 工作流测试目录下，哪些子目录属于"工作流自身资源"而不是"产出的子项目"
+WORKFLOW_INTERNAL_DIRS = {"scripts", "prompts", "skills", "docs", "workflow",
+                          "workflow_cli", "workflow_cli.egg-info", ".cursor", ".trae",
+                          ".github", ".pytest_cache", ".screenshots", "step00_产出_20261027"}
 
 # 依赖关键词 → 技能点（粗匹配，够用就行）
 SKILL_MAP = [
@@ -122,6 +127,15 @@ def scan_project(proj_dir: Path) -> dict:
     return info
 
 
+def has_artifact_at(d: Path) -> bool:
+    candidate_bases = [d, d / "05_代码" / "backend", d / "backend"]
+    return any(
+        (base / f).exists()
+        for base in candidate_bases
+        for f in ["pom.xml", "requirements.txt", "package.json", "pyproject.toml", "README.md"]
+    )
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=r"D:\lg\project", help="作品集根目录")
@@ -133,23 +147,49 @@ def main():
         print(f"根目录不存在: {root}")
         return 1
 
-    projects = []
+    # 待扫描的项目目录列表
+    targets: list[Path] = []
+
+    # 1) 扫 root 下一级子目录（老项目、archive 里的项目、工作流测试本身）
     for child in sorted(root.iterdir()):
         if not child.is_dir():
             continue
         if child.name.startswith(".") or child.name in SKIP_DIRS:
             continue
-        # 至少要有一个依赖文件或 README 才算项目（根目录或 backend/ 子目录都算）
-        candidate_bases = [child, child / "05_代码" / "backend", child / "backend"]
-        has_artifact = any(
-            (base / f).exists()
-            for base in candidate_bases
-            for f in ["pom.xml", "requirements.txt", "package.json", "pyproject.toml", "README.md"]
-        )
-        if not has_artifact:
+        targets.append(child)
+
+    # 2) 工作流测试/projects/ 下的子项目单独扫（这些是工作流产出的项目）
+    wf_projects = root / "工作流测试" / "projects"
+    if wf_projects.exists():
+        for child in sorted(wf_projects.iterdir()):
+            if not child.is_dir():
+                continue
+            if child.name.startswith(".") or child.name.startswith("_"):
+                continue
+            if child.name in {"_TEMPLATE_新项目", "_队列"}:
+                continue
+            targets.append(child)
+
+    # 3) archive/ 下的子目录也是项目（早期项目，有用）
+    archive = root / "archive"
+    if archive.exists():
+        for child in sorted(archive.iterdir()):
+            if not child.is_dir():
+                continue
+            if child.name.startswith(".") or child.name.startswith("_"):
+                continue
+            targets.append(child)
+
+    projects = []
+    seen = set()
+    for d in targets:
+        if d in seen:
             continue
-        print(f"扫描: {child.name}")
-        info = scan_project(child)
+        seen.add(d)
+        if not has_artifact_at(d):
+            continue
+        print(f"扫描: {d.relative_to(root)}")
+        info = scan_project(d)
         projects.append(info)
         print(f"  → {len(info['tech_stack'])} 个技能点: {', '.join(info['tech_stack'][:8])}")
 

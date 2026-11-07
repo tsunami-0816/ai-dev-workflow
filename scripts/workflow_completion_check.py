@@ -407,6 +407,69 @@ def check_mapping(root: Path, created_date: str | None) -> dict:
     return info
 
 
+def check_job_handoff(project_name: str) -> dict:
+    """
+    求职侧联动（2026-11-07 新增，用户硬要求）：
+    项目做完后，扫 D:\\lg\\resume\\JD仓库\\ 下所有状态为「⏳等项目」的 JD，
+    看有没有 JD 在等当前这个项目。有就提示去求职侧推进，没有就静默通过。
+    INFO 级，不阻塞门禁。
+    """
+    info = {
+        "path": "(求职侧联动)",
+        "label": "求职侧联动扫描",
+        "status": "OK",
+        "details": "",
+    }
+    jd_dir = Path(r"D:\lg\resume\JD仓库")
+    if not jd_dir.exists():
+        info["details"] = "JD仓库不存在，跳过"
+        return info
+
+    waiting_jds = []
+    for md in jd_dir.glob("*.md"):
+        if md.name.startswith("_") or md.name == "README.md":
+            continue
+        text = md.read_text(encoding="utf-8", errors="ignore")
+        if "⏳" not in text and "等项目" not in text:
+            continue
+        # 解析待补项目 checkbox 行
+        pending = []
+        for line in text.splitlines():
+            m = re.match(r"\s*-\s*\[\s[ xX]\s*\]\s*(.+)", line)
+            if m:
+                pending.append(m.group(1).strip())
+        if pending:
+            waiting_jds.append((md.stem, pending))
+
+    if not waiting_jds:
+        info["details"] = "无等待中的 JD"
+        return info
+
+    # 找哪些 JD 在等当前项目
+    matched = []
+    for jd_name, pending in waiting_jds:
+        for p in pending:
+            # 项目名可能是 pending 行的子串，反之亦然
+            if project_name.lower() in p.lower() or p.lower() in project_name.lower():
+                matched.append((jd_name, pending))
+                break
+
+    if matched:
+        lines = [f"项目「{project_name}」被 {len(matched)} 个 JD 在等："]
+        for jd_name, pending in matched:
+            remaining = [p for p in pending if project_name.lower() not in p.lower()]
+            if remaining:
+                lines.append(f"  ⏳ {jd_name} → 还在等: {', '.join(remaining)}")
+                lines.append(f"     → 要不要把下一个排进队列？")
+            else:
+                lines.append(f"  ✅ {jd_name} → 等的项目全齐了，可以去求职侧出简历")
+        info["details"] = "；".join(lines)
+        info["status"] = "JOB_HANDOFF"
+    else:
+        info["details"] = f"有 {len(waiting_jds)} 个 JD 在等其他项目，与本项目无关"
+    return info
+
+
 def main():
     ap = argparse.ArgumentParser(description="工作流完成门禁检查")
     ap.add_argument("project_dir", help="项目目录，如 projects/xxx")
@@ -454,12 +517,14 @@ def main():
     board_result = check_board_consistency(root)
     log_gap_result = check_log_gap(root)
     mapping_result = check_mapping(root, created_date)
+    job_handoff_result = check_job_handoff(project_name)
     results.append(ledger_result)
     results.append(board_result)
     results.append(log_gap_result)
     results.append(mapping_result)
+    results.append(job_handoff_result)
     failed = [r for r in results
-              if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING")]
+              if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING", "JOB_HANDOFF")]
 
     # 建议回退到的步骤：第一个失败项按 path 反查 gate_items（含翻新 items）
     suggested_fallback = None
@@ -490,6 +555,7 @@ def main():
                 "BOARD_STALE": "🔴",
                 "BOARD_FRESH_WARNING": "🟡",
                 "LOG_GAP_WARNING": "🟡",
+                "JOB_HANDOFF": "📮",
                 "LEDGER_OPEN": "🔴",
                 "MAPPING_MISSING": "🔴",
                 "MAPPING_EMPTY": "🔴",
@@ -513,6 +579,8 @@ def main():
                 line += f"  [看板可能未回写：{r.get('details','')}]"
             elif r["status"] == "LOG_GAP_WARNING":
                 line += f"  [失败日志缺口（不阻塞）：{r.get('details','')}]"
+            elif r["status"] == "JOB_HANDOFF":
+                line += f"  [求职侧联动：{r.get('details','')}]"
             elif r["status"] == "LEDGER_OPEN":
                 line += f"  [台账未收敛：{r.get('details','')}]"
             elif r["status"] in ("MAPPING_MISSING", "MAPPING_EMPTY", "MAPPING_STRUCTURE", "MAPPING_NOT_READY"):
