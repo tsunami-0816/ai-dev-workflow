@@ -68,6 +68,7 @@ AI 生成代码的经典安全问题，靠第 8 步功能测试**测不出来**�
 ## 六、依赖与组件安全
 22. 所有依赖版本是否真实存在（配合 dependency_checker.py 脚本验证）
 23. 依赖是否包含已知高危 CVE（可运行 pip-audit / npm audit / safety）
+    - **npm audit 国内镜像坑**：npmmirror（淘宝镜像）不支持 audit 接口，直接跑会报 `NOT_IMPLEMENTED`。必须显式切官方 registry：`npm audit --registry=https://registry.npmjs.org`（来源：nestjs-agent-workbench 2026-11-08）
 24. 是否使用了已废弃、不再维护的库
 
 ## 七、部署与配置安全

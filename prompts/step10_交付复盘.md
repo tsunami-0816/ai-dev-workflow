@@ -33,6 +33,19 @@
 
 ---
 
+## 10.5 GitHub 推送前 .gitignore 必查（强制）
+
+> 实测 nestjs-agent-workbench 项目根目录和 frontend/ 缺 .gitignore，差点把 node_modules/.env 推上去。
+
+push 到 GitHub 前必须确认三处 .gitignore 存在且包含 `node_modules/`、`.env`、`dist/`、`__pycache__/`、`.pytest_cache/`：
+- 项目根目录 `.gitignore`
+- `backend/`（或后端代码目录）`.gitignore`
+- `frontend/`（或前端代码目录）`.gitignore`
+
+跑一遍 `git status` 确认 `.env`、`node_modules/` 不在 untracked 列表里。`.env.example`（占位符模板）可以提交，真实 `.env` 必须不提交。
+
+---
+
 ## 10.7 环境收尾（强制，交付的最后一步）
 
 > 开发/测试期起的服务不关，会一直占内存与端口，污染下一个项目的环境预检与端口分配。

@@ -79,6 +79,14 @@
 
 **输出物**：台账状态更新（`verified` / `open`）+ 「轮次日志」一行
 
+---
+
+## 7.4 常见坑（来自历史项目踩坑，避坑用）
+
+1. **PowerShell 下 WS 客户端脚本 stdout 被吞**：node/python WS 脚本在 PowerShell 里 `console.log`/`print` 输出可能完全看不到，但服务端消息已处理。**不要先纠结客户端脚本为什么没输出，直接查 DB（`SELECT * FROM messages ORDER BY id DESC LIMIT 5`）验证服务端是否已写库**。库有数据 → 客户端 stdout 问题，不是服务端问题。（来源：nestjs-agent-workbench 2026-11-08）
+2. **WS chunk 必须按 conversationId 过滤**：一个浏览器 tab 可能同时连多个对话，服务端广播所有 chunk，前端不过滤会把别的对话的 token 拼到当前气泡上。
+3. **手动 `close()` 后 onclose 仍会异步触发重连**：前端 WS 客户端带自动重连时，手动关闭（退出登录）必须先把 `onclose` 回调置 null，否则 onclose 异步触发会重新起重连定时器。
+
 > **P1 记账前置（强制）**：任何一条 **P1** 问题在台账里改 `verified` 之前，必须先运行
 > `python scripts/log_failure.py <项目目录> --step 7 --category "<类别>" ... --rule R10`
 > 写入 `_失败日志.md`。没记失败日志的 P1 不许标 `verified`（第 10 步复盘与门禁 `LOG_GAP_WARNING` 会比对台账 P1 数 vs 失败日志条数）。
