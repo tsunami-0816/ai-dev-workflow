@@ -72,13 +72,17 @@ def _cell(value: str) -> str:
     return value.strip().strip("*").strip()
 
 
-def _load_baseline_criteria(root: Path) -> set[str]:
-    """读基线说明书里的 criterion_id（C01…）；基线缺失或无编号返回空集（历史项目豁免）。"""
+def _load_baseline_criteria(root: Path) -> tuple[set[str], bool]:
+    """读基线说明书里的 criterion_id（C01…）。
+
+    返回 (criteria, baseline_missing)：文件不存在 → (set(), True) 由调用方显式告警，
+    不再静默当成「历史项目豁免」；文件存在但无 C 编号 → (set(), False)（历史项目豁免）。
+    """
     base = root / DEFAULT_BASELINE_PATH
     if not base.exists():
-        return set()
+        return set(), True
     text = base.read_text(encoding="utf-8", errors="ignore")
-    return set(CRITERION_RE.findall(text))
+    return set(CRITERION_RE.findall(text)), False
 
 
 def _classify(status_raw: str) -> str:
@@ -146,6 +150,8 @@ def check_project(project_dir: str | Path, stage: str = "10",
         "criterion_unmapped": [],
         "criterion_dangling": [],
         "criterion_warning": "",
+        "baseline_missing": False,
+        "baseline_warning": "",
         "mapping_path": str(path),
     }
 
@@ -240,9 +246,17 @@ def check_project(project_dir: str | Path, stage: str = "10",
         blockers = 0
 
     # G8：stage10 核对基线 criterion 100% 挂接（基线无 C 编号时跳过，历史项目豁免）
+    baseline_missing = False
     if delivery:
-        base_crits = _load_baseline_criteria(root)
-        if base_crits:
+        base_crits, baseline_missing = _load_baseline_criteria(root)
+        result["baseline_missing"] = baseline_missing
+        if baseline_missing:
+            # 基线缺失不再静默跳过：显式告警；G8 转 strict 后按 criterion 逻辑阻塞
+            result["baseline_warning"] = (
+                "缺少 01_项目基线说明书.md，G8 指标挂接核对无基线可依（BASELINE_MISSING）"
+            )
+            gates.record_observation(root, "criterion_mapping", 1)
+        elif base_crits:
             if "验收指标" not in idx:
                 result["status"] = "MAPPING_STRUCTURE"
                 result["details"] = "基线含 C 编号指标，但映射表缺「验收指标」列（G8 挂接列）"
@@ -282,6 +296,9 @@ def check_project(project_dir: str | Path, stage: str = "10",
             shown += "…"
         result["details"] = (f"{result['evidence_missing']} 条 ✅ 行「验证证据」为空/占位"
                              f"（交付阶段必须写实测证据：{shown}）")
+    elif baseline_missing and (strict_criterion or gates.is_strict("criterion_mapping")):
+        result["status"] = STATUS_CRITERION
+        result["details"] = result["baseline_warning"]
     elif result["criterion_unmapped"] or result["criterion_dangling"]:
         parts = []
         if result["criterion_unmapped"]:
@@ -349,6 +366,10 @@ def main():
             if r.get("criterion_warning"):
                 print(f"⚠️ G8 指标挂接待核（旁路观察期，未阻塞）：{r['criterion_warning']}")
                 print("   观察期内先记录；连续一个项目无误报后加 --strict-criterion 转阻塞闸。")
+            if r.get("baseline_warning"):
+                print(f"⚠️ {r['baseline_warning']}")
+                print("   补法：按第 1 步产出基线说明书并给关键指标编 C01… 编号；"
+                      "G8 转阻塞后缺失将直接判红。")
         print("口径：❌未实现 = 设计里有、代码里没有；⚠️已实现未验证 = 写了但没按用户操作路径跑通过；"
               "✂️砍掉 = 必须附「砍掉依据」并已写进设计书 §8/基线排除范围。")
     sys.exit(0 if r["status"] == "OK" else 1)

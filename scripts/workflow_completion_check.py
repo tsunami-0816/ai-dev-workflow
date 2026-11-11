@@ -105,6 +105,7 @@ def _gate_item(art: dict, step: dict, is_refurbish: bool) -> dict:
         "optional": bool(art.get("optional")),
         "mode": art.get("mode") or "",
         "requires_frontend": bool(art.get("requires_frontend")),
+        "requires_http_api": bool(art.get("requires_http_api")),
     }
 
 
@@ -176,6 +177,17 @@ def _normalize_design_mode(board_mode: str) -> str:
     if "精修" in text:
         return "精修"
     return ""
+
+
+def _has_http_api(project_root: Path) -> bool:
+    """看板「接口形态」为二进制/非 HTTP 时返回 False；缺失默认 True（保守要求）。"""
+    board = project_root / "_项目状态.md"
+    if not board.exists():
+        return True
+    text = board.read_text(encoding="utf-8", errors="ignore")
+    if re.search(r"接口形态\*{0,2}[：:]\s*(二进制|非\s*HTTP|Protobuf|KCP|WebSocket-only)", text):
+        return False
+    return True
 
 
 def _has_frontend(project_root: Path) -> bool:
@@ -289,6 +301,13 @@ def check_one(project_root: Path, item: dict) -> dict:
     # 项目无前端时直接跳过，不判 MISSING；仍允许补「不适用登记占位」文件留痕。
     if item.get("requires_frontend") and not _has_frontend(project_root):
         result["skipped"] = "纯后端项目无前端工程，该产物不适用，跳过"
+        result["details"] = result["skipped"]
+        result["status"] = "OK"
+        return result
+
+    # 非 HTTP 接口形态（二进制/Protobuf/KCP 等）：无 OpenAPI 可导出，跳过（#98 补口）
+    if item.get("requires_http_api") and not _has_http_api(project_root):
+        result["skipped"] = "看板接口形态非 HTTP，无 OpenAPI 可导出，跳过"
         result["details"] = result["skipped"]
         result["status"] = "OK"
         return result

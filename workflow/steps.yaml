@@ -52,7 +52,13 @@ steps:
     fallback: ["1"]
     # G1 输入卡（typed handoff）；校验脚本 scripts/input_card_check.py，历史项目豁免
     input_card: 01_项目基线说明书.md.input_card.yaml
-    artifacts: []
+    artifacts:
+      - path: 01_项目基线说明书.md
+        label: step1 项目基线说明书
+        keywords: ["基线", "指标", "排除范围"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 200
+        launch_date: "2026-11-11"
 
   - id: "2"
     name: 技术架构设计
@@ -60,14 +66,28 @@ steps:
     prompt: step02_技术架构设计.md
     fallback: ["1", "2"]
     input_card: 02_架构设计/input_card.yaml
-    artifacts: []
+    artifacts:
+      - path: 02_架构设计/第一轮技术架构设计文档.md
+        alt: ["02_架构设计/第二轮技术架构设计文档.md"]
+        label: step2 技术架构设计文档
+        keywords: ["架构", "选型"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 300
+        launch_date: "2026-11-11"
 
   - id: "3"
     name: 架构评审卡点
     owner: human
     prompt: step03_架构评审卡点.md
     fallback: ["1", "2", "3"]
-    artifacts: []
+    artifacts:
+      - path: 03_评审报告/第一轮架构评审报告.md
+        alt: ["03_评审报告/第二轮架构复审报告.md"]
+        label: step3 架构评审报告
+        keywords: ["评审", "结论"]
+        forbid: ["待补", "TODO", "结论：不通过"]
+        min_bytes: 200
+        launch_date: "2026-11-11"
 
   - id: "4"
     name: 任务拆解与开发规范
@@ -76,7 +96,13 @@ steps:
     prompt: step04_任务拆解与开发规范.md
     fallback: ["3", "4"]
     input_card: 04_任务拆解与开发规范.md.input_card.yaml
-    artifacts: []
+    artifacts:
+      - path: 04_任务拆解与开发规范.md
+        label: step4 任务拆解与开发规范
+        keywords: ["任务", "开发规范"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 300
+        launch_date: "2026-11-11"
 
   - id: "5A"
     name: 后端开发
@@ -157,8 +183,8 @@ steps:
         label: step6.5 接口契约（OpenAPI 导出）
         keywords: []
         min_bytes: 100
-        # #98 纯后端/私有二进制协议（Protobuf/KCP 等）无 HTTP 路由可导出 OpenAPI，自动跳过；契约载体见契约校验记录
-        requires_frontend: true
+        # #98 纯后端覆盖不到「二进制/私有协议」：看板「接口形态」非 HTTP 时无 OpenAPI 可导出，自动跳过
+        requires_http_api: true
       - path: 06.5_契约/契约校验记录.md
         label: step6.5 契约校验结果记录
         keywords: ["通过", "PASS", "0 个臆造", "无臆造", "一致"]
@@ -274,15 +300,32 @@ steps:
     owner: agent
     prompt: step10_简历适配.md
     fallback: ["10.6"]
-    # 不入门禁：历史项目（门禁上线前完成）没有这两份产物，硬查会把它们判红
-    artifacts: []
+    artifacts:
+      - path: 10_交付/简历项目描述.md
+        label: step10.6 简历项目描述
+        keywords: ["项目", "简历"]
+        forbid: ["待补", "TODO", "虚构"]
+        min_bytes: 200
+        launch_date: "2026-11-11"
+      - path: 10_交付/面试问答库.md
+        label: step10.6 面试问答库
+        keywords: ["面试", "问答"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 200
+        launch_date: "2026-11-11"
 
   - id: "11"
     name: 工作流自迭代
     owner: human
     prompt: step11_工作流自迭代.md
     fallback: ["11"]
-    artifacts: []
+    artifacts:
+      - path: 10_交付/工作流自迭代报告.md
+        label: step11 工作流自迭代报告
+        keywords: ["自迭代", "优化点", "机器校验"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 300
+        launch_date: "2026-11-11"
 
 # ---------- 翻新线步骤（F0~F4） ----------
 # 定位与设计见 WORKFLOW_翻新线设计.md；WORKFLOW_步骤定义.md 同步有翻新线步骤表
@@ -343,6 +386,8 @@ steps:
         forbid: ["未检测", "脚本异常", "待补", "TODO"]
         launch_date: "2026-11-04"
         min_bytes: 60
+        # 纯后端翻新项目无前端，不要求交 UI 报告
+        requires_frontend: true
 
   - id: "F3"
     name: 返修

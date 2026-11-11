@@ -268,3 +268,96 @@ def test_gate_forbid_no_false_positive_on_history():
                 )
                 checked += 1
     assert checked > 0, "没有检查到任何历史产物，用例本身失效"
+
+
+# ---------- 5. 新增产物按创建日期豁免 + 接口形态/前端降级 + G8 基线缺失 ----------
+
+def _write_board(root: Path, *lines: str):
+    (root / "_项目状态.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _item(path: str, **extra) -> dict:
+    base = {"path": path, "keywords": [], "forbid": [], "min_bytes": 10}
+    base.update(extra)
+    return base
+
+
+def test_gate_new_project_requires_resume_artifacts(tmp_path):
+    """2026-11-11 起创建的项目：缺简历产物 / 自迭代报告必须判 MISSING"""
+    import workflow_completion_check as gate
+
+    _write_board(tmp_path, "- 创建日期：2026-11-11")
+    resume = gate._gate_item(
+        _item("10_交付/简历项目描述.md", launch_date="2026-11-11"),
+        {"id": "10.6", "fallback": ["10.6"]}, False,
+    )
+    assert gate.check_one(tmp_path, resume)["status"] == "MISSING"
+
+    retro = gate._gate_item(
+        _item("10_交付/工作流自迭代报告.md", launch_date="2026-11-11"),
+        {"id": "11", "fallback": ["11"]}, False,
+    )
+    assert gate.check_one(tmp_path, retro)["status"] == "MISSING"
+
+
+def test_gate_old_project_exempts_new_artifacts(tmp_path):
+    """创建日期早于上线日：同样缺文件应 OK + skipped，不判红"""
+    import workflow_completion_check as gate
+
+    _write_board(tmp_path, "- 创建日期：2026-11-01")
+    item = gate._gate_item(
+        _item("10_交付/简历项目描述.md", launch_date="2026-11-11"),
+        {"id": "10.6", "fallback": ["10.6"]}, False,
+    )
+    r = gate.check_one(tmp_path, item)
+    assert r["status"] == "OK" and r.get("skipped"), r
+
+
+def test_gate_openapi_skipped_for_non_http(tmp_path):
+    """看板接口形态=二进制时跳过 OpenAPI；HTTP 或缺省则必须交"""
+    import workflow_completion_check as gate
+
+    item = gate._gate_item(
+        _item("06.5_契约/openapi.json", requires_http_api=True),
+        {"id": "6.5", "fallback": ["6.5"]}, False,
+    )
+    _write_board(tmp_path, "- **接口形态**：二进制")
+    r = gate.check_one(tmp_path, item)
+    assert r["status"] == "OK" and "非 HTTP" in r.get("skipped", ""), r
+
+    _write_board(tmp_path, "- **接口形态**：HTTP")
+    assert gate.check_one(tmp_path, item)["status"] == "MISSING"
+
+
+def test_gate_f2_ui_report_skipped_without_frontend(tmp_path):
+    """纯后端翻新项目不要求交前端 UI 报告"""
+    import workflow_completion_check as gate
+
+    item = gate._gate_item(
+        _item("F2_体检/前端UI质量报告.md", requires_frontend=True),
+        {"id": "F2", "fallback": ["F2"]}, True,
+    )
+    _write_board(tmp_path, "- **路线**：翻新\n- 本项目无前端")
+    r = gate.check_one(tmp_path, item)
+    assert r["status"] == "OK" and r.get("skipped"), r
+
+
+def test_g8_baseline_missing_is_warned(tmp_path):
+    """基线缺失不再静默豁免：旁路观察期告警，strict 转阻塞"""
+    from design_impl_check import check_project
+
+    root = tmp_path / "proj"
+    root.mkdir()
+    (root / "_设计实施映射表.md").write_text(
+        "| 编号 | 设计来源 | 设计项（功能/链路） | 验收指标 | 端到端链路 | 用户操作路径 | 实现落点 | 状态 | 验证证据 |\n"
+        "|---|---|---|---|---|---|---|---|---|\n"
+        "| D-01 | 架构 | 链路A | — | 输入→处理→输出 | 路径 | backend/a.py | ✅已实现已验证 | curl /x 200 |\n",
+        encoding="utf-8",
+    )
+    r = check_project(root, stage="10", min_rows=0)
+    assert r["status"] == "OK", r
+    assert "BASELINE_MISSING" in r["baseline_warning"]
+
+    strict = check_project(root, stage="10", min_rows=0, strict_criterion=True)
+    assert strict["status"] == "MAPPING_CRITERION", strict
+    assert "BASELINE_MISSING" in strict["details"]

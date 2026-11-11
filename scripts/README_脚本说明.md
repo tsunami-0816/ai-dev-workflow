@@ -94,7 +94,7 @@ python scripts/api_contract_validator.py check <openapi.json> <前端目录> \
 第 8 步生成测试用例时，让 AI **同时输出 p0_cases.json**（格式见脚本 docstring），你本地跑：
 
 ```bash
-python scripts/p0_regression_test.py projects/生产异常答疑AI助手/08_测试/cases/p0_cases.json
+python scripts/p0_regression_test.py projects/生产异常答疑AI助手/08_测试/p0_cases.json
 ```
 
 输出逐条通过/失败 + `p0_cases_report.json` 报告。修复后重跑一遍即完成回归，不再手点。

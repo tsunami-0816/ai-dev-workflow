@@ -114,7 +114,7 @@ wf check contract export http://127.0.0.1:8000/openapi.json ./openapi.json
 wf check contract check ./openapi.json ./projects/my-project/05_代码/frontend
 
 # P0 自动化回归测试
-wf check regression ./projects/my-project/08_测试/cases/p0_cases.json
+wf check regression ./projects/my-project/08_测试/p0_cases.json
 ```
 
 ### 失败日志
