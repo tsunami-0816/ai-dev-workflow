@@ -1,0 +1,32 @@
+{
+  "job_title": "AI运营（含界面设计）",
+  "company": "杭州锦鹿网络科技",
+  "hard_stack": [
+    "python",
+    "fastapi",
+    "langgraph",
+    "vue",
+    "typescript",
+    "qdrant",
+    "mysql",
+    "redis",
+    "tailwind",
+    "docker"
+  ],
+  "architecture_skills": [
+    "rag",
+    "agent",
+    "工作流编排",
+    "向量检索",
+    "多轮对话",
+    "反馈闭环"
+  ],
+  "must_have": [
+    "python",
+    "vue",
+    "rag",
+    "agent",
+    "langgraph",
+    "工作流编排"
+  ]
+}

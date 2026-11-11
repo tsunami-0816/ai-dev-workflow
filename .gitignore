@@ -48,6 +48,9 @@ target/
 Thumbs.db
 .screenshots/
 
+# ===== 本地能力库（不入库；prompts/step01 按项目类型加载，缺失时降级）=====
+skills/
+
 # ===== 独立项目（用户其他项目，不计入本工作流仓库）=====
 projects/saas-workflow-agent/
 projects/llm-eval-observability/
@@ -63,3 +66,7 @@ projects/SparrowScheduler/
 # 已交付项目（各自独立仓库，不入工作流仓库）
 projects/nestjs-agent-workbench/
 projects/shopmate-ai/
+projects/cpp-game-server-kit/
+
+# ===== 本地工具记忆（不入库）=====
+.workbuddy/

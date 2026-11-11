@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JD 技能点对账器（step00.5 卡点2 机器校验）
+JD 技能点对账器（step00 设计书机器闸门，WORKFLOW_卡点协议.md「机器闸门」表）
 专治「JD 要 Kafka，设计书里只写了个 Kafka 名字就算覆盖」。
 
 使用方法：
@@ -67,7 +67,7 @@ ALIAS = {
     "jenkins": ["jenkins"],
     "github actions": ["github actions", "gh actions", "github-actions"],
     "ci/cd": ["ci/cd", "cicd", "ci cd", "持续集成"],
-    "restful": ["restful", "rest", "restful api"],
+    "restful": ["restful", "rest", "restful api", "rest api"],
     "graphql": ["graphql"],
     "websocket": ["websocket", "web socket"],
     "jwt": ["jwt", "json web token"],
@@ -85,13 +85,41 @@ ALIAS = {
     "rag": ["rag", "检索增强", "retrieval-augmented"],
     "向量数据库": ["向量库", "向量数据库", "qdrant", "milvus", "chroma", "weaviate"],
     "langchain": ["langchain"],
-    "llm": ["llm", "大模型", "gpt", "deepseek", "通义"],
+    "langgraph": ["langgraph"],
+    "llm": ["llm", "大模型", "gpt", "deepseek", "通义", "qwen", "qwen-flash", "百炼"],
     "openai": ["openai", "gpt"],
     "fastapi": ["fastapi"],
     "springboot": ["spring boot", "springboot"],
-    "vue": ["vue"],
+    "vue": ["vue", "vue3", "vue.js", "vue js"],
+    "vue3": ["vue3", "vue"],
     "react": ["react"],
+    "typescript": ["typescript", "ts"],
+    "node.js": ["node.js", "nodejs", "node js"],
+    "nestjs": ["nestjs", "nest", "@nestjs"],
+    "tauri": ["tauri"],
     "streamlit": ["streamlit"],
+    # 权限与安全
+    "rbac": ["rbac", "权限控制", "角色权限", "权限管理"],
+    "sso": ["sso", "单点登录"],
+    # 前端框架与可视化
+    "element plus": ["element plus", "element-plus", "element-ui", "element ui"],
+    "element-ui": ["element-ui", "element plus", "element-ui"],
+    "ant design": ["ant design", "antd", "ant-design"],
+    "antv x6": ["antv x6", "antv", "x6", "@antv/x6"],
+    "echarts": ["echarts"],
+    "pinia": ["pinia"],
+    "vite": ["vite"],
+    "tailwind": ["tailwind", "tailwindcss", "tailwind css"],
+    # Go 生态
+    "gin": ["gin", "gin-gonic"],
+    "gorm": ["gorm"],
+    "etcd": ["etcd"],
+    # 工程与工具
+    "swagger": ["swagger", "openapi", "openapi.json"],
+    "openapi": ["openapi", "swagger"],
+    "maven": ["maven"],
+    "npm": ["npm"],
+    "docker compose": ["docker compose", "docker-compose", "dockercompose"],
 }
 
 
@@ -321,5 +349,16 @@ def main():
     return 0
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     sys.exit(main())

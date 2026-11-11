@@ -14,6 +14,7 @@
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -22,6 +23,18 @@ STEPS_FILE = Path(__file__).resolve().parent.parent / "workflow" / "steps.yaml"
 QUEUE_FILE = Path(__file__).resolve().parent.parent / "WORKFLOW_项目队列.md"
 # 门禁上线日期：此日期前创建的项目，台账/10.6 为可选；之后的必查（方案 A，按创建日期切分）
 GATE_LAUNCH_DATE = "2026-10-29"
+# 产物内容闸门默认值（steps.yaml 单个 artifact 可用 min_bytes 覆盖）
+DEFAULT_MIN_BYTES = 32
+# forbid 语境豁免词（#97）：命中禁词的同一行若含下列语境标记，视为「如实归属技术债 / 已修复根因 / 占位口径」，
+# 不判结论性否定；只禁 Review 未通过 / 主流程未通 / P0 未清零 这类结论。
+FORBID_CONTEXT_EXEMPT = [
+    "deferred", "技术债", "已修复", "已改", "回归通过", "瑕疵", "根因", "历史瑕疵",
+    "无 todo", "占位", "如实", "未验证", "边界", "降级", "砍除", "未做", "诚实", "标注",
+]
+# 看板「创建日期」兼容两种写法：
+#   创建日期：2026-11-02
+#   创建日期：**2026-11-02**（翻新建档）      ← 粗体 + 后缀说明，必须照样抓到日期
+CREATE_DATE_RE = re.compile(r"创建日期[：:]\s*\**\s*(\d{4}-\d{2}-\d{2})")
 
 
 def _parse_date(s: str) -> str:
@@ -31,14 +44,12 @@ def _parse_date(s: str) -> str:
 
 
 def _read_project_create_date(pdir: Path) -> str:
-    """从项目看板的「创建日期」行取 YYYY-MM-DD。取不到返回 None。"""
+    """从项目看板取「创建日期」YYYY-MM-DD（兼容 `创建日期：**2026-11-02**（翻新建档）`）。取不到返回 None。"""
     board = pdir / "_项目状态.md"
     if not board.exists():
         return None
-    for line in board.read_text(encoding="utf-8", errors="ignore").splitlines():
-        if "创建日期" in line:
-            return _parse_date(line)
-    return None
+    m = CREATE_DATE_RE.search(board.read_text(encoding="utf-8", errors="ignore"))
+    return m.group(1) if m else None
 
 
 def _is_exempt(root: Path, project_name: str) -> tuple[bool, str]:
@@ -79,10 +90,34 @@ def load_steps() -> list:
     return load_config().get("steps") or []
 
 
+def _gate_item(art: dict, step: dict, is_refurbish: bool) -> dict:
+    """把 steps.yaml 的一条 artifact 展开成门禁检查项（含内容闸门扩展键，缺省不启用）。"""
+    return {
+        "path": art["path"],
+        "alt": art.get("alt") or [],
+        "label": art.get("label", art["path"]),
+        "keywords": art.get("keywords") or [],
+        "launch_date": art.get("launch_date") or step.get("launch_date") or "",
+        "fallback_steps": step.get("fallback") or [step["id"]],
+        "is_refurbish": is_refurbish,
+        "min_bytes": art.get("min_bytes", DEFAULT_MIN_BYTES),
+        "forbid": art.get("forbid") or [],
+        "optional": bool(art.get("optional")),
+        "mode": art.get("mode") or "",
+        "requires_frontend": bool(art.get("requires_frontend")),
+    }
+
+
 def load_gate_items() -> list:
     """从 steps.yaml 展开门禁检查项：(路径, 说明, 关键字, 回退步骤)。
     F0/F1/F2 为翻新线专属步骤，仅当项目看板「路线=翻新」时返回其 artifacts。
-    生产线项目（路线=生产或缺省）自动跳过 F0~F2。"""
+    生产线项目（路线=生产或缺省）自动跳过 F0~F2。
+
+    artifact 可选内容闸门键（缺省不启用）：
+      - min_bytes：文件最小字节数，默认 32；小于判 EMPTY
+      - forbid：禁用内容子串列表，命中任一判 NEGATIVE
+      - optional + mode：仅当看板「设计模式」含 mode 时才要求该产物，否则返回 OK+skipped
+    """
     items = []
     for step in load_steps():
         step_id = str(step["id"])
@@ -91,15 +126,7 @@ def load_gate_items() -> list:
             # 翻新线步骤的 artifacts 不在此处无条件展开——由 main() 按路线字段二次过滤
             continue
         for art in step.get("artifacts") or []:
-            items.append({
-                "path": art["path"],
-                "alt": art.get("alt") or [],
-                "label": art.get("label", art["path"]),
-                "keywords": art.get("keywords") or [],
-                "launch_date": art.get("launch_date") or step.get("launch_date") or "",
-                "fallback_steps": step.get("fallback") or [step["id"]],
-                "is_refurbish": False,
-            })
+            items.append(_gate_item(art, step, is_refurbish=False))
     return items
 
 
@@ -111,15 +138,7 @@ def load_refurbish_gate_items() -> list:
         if not step_id.startswith("F"):
             continue
         for art in step.get("artifacts") or []:
-            items.append({
-                "path": art["path"],
-                "alt": art.get("alt") or [],
-                "label": art.get("label", art["path"]),
-                "keywords": art.get("keywords") or [],
-                "launch_date": art.get("launch_date") or step.get("launch_date") or "",
-                "fallback_steps": step.get("fallback") or [step["id"]],
-                "is_refurbish": True,
-            })
+            items.append(_gate_item(art, step, is_refurbish=True))
     return items
 
 
@@ -133,6 +152,53 @@ def _read_project_route(project_root: Path) -> str:
     return m.group(1) if m else "生产"
 
 
+def _read_design_mode(project_root: Path) -> str:
+    """读看板「设计模式」字段（如「普通模式（R24）」「精修模式」）。取不到返回空串。"""
+    board = project_root / "_项目状态.md"
+    if not board.exists():
+        return ""
+    text = board.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r"设计模式\*{0,2}[：:]\s*(.+)", text)
+    return m.group(1).strip().strip("*").strip() if m else ""
+
+
+def _normalize_design_mode(board_mode: str) -> str:
+    """把看板设计模式说明归一化为枚举取值「精修」/「普通」/空（#99 精确匹配，不再子串包含）。
+
+    否定语境优先：「无 UI 精修需求」「不精修」「非精修」「普通」都归普通，
+    避免说明文字里出现「精修」二字就被误判成精修模式。
+    """
+    if not board_mode:
+        return ""
+    text = board_mode
+    if re.search(r"无\s*UI?\s*精修|不精修|非精修|普通", text):
+        return "普通"
+    if "精修" in text:
+        return "精修"
+    return ""
+
+
+def _has_frontend(project_root: Path) -> bool:
+    """判断项目是否带前端工程（#98）。
+
+    依据看板：5B 前端开发行状态为「不适用」，或看板明确写「本项目无前端 / 无前端工程」→ 纯后端，返回 False；
+    其余默认 True（保守：拿不准时仍按有前端查产物）。
+    """
+    board = project_root / "_项目状态.md"
+    if not board.exists():
+        return True
+    text = board.read_text(encoding="utf-8", errors="ignore")
+    if re.search(r"本项目无前端|无前端工程|纯后端", text):
+        return False
+    # 5B 行：`| 5B | 前端开发 | 不适用 | ...`
+    for line in text.splitlines():
+        if line.strip().startswith("|") and "5B" in line and "前端" in line:
+            cells = [c.strip() for c in line.split("|")[1:-1]]
+            if len(cells) >= 3 and cells[2] in ("不适用", "跳过", "N/A"):
+                return False
+    return True
+
+
 # 必交产物（由 workflow/steps.yaml 生成，改清单请改 yaml）
 GATE_ITEMS = load_gate_items()
 # 问题台账配置（同文件 ledger: 段）
@@ -142,16 +208,51 @@ MAPPING = load_config().get("mapping") or {}
 
 
 def _project_created_date(project_root: Path) -> str:
-    """读看板「创建日期」，用于按上线日豁免历史项目的新增产物（同 mapping.launch_date 口径）。"""
+    """读看板「创建日期」，用于按上线日豁免历史项目的新增产物（同 mapping.launch_date 口径）。
+    兼容粗体写法 `创建日期：**2026-11-02**（翻新建档）`——此前只认无粗体，导致翻新项目豁免失效。"""
     board = project_root / "_项目状态.md"
     if not board.exists():
         return ""
     text = board.read_text(encoding="utf-8", errors="ignore")
-    m = re.search(r"创建日期[：:]\s*(\d{4}-\d{2}-\d{2})", text)
+    m = CREATE_DATE_RE.search(text)
     return m.group(1) if m else ""
 
 
+def _scan_forbid(content: str, forbids: list[str]) -> list[str]:
+    """逐行扫 forbid 词（#97）：命中行若带豁免语境（技术债/已修复/如实标注/占位等），不计结论性否定。
+
+    跨语境不豁免——只看命中词所在那一行；返回去重后的命中禁词列表。
+    """
+    hits = []
+    for line in content.splitlines():
+        low_line = line.lower()
+        matched = [f for f in forbids if f in line or f.lower() in low_line]
+        if not matched:
+            continue
+        if any(ctx in low_line for ctx in FORBID_CONTEXT_EXEMPT):
+            continue
+        hits.extend(matched)
+    # 去重保序
+    seen = set()
+    uniq = []
+    for h in hits:
+        if h not in seen:
+            seen.add(h)
+            uniq.append(h)
+    return uniq
+
+
 def check_one(project_root: Path, item: dict) -> dict:
+    """校验单个产物：存在 + 体积 + 关键字（+ 禁用内容 / 可选模式）。
+
+    返回 status：
+      OK              通过（可带 skipped 说明为何跳过内容校验）
+      MISSING         文件不存在
+      EMPTY           文件小于 min_bytes（默认 32B）
+      NO_KEYWORD      未命中任一 keywords（keywords 为空时不查）
+      NEGATIVE        命中 forbid 中任一禁用内容（如「P0 未清零」「未通过」）
+      READ_ERROR      文件读取失败
+    """
     # path 是主路径，alt 是历史项目可能用的旧路径（任一存在即算落盘）
     candidates = [item["path"]] + list(item.get("alt") or [])
     path = project_root / item["path"]
@@ -159,14 +260,38 @@ def check_one(project_root: Path, item: dict) -> dict:
         if (project_root / c).exists():
             path = project_root / c
             break
+    try:
+        min_bytes = int(item.get("min_bytes", DEFAULT_MIN_BYTES))
+    except (TypeError, ValueError):
+        min_bytes = DEFAULT_MIN_BYTES
     result = {
         "path": item["path"],
         "label": item["label"],
         "exists": path.exists(),
         "size": path.stat().st_size if path.exists() else 0,
+        "min_bytes": min_bytes,
         "keywords_hit": None,
+        "forbid_hit": None,
         "status": "MISSING",
     }
+
+    # 可选产物：只有看板「设计模式」等于指定模式时才要求（#99 精确匹配枚举，不再子串包含）
+    optional_mode = (item.get("mode") or "").strip() if item.get("optional") else ""
+    if optional_mode:
+        board_mode = _read_design_mode(project_root)
+        if _normalize_design_mode(board_mode) != optional_mode:
+            result["skipped"] = f"看板「设计模式」为「{board_mode or '未填'}」，非{optional_mode}模式，跳过"
+            result["details"] = result["skipped"]
+            result["status"] = "OK"
+            return result
+
+    # 纯后端不适用产物（#98）：前端 UI / taste / OpenAPI 等 requires_frontend 条目，
+    # 项目无前端时直接跳过，不判 MISSING；仍允许补「不适用登记占位」文件留痕。
+    if item.get("requires_frontend") and not _has_frontend(project_root):
+        result["skipped"] = "纯后端项目无前端工程，该产物不适用，跳过"
+        result["details"] = result["skipped"]
+        result["status"] = "OK"
+        return result
 
     # 新增产物带 launch_date：项目创建于上线日之前的，视为历史项目豁免，不判红
     launch = item.get("launch_date") or ""
@@ -175,28 +300,41 @@ def check_one(project_root: Path, item: dict) -> dict:
         if created and created < launch:
             result["status"] = "OK"
             result["skipped"] = f"历史项目（创建于 {created}，早于上线日 {launch}）"
+            result["details"] = result["skipped"]
             return result
 
     if not path.exists():
         result["status"] = "MISSING"
         return result
 
-    if path.stat().st_size < 10:
+    actual_size = path.stat().st_size
+    if actual_size < min_bytes:
         result["status"] = "EMPTY"
+        result["details"] = f"{actual_size}B < 阈值 {min_bytes}B"
         return result
 
     kws = item.get("keywords") or []
-    if kws:
+    forbids = [f for f in (item.get("forbid") or []) if f]
+    if kws or forbids:
         try:
-            content = path.read_text(encoding="utf-8", errors="ignore").lower()
-            hit = [kw for kw in kws if kw.lower() in content]
+            content = path.read_text(encoding="utf-8", errors="ignore")
+        except Exception as e:
+            result["status"] = f"READ_ERROR: {e}"
+            return result
+        low = content.lower()
+        if forbids:
+            forbid_hit = _scan_forbid(content, forbids)
+            result["forbid_hit"] = forbid_hit
+            if forbid_hit:
+                result["status"] = "NEGATIVE"
+                result["details"] = f"命中禁用内容：{'、'.join(forbid_hit[:5])}"
+                return result
+        if kws:
+            hit = [kw for kw in kws if kw.lower() in low]
             result["keywords_hit"] = hit
             if not hit:
                 result["status"] = "NO_KEYWORD"
                 return result
-        except Exception as e:
-            result["status"] = f"READ_ERROR: {e}"
-            return result
 
     result["status"] = "OK"
     return result
@@ -237,27 +375,48 @@ def check_board_consistency(root: Path) -> dict:
     is_closed_word = any(m in text for m in closed_markers)
 
     found_danger = []
-    for marker, desc in danger_markers:
-        if marker in text:
-            # 如果同时有闭环词，且这个 marker 是表格里历史行的"未开始"（已被回写覆盖），不算
-            # 粗判：只看"当前阶段"那一行
+    seen_danger = set()
+
+    def _add(desc: str):
+        if desc not in seen_danger:
+            seen_danger.add(desc)
+            found_danger.append(desc)
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        # 跳过 markdown 标题：段标题（如「## 当前卡点」）是固定模板结构，不是卡点正文
+        if stripped.startswith("#"):
+            continue
+        # 跳过「状态取值：…」枚举说明行：列出合法状态词，不代表当前状态
+        if "状态取值" in stripped:
+            continue
+
+        if stripped.startswith("|"):
+            # 表格行：只解析状态列（第 3 列），产物路径/备注列里的词不算滞后
+            cells = [c.strip() for c in stripped.split("|")[1:-1]]
+            if len(cells) >= 3:
+                state_col = cells[2]
+                path_col = cells[3] if len(cells) >= 4 else ""
+                for marker, desc in danger_markers:
+                    if marker == "当前阶段：**":
+                        continue
+                    if marker in state_col:
+                        # 产物路径列非空 = 产物已登记、看板已回写，仅待人工确认，不算未回写
+                        if path_col:
+                            continue
+                        _add(desc)
+            continue
+
+        # 非表格行：当前阶段行单独判；其余危险词受闭环词豁免大闸
+        for marker, desc in danger_markers:
+            if marker not in line:
+                continue
             if marker == "当前阶段：**":
-                # 提取当前阶段行
-                for line in text.splitlines():
-                    if "当前阶段" in line:
-                        if "已完成" in line or "已交付" in line or "闭环" in line:
-                            break
-                        else:
-                            found_danger.append(desc)
-                        break
-            elif marker == "进行中":
-                # 排除"已完成"行里的"进行中"（如"原标进行中"）
-                # 只在"当前阶段"或"当前卡点"附近找
-                if not is_closed_word:
-                    found_danger.append(desc)
-            else:
-                if not is_closed_word:
-                    found_danger.append(desc)
+                if "已完成" in line or "已交付" in line or "闭环" in line:
+                    break
+                _add(desc)
+            elif not is_closed_word:
+                _add(desc)
 
     if found_danger:
         info["status"] = "BOARD_STALE"
@@ -373,11 +532,13 @@ def check_mapping(root: Path, created_date: str | None) -> dict:
     """
     设计→实施 100% 映射核对（改进建议 #52④ + 用户 2026-10-30 硬要求）。
     上线日（steps.yaml mapping.launch_date）之前创建的项目豁免，避免把历史已交付项目判红。
+    交付阶段（stage 10）：✅ 行必须有「验证证据」（空/—/无/待补/TODO 判 MAPPING_EVIDENCE）；
+    steps.yaml 的 mapping.min_rows 会传给 design_impl_check 做条数下限。
     """
     map_path = MAPPING.get("path") or "_设计实施映射表.md"
     info = {
         "path": map_path,
-        "label": "设计→实施 100% 映射（无 ❌未实现 / ⚠️未验证）",
+        "label": "设计→实施 100% 映射（无 ❌未实现 / ⚠️未验证 / ✅缺证据）",
         "status": "OK",
         "details": "",
         "fallback_steps": MAPPING.get("fallback") or ["4", "5A", "5B", "6"],
@@ -398,9 +559,14 @@ def check_mapping(root: Path, created_date: str | None) -> dict:
         info["details"] = f"无法导入 design_impl_check.py：{e}"
         return info
 
-    r = check_project(root, stage="10", mapping_path=map_path)
+    try:
+        min_rows = int(MAPPING.get("min_rows") or 0)
+    except (TypeError, ValueError):
+        min_rows = 0
+    r = check_project(root, stage="10", mapping_path=map_path, min_rows=min_rows)
     if r["status"] == "OK":
-        info["details"] = f"条目 {r['total']}：✅{r['verified']} / ⚠️{r['unverified']} / ❌{r['missing']} / ✂️{r['cut']}"
+        info["details"] = (f"条目 {r['total']}（min_rows={min_rows}）："
+                           f"✅{r['verified']} / ⚠️{r['unverified']} / ❌{r['missing']} / ✂️{r['cut']}")
     else:
         info["status"] = r["status"]
         info["details"] = r["details"]
@@ -410,8 +576,8 @@ def check_mapping(root: Path, created_date: str | None) -> dict:
 def check_job_handoff(project_name: str) -> dict:
     """
     求职侧联动（2026-11-07 新增，用户硬要求）：
-    项目做完后，扫 D:\\lg\\resume\\JD仓库\\ 下所有状态为「⏳等项目」的 JD，
-    看有没有 JD 在等当前这个项目。有就提示去求职侧推进，没有就静默通过。
+    项目做完后，扫 JD 仓库下所有状态为「⏳等项目」的 JD，看有没有在等当前项目。
+    JD 仓库路径由环境变量 WORKFLOW_JD_REPO 指定；未配置则静默跳过（不写死本机路径）。
     INFO 级，不阻塞门禁。
     """
     info = {
@@ -420,9 +586,13 @@ def check_job_handoff(project_name: str) -> dict:
         "status": "OK",
         "details": "",
     }
-    jd_dir = Path(r"D:\lg\resume\JD仓库")
+    jd_env = os.environ.get("WORKFLOW_JD_REPO", "").strip()
+    if not jd_env:
+        info["details"] = "JD仓库未配置（设 WORKFLOW_JD_REPO 环境变量启用），跳过"
+        return info
+    jd_dir = Path(jd_env).expanduser()
     if not jd_dir.exists():
-        info["details"] = "JD仓库不存在，跳过"
+        info["details"] = f"JD仓库不存在（{jd_dir}），跳过"
         return info
 
     waiting_jds = []
@@ -536,6 +706,7 @@ def main():
         "project": str(root),
         "total": len(results),
         "passed": len(results) - len(failed),
+        "skipped": sum(1 for r in results if r.get("skipped")),
         "failed": len(failed),
         "suggested_fallback_steps": suggested_fallback,
         "all_green": len(failed) == 0,
@@ -552,6 +723,7 @@ def main():
                 "MISSING": "❌",
                 "EMPTY": "⚠️ ",
                 "NO_KEYWORD": "⚠️ ",
+                "NEGATIVE": "🔴",
                 "BOARD_STALE": "🔴",
                 "BOARD_FRESH_WARNING": "🟡",
                 "LOG_GAP_WARNING": "🟡",
@@ -561,18 +733,23 @@ def main():
                 "MAPPING_EMPTY": "🔴",
                 "MAPPING_STRUCTURE": "🔴",
                 "MAPPING_NOT_READY": "🔴",
+                "MAPPING_EVIDENCE": "🔴",
             }.get(r["status"], "💥")
             line = f"{icon} {r['label']:<28} {r['path']}"
-            if r["status"] == "OK" and "size" in r:
+            if r["status"] == "OK" and r.get("skipped"):
+                line += f"  [跳过：{r['skipped']}]"
+            elif r["status"] == "OK" and "size" in r and r.get("exists"):
                 line += f"  ({r['size']}B)"
             elif r["status"] == "OK" and r.get("details"):
                 line += f"  [{r['details']}]"
             elif r["status"] == "MISSING":
                 line += "  [文件不存在]"
             elif r["status"] == "EMPTY":
-                line += "  [文件为空]"
+                line += f"  [文件过小：{r.get('details') or '未达 min_bytes'}]"
             elif r["status"] == "NO_KEYWORD":
                 line += f"  [未命中关键字]"
+            elif r["status"] == "NEGATIVE":
+                line += f"  [{r.get('details','')}]"
             elif r["status"] == "BOARD_STALE":
                 line += f"  [看板未同步：{r.get('details','')}]"
             elif r["status"] == "BOARD_FRESH_WARNING":
@@ -583,7 +760,8 @@ def main():
                 line += f"  [求职侧联动：{r.get('details','')}]"
             elif r["status"] == "LEDGER_OPEN":
                 line += f"  [台账未收敛：{r.get('details','')}]"
-            elif r["status"] in ("MAPPING_MISSING", "MAPPING_EMPTY", "MAPPING_STRUCTURE", "MAPPING_NOT_READY"):
+            elif r["status"] in ("MAPPING_MISSING", "MAPPING_EMPTY", "MAPPING_STRUCTURE",
+                                 "MAPPING_NOT_READY", "MAPPING_EVIDENCE"):
                 line += f"  [映射未 100%：{r.get('details','')}]"
             print(line)
 
@@ -603,8 +781,12 @@ def main():
                 print("   按附录 A 修完并回归，把台账状态改 verified，再重跑本脚本。")
             elif mapping_result["status"] != "OK":
                 print(f"   ⚠️ 设计→实施映射未 100%：{mapping_result.get('details','')}")
-                print("   按映射表补齐 ❌未实现 的功能链路，或把 ⚠️ 行按用户操作路径验证掉；"
-                      "确实不做的标 ✂️ 并写砍掉依据。补齐后重跑本脚本。")
+                if mapping_result["status"] == "MAPPING_EVIDENCE":
+                    print("   ✅ 行「验证证据」必须写实测证据（接口返回/截图路径/日志片段），"
+                          "不能是空/—/无/待补/TODO。补证据后重跑本脚本。")
+                else:
+                    print("   按映射表补齐 ❌未实现 的功能链路，或把 ⚠️ 行按用户操作路径验证掉；"
+                          "确实不做的标 ✂️ 并写砍掉依据。补齐后重跑本脚本。")
             elif suggested_fallback:
                 print(f"   建议回退到步骤：{suggested_fallback}")
                 print("   补齐缺失产物后重跑本脚本，全绿再推进。")
@@ -612,5 +794,16 @@ def main():
     sys.exit(0 if summary["all_green"] else 1)
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     main()

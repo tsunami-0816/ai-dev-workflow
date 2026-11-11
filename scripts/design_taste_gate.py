@@ -10,7 +10,7 @@
     python scripts/design_taste_gate.py --url http://localhost:5173 --app        # B端后台（app 模式）
     python scripts/design_taste_gate.py --url http://localhost:5173 --json out.json
 
-第一期策略（R25，2026-11-05）：
+第一期策略（R23 配套 taste 软观察，2026-11-05）：
     - 只产报告不阻塞。inspect.mjs 退出码 1（有 FAIL）时本脚本仍退出 0，
       把问题写进报告让人工/AI 决定改不改。
     - 跑 1-2 个项目观察误报率后，再决定是否改成硬卡（退出码 1）。
@@ -143,5 +143,16 @@ def main():
     sys.exit(0)
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     main()

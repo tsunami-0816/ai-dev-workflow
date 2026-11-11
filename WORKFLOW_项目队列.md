@@ -2,7 +2,7 @@
 
 > step00 一次会从若干份 JD 设计出多个候选项目，但工作流一次只能做一个。
 > 所有选中的项目先入这个队列，做完一个再启动下一个。
-> **状态机**：待启动 → 进行中 → 已完成；或 → 已搁置（业务方向作废/硬件跑不动）。
+> **状态机**：待开工 → 进行中 → 已完成；或 → 已搁置（业务方向作废/硬件跑不动）。
 
 ## 队列总表
 
@@ -19,7 +19,14 @@
 | light-workflow-studio | 生产 | 轻量流程画布（v2 保底版，3种节点线性执行） | `projects/_队列/light-workflow-studio/00_项目设计书.md` | 已搁置 | v1 返厂重做 | 2026-10-28 | - | v1 saas-workflow-agent 已于 2026-10-28 闭环交付（11步全绿/用户验收）；v2 后端为 v1 阉割版，唯一增量是 AntV X6 拖拽画布（v1 为表单式 DSL 配置），增量不足以再做一个项目（2026-10-31 搁置） |
 | llm-trace-dashboard | 生产 | LLM 调用追踪看板（v2 保底版，手动录入+ECharts） | `projects/_队列/llm-trace-dashboard/00_项目设计书.md` | 已搁置 | v1 返厂重做 | 2026-10-28 | - | 与 v1 llm-eval-observability 重复：v1 已于 2026-10-30 闭环交付（含 ECharts 看板/trace 列表/metrics，已推 GitHub public）；v2 砍成手动录入+SQLite，零增量（2026-10-31 搁置） |
 | shopmate-ai | 生产 | ShopMate 电商AI客服运营工作台（LangGraph+RAG+文案生成+反馈闭环） | `projects/_队列/shopmate-ai/00_项目设计书.md` | 已完成 | AI运营含界面设计JD | 2026-11-04 | 2026-11-05 | 无（门禁全绿） |
-| nestjs-agent-workbench | 生产 | Node.js NestJS AI对话工作台（补Node.js缺口，WebSocket流式+JWT/RBAC） | `projects/_队列/nestjs-agent-workbench/00_项目设计书.md` | 进行中（第 1 步 · 项目基线定义（未开始）） | 垦驱智能Agent岗（求职侧设计台） | 2026-11-08 | - | 无（刚启动，等 step1 产出基线后自动过机器闸门） |
+| nestjs-agent-workbench | 生产 | Node.js NestJS AI对话工作台（补Node.js缺口，WebSocket流式+JWT/RBAC） | `projects/_队列/nestjs-agent-workbench/00_项目设计书.md` | 已完成 | 垦驱智能Agent岗（求职侧设计台） | 2026-11-08 | 2026-11-08 | 无（门禁全绿） |
+| SparrowScheduler | 翻新 | 分布式任务调度平台（翻新线·野生入口） | `projects/SparrowScheduler/00_项目设计书.md` | 已完成 | 野生入口迁入 | 2026-11-02 | 2026-11-03 | 无（门禁全绿） |
+| cpp-game-server-kit | 生产 | 现代 C++ 游戏服务器基础设施套件（epoll Reactor + 无锁日志 + Protobuf 网关 + KCP 帧同步战斗服） | `projects/_队列/cpp-game-server-kit/00_项目设计书.md` | 已完成 | 求职侧设计台：杭州游梦光年 C++游戏服务端 | - | 2026-11-11 | 无（门禁全绿） |
+| react-taro-microfrontend | 生产 | React 18+Taro4 跨端H5/小程序 + qiankun 微前端挂载Vue3子应用 | `projects/_队列/react-taro-microfrontend/00_项目设计书.md` | 待开工 | 求职侧设计台：连帆/九凌/高帆/伯遇/垦驱 | - | - | 无 |
+| tauri-rust-ai-task-desktop | 生产 | Tauri 2 + Rust 桌面 AI 任务工作台（ownership/Tokio异步/thiserror错误处理/rusqlite建模/AI任务状态机与异常恢复） | `projects/_队列/tauri-rust-ai-task-desktop/00_项目设计书.md` | 待开工 | 求职侧设计台：镜跃网络桌面开发(Tauri/Rust) | - | - | 无 |
+| pytorch-inference-service | 生产 | PyTorch微调BERT中文文本分类 + ONNX导出 + FastAPI推理服务 | `projects/_队列/pytorch-inference-service/00_项目设计书.md` | 待开工 | 求职侧设计台：宇佐智能/绍兴猫草 | - | - | 无 |
+| web3-dapp-voting | 生产 | Solidity ERC20+投票合约 + Hardhat本地链 + React+MetaMask DApp | `projects/_队列/web3-dapp-voting/00_项目设计书.md` | 待开工 | 求职侧设计台：坤汇高新Web3 | - | - | 无 |
+| sd-image-workflow | 生产 | Stable Diffusion WebUI+ComfyUI+ControlNet 批量电商图生成工作流 | `projects/_队列/sd-image-workflow/00_项目设计书.md` | 待开工 | 求职侧设计台：思元环保/丰度科技 | - | - | 无 |
 
 ---
 
@@ -36,7 +43,7 @@
 
 ## 队列规则
 
-1. **入队**：step00 卡点2 用户确认后，每个选中项目的 `00_项目设计书.md` + `00_JD对账表.md` 复制到 `projects/_队列/<项目名>/`，状态标"待开工"。此时**不复制模板骨架**，不建 02_架构设计/05_代码 等空目录。
+1. **入队**：step00 设计书机器闸门全绿后，每个选中项目的 `00_项目设计书.md` + `00_JD对账表.md` 复制到 `projects/_队列/<项目名>/`，状态标"待开工"。此时**不复制模板骨架**，不建 02_架构设计/05_代码 等空目录。
 2. **启动**：用户说「启动队列下一个」/「继续下一个项目」时，取状态=待开工 且排最前的项目，从 `projects/_队列/<名>/` 复制设计书到 `projects/<名>/00_原始项目描述.md`，复制模板骨架，初始化 `_项目状态.md`，状态改为"进行中"。
 3. **完成**：step10 结束后，先跑 `workflow_completion_check.py` 全绿，状态才能改为"已完成"，填完成日期。设计书留在 `_队列/<名>/` 作为档案，不删。豁免项目（见豁免清单）跳过门禁，直接改"已豁免"。
 4. **搁置/抢占**：并行项目要插队时，手上的项目**必须记录三件事**——当前步骤编号、已完成到哪、下次开工清单，才能改"已搁置"。没有三件事的搁置视为无效，禁止抢占。
@@ -55,6 +62,6 @@ projects/
 │   └── <项目B>/
 │       └── ...
 ├── _TEMPLATE_新项目/               # 模板骨架（启动时复制）
-├── multi-tenant-crm-ticket/        # 进行中项目（完整骨架）
+├── multi-tenant-crm-ticket/        # 已完成项目（完整骨架）
 └── <已完成项目>/                    # 已完成项目（完整骨架，保留）
 ```

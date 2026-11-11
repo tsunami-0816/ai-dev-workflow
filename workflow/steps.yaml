@@ -1,6 +1,6 @@
 # 工作流步骤单一清单（单一事实源）
 # 谁读它：scripts/workflow_completion_check.py（门禁检查项）、workflow_cli/cli.py（wf next / wf prompt / wf steps --check）
-# 改步骤只改这里；主控 §2 表格与看板模板用于人读，由 `wf steps --check` 校验是否对得上。
+# 改步骤只改这里；WORKFLOW_步骤定义.md 表格与看板模板用于人读，由 `wf steps --check` 校验是否对得上。
 # owner：agent = AI 自跑 | human = 人工卡点 | machine = 脚本自动
 
 version: 1
@@ -20,6 +20,27 @@ mapping:
   path: _设计实施映射表.md
   launch_date: "2026-10-31"
   fallback: ["4", "5A", "5B", "6"]
+  # 10.0 门禁：映射表少于 10 行直接判结构不完整（防 1 行表冒充 100%）
+  min_rows: 10
+
+# 设计模块 0.1~0.5：不在 steps 列表里（它没有项目看板，走 projects/_队列/），
+# 但提示词必须存在，由 `wf steps --check` 与 WORKFLOW_步骤定义.md 双向校验。
+design_module:
+  - id: "0.1"
+    name: JD 结构化拆解
+    prompt: step00_1_拆解JD.md
+  - id: "0.2"
+    name: 作品集画像扫描
+    prompt: step00_2_建画像库.md
+  - id: "0.3"
+    name: 缺口分析
+    prompt: null
+  - id: "0.4"
+    name: 候选选题矩阵
+    prompt: step00_3_选题设计.md
+  - id: "0.5"
+    name: 一页纸项目设计书
+    prompt: null
 
 steps:
   - id: "1"
@@ -68,8 +89,11 @@ steps:
       - path: 05_代码/frontend/设计精修记录.md
         label: step5B 设计精修记录（精修模式下）
         keywords: ["设计精修", "第 1 轮", "最终检测结果"]
+        forbid: ["结论：不通过", "结论: 不通过", "未达标", "待补", "TODO"]
         launch_date: "2026-11-04"
+        # optional + mode：看板「设计模式」不含“精修”时跳过，不判红也不要求交占位文件
         optional: true
+        mode: "精修"
 
   - id: "5.5"
     name: 独立代码 Review（写实现者不得自审）
@@ -81,8 +105,10 @@ steps:
       - path: 05.5_代码Review/代码Review报告.md
         label: step5.5 独立代码 Review 报告
         keywords: ["需求正确性", "系统一致性", "回归", "结论"]
+        forbid: ["结论：不通过", "Review 未通过", "未达标", "待补", "TODO"]
         # 上线日：此前创建的项目视为历史项目，不因缺这份新增产物被判红
         launch_date: "2026-11-01"
+        min_bytes: 500
 
   - id: "6"
     name: 本地真实运行与冒烟
@@ -93,14 +119,24 @@ steps:
       - path: 06_冒烟/冒烟记录.md
         label: step6 本地冒烟记录
         keywords: ["冒烟", "主流程", "探活", "启动"]
+        forbid: ["主流程未通", "结论：不通过", "未达标", "待补", "TODO"]
+        min_bytes: 200
       - path: 06_冒烟/前端UI质量报告.md
         label: step6 前端 UI 质量检测报告（R23）
-        keywords: ["error", "warning", "advisory", "对比度", "padding"]
+        keywords: ["error", "warning", "advisory", "对比度"]
+        forbid: ["未检测", "脚本异常", "待补", "TODO"]
         launch_date: "2026-11-04"
+        min_bytes: 60
+        # #98 纯后端无前端项目自动跳过；仍可补「不适用登记占位」留痕
+        requires_frontend: true
       - path: 06_冒烟/taste审美检测报告.md
-        label: step6 taste 审美检测报告（R25）
-        keywords: ["FAIL", "taste", "inspect", "平均值页面"]
+        label: step6 taste 审美检测报告（R23 配套 taste 子项）
+        keywords: ["FAIL", "taste", "inspect", "对比度"]
+        forbid: ["未检测", "脚本异常", "待补", "TODO"]
         launch_date: "2026-11-05"
+        min_bytes: 60
+        # #98 纯后端无前端项目自动跳过
+        requires_frontend: true
 
   - id: "6.5"
     name: 接口契约校验
@@ -111,9 +147,14 @@ steps:
       - path: 06.5_契约/openapi.json
         label: step6.5 接口契约（OpenAPI 导出）
         keywords: []
+        min_bytes: 100
+        # #98 纯后端/私有二进制协议（Protobuf/KCP 等）无 HTTP 路由可导出 OpenAPI，自动跳过；契约载体见契约校验记录
+        requires_frontend: true
       - path: 06.5_契约/契约校验记录.md
         label: step6.5 契约校验结果记录
         keywords: ["通过", "PASS", "0 个臆造", "无臆造", "一致"]
+        forbid: ["校验未通过", "契约未通过", "结论：不通过", "未通过", "不通过"]
+        min_bytes: 80
 
   - id: "7"
     name: 全链路联调验证
@@ -126,6 +167,8 @@ steps:
         alt: ["07_联调/联调问题清单.md"]
         label: step7 联调检查清单（问题记入 _问题台账.md）
         keywords: ["链路", "联调", "检查"]
+        forbid: ["联调未通过", "结论：不通过", "待补", "TODO"]
+        min_bytes: 200
 
   - id: "7.5"
     name: 测试数据重置与干净交接
@@ -136,6 +179,8 @@ steps:
       - path: 07_联调/数据重置记录.md
         label: step7.5 测试数据重置记录
         keywords: ["重置", "清理", "种子数据", "干净"]
+        forbid: ["未重置", "重置失败", "待补", "TODO"]
+        min_bytes: 100
 
   - id: "8"
     name: 第一轮全量测试
@@ -146,9 +191,12 @@ steps:
       - path: 08_测试/p0_cases.json
         label: step8 P0 用例沉淀
         keywords: []
+        min_bytes: 50
       - path: 08_测试/基线指标验证表.md
         label: step8 基线量化指标验证归属表
         keywords: ["M1", "M2", "指标", "验证"]
+        forbid: ["未达标", "未验收", "待补", "TODO"]
+        min_bytes: 200
 
   - id: "8.5"
     name: 安全扫描与渗透检查
@@ -158,7 +206,10 @@ steps:
     artifacts:
       - path: 08.5_安全扫描/docs/安全扫描报告.md
         label: step8.5 安全扫描报告
-        keywords: ["P0", "P1", "清零", "通过", "安全"]
+        keywords: ["P0", "P1", "清零"]
+        # 防“否定式通过”：只禁结论性否定，不误伤“未修复前阻塞验收”这类流程说明
+        forbid: ["P0 未清零", "P1 未清零", "安全未通过", "结论：不通过", "仍存在 P0", "仍存在 P1"]
+        min_bytes: 300
 
   - id: "9"
     name: 最终验收测试
@@ -168,7 +219,9 @@ steps:
     artifacts:
       - path: 09_验收/最终验收清单与报告.md
         label: step9 最终验收报告
-        keywords: ["验收通过", "通过", "上线", "可交付"]
+        keywords: ["验收", "通过", "上线"]
+        forbid: ["验收不通过", "结论：不通过", "未验收"]
+        min_bytes: 200
 
   - id: "10"
     name: 上线交付与复盘
@@ -179,6 +232,15 @@ steps:
       - path: 10_交付/交付复盘.md
         label: step10 交付复盘报告
         keywords: ["复盘", "归因", "踩坑"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 400
+      - path: 10_交付/交付包与上线方案.md
+        label: step10 交付包与上线方案（含 10.7 环境收尾留证）
+        keywords: ["交付", "上线", "环境收尾"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 300
+        # 2026-11-08 起新增：此前完成的项目不补造，不判红
+        launch_date: "2026-11-09"
 
   - id: "10.0"
     name: 完成门禁（机器卡点）
@@ -210,7 +272,7 @@ steps:
     artifacts: []
 
 # ---------- 翻新线步骤（F0~F4） ----------
-# 定位与设计见 WORKFLOW_翻新线设计.md；主控 §2 同步有翻新线步骤表
+# 定位与设计见 WORKFLOW_翻新线设计.md；WORKFLOW_步骤定义.md 同步有翻新线步骤表
 # owner：agent = AI 自跑 | human = 人工卡点 | machine = 脚本自动
 # 翻新线 owner 标记沿用生产线口径；卡点 R-1/R-2 为人工卡点
 
@@ -225,6 +287,7 @@ steps:
       - path: _项目状态.md
         label: F0 翻新线看板字段（路线 + 源路径 + remote URL + git 基线）
         keywords: ["路线=翻新", "远程仓库", "git 基线"]
+        forbid: ["未迁入", "未闭环", "结论：不通过", "结论: 不通过"]
         launch_date: "2026-11-02"
 
   - id: "F1"
@@ -237,12 +300,15 @@ steps:
       - path: 00_原始项目描述.md
         label: F1 逆向原始描述（标注「逆向自代码」）
         keywords: ["逆向自代码", "逆向"]
+        forbid: ["待补", "TODO", "未达标", "结论：不通过"]
       - path: 00_项目设计书.md
         label: F1 逆向项目设计书
         keywords: ["逆向", "顶层模块"]
+        forbid: ["待补", "TODO", "未达标", "结论：不通过"]
       - path: 01_项目基线说明书.md
         label: F1 逆向项目基线（量化指标标「实测」或「待拍板」）
         keywords: ["实测", "待拍板", "逆向"]
+        forbid: ["待补", "TODO", "未达标", "结论：不通过"]
 
   - id: "F2"
     name: 九维度体检
@@ -255,11 +321,15 @@ steps:
       - path: F2_体检/体检报告.md
         label: F2 九维度体检报告（可运行性/映射/契约/安全/测试/产物/文档/链路追踪/UI质量）
         keywords: ["可运行性", "体检报告", "九维度", "P0", "P1"]
+        forbid: ["未体检", "结论：不通过", "待补", "TODO"]
         launch_date: "2026-11-02"
+        min_bytes: 500
       - path: F2_体检/前端UI质量报告.md
         label: F2 前端 UI 质量检测报告（R23）
         keywords: ["error", "warning", "advisory", "对比度"]
+        forbid: ["未检测", "脚本异常", "待补", "TODO"]
         launch_date: "2026-11-04"
+        min_bytes: 60
 
   - id: "F3"
     name: 返修

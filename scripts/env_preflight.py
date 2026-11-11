@@ -9,8 +9,14 @@
     python scripts/env_preflight.py --ports 8080,3306,6379,9092
     python scripts/env_preflight.py --project saas-workflow-agent   # 从端口分配表自动读端口
     python scripts/env_preflight.py --verify-config projects/<项目名>   # 配置值实测
+    python scripts/env_preflight.py --env-coverage                     # 裸跑 = 扫描当前目录
     python scripts/env_preflight.py --env-coverage projects/<项目名>    # 代码环境变量引用 vs .env.example 差集
+    python scripts/env_preflight.py --smoke                            # 裸跑 = 默认 URL（见 DEFAULT_SMOKE_URL）
     python scripts/env_preflight.py --smoke http://127.0.0.1:8081/health,http://127.0.0.1:5173/  # HTTP 冒烟断言
+
+退出码：0 = 工具齐全/版本达标/端口空闲/配置与冒烟通过；
+        1 = 必需工具缺失或版本不达标 / 端口被占 / 配置实测失败 / 冒烟失败。
+        内存不足保留为警告（不阻塞），但仍会打印在警告清单里。
 
 --smoke 说明（改进建议 #51）：对已启动的服务发真实 HTTP GET，断言返回码；用于 5A/5B 完成定义与第 6 步阶段一，
     防止「进程活着但接口 500 / 页面白屏」被算作启动成功。
@@ -30,7 +36,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# 期望版本（宽松下限，低于此给警告但不打回）
+# 期望版本（下限，低于此判失败，退出码 1）
 EXPECTED = {
     "java": (17, 0),
     "maven": (3, 8),
@@ -42,6 +48,9 @@ EXPECTED = {
 }
 
 DEFAULT_PORTS = [8080, 3306, 5432, 6379, 9092, 8848, 9000, 9001, 8500]
+
+# --smoke 裸跑时的默认冒烟 URL（文档可直接 `--smoke`，不再 argparse 报错）
+DEFAULT_SMOKE_URL = "http://127.0.0.1:8080/health"
 
 
 def run(cmd: list[str]) -> str | None:
@@ -81,7 +90,7 @@ def parse_ver(text: str) -> tuple[int, int] | None:
 
 
 def check_tool(name: str, cmd: list[str]) -> tuple[str, str]:
-    """返回 (状态, 描述)。状态: ok / warn / missing。"""
+    """返回 (状态, 描述)。状态: ok / low（版本不达标）/ warn（装了但版本号解析不出）/ missing。"""
     text = run(cmd)
     if text is None:
         return "missing", f"{name}: 未安装（{cmd[0]} 不在 PATH）"
@@ -90,7 +99,7 @@ def check_tool(name: str, cmd: list[str]) -> tuple[str, str]:
         return "warn", f"{name}: 已安装但无法解析版本号，输出首行: {text.strip().splitlines()[0] if text.strip() else '(空)'}"
     exp = EXPECTED.get(name)
     if exp and ver < exp:
-        return "warn", f"{name}: 检测到 {ver[0]}.{ver[1]}，期望 ≥ {exp[0]}.{exp[1]}"
+        return "low", f"{name}: 检测到 {ver[0]}.{ver[1]}，期望 ≥ {exp[0]}.{exp[1]}（版本不达标）"
     return "ok", f"{name}: {ver[0]}.{ver[1]}"
 
 
@@ -492,10 +501,12 @@ def main():
                     help="项目名：自动从 WORKFLOW_端口分配表.md 读取该项目的基础设施+后端+前端端口")
     ap.add_argument("--verify-config", metavar="项目目录",
                     help="实测项目 .env 配置：TCP 探活 + Redis/MySQL 登录 + 双侧令牌比对 + 必填项")
-    ap.add_argument("--env-coverage", metavar="项目目录",
-                    help="配置完整性：扫描代码环境变量引用 vs .env.example 差集，缺 key 报红")
-    ap.add_argument("--smoke", default="",
-                    help="HTTP 冒烟：逗号分隔的 URL 列表，逐个 GET 并断言返回码（用于 5A/5B/第6步）")
+    ap.add_argument("--env-coverage", nargs="?", const=".", default=None, metavar="项目目录",
+                    help="配置完整性：扫描代码环境变量引用 vs .env.example 差集，缺 key 报红"
+                         "（裸跑 --env-coverage 等价于当前目录 .）")
+    ap.add_argument("--smoke", nargs="?", const=DEFAULT_SMOKE_URL, default=None, metavar="URLS",
+                    help=f"HTTP 冒烟：逗号分隔的 URL 列表，逐个 GET 并断言返回码（用于 5A/5B/第6步）；"
+                         f"裸跑 --smoke 默认检查 {DEFAULT_SMOKE_URL}")
     ap.add_argument("--smoke-expect", type=int, default=200,
                     help="--smoke 期望的 HTTP 状态码，默认 200")
     args = ap.parse_args()
@@ -520,9 +531,9 @@ def main():
     print("\n--- 工具版本 ---")
     for name, cmd in tools:
         st, desc = check_tool(name, cmd)
-        icon = {"ok": "✅", "warn": "⚠️ ", "missing": "❌"}[st]
+        icon = {"ok": "✅", "low": "❌", "warn": "⚠️ ", "missing": "❌"}[st]
         print(f"  {icon} {desc}")
-        if st == "missing":
+        if st in ("missing", "low"):
             problems.append(desc)
         elif st == "warn":
             warns.append(desc)
@@ -540,10 +551,11 @@ def main():
         ports = [int(p.strip()) for p in args.ports.split(",") if p.strip()]
     for p in ports:
         st, desc = check_port(p)
-        icon = "✅" if st == "free" else "⚠️ "
+        icon = "✅" if st == "free" else "❌"
         print(f"  {icon} {desc}")
         if st == "busy":
-            warns.append(desc)
+            # 端口被占是硬失败（2026-11-08 起）：服务起不来时「环境就绪」是假绿
+            problems.append(desc)
 
     print("\n--- 内存 ---")
     st, desc = check_memory()
@@ -598,7 +610,8 @@ def main():
         print("\n❌ 必须处理（架构里依赖这些工具才能落地）：")
         for p in problems:
             print(f"  - {p}")
-        print("\n处理方式：工具缺失 → 装工具或回 step02 换技术栈；配置实测失败 → 按条目修 .env/端口/令牌后重跑。")
+        print("\n处理方式：工具缺失/版本不达标 → 装/升级工具，或回 step02 换技术栈；"
+              "端口被占 → 停掉占用进程或换端口；配置/冒烟失败 → 按条目修 .env/端口/令牌后重跑。")
         return 1
     if warns:
         print("\n⚠️  警告（不阻塞但评审时人工确认）：")
@@ -608,5 +621,16 @@ def main():
     return 0
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     sys.exit(main())

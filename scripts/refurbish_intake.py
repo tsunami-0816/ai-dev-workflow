@@ -3,7 +3,7 @@
 翻新线 F0 迁入建档脚本
 
 两种入口：
-  野生入口：  python scripts/refurbish_intake.py --wild --source D:\\lg\\project\\SparrowScheduler --target projects/SparrowScheduler
+  野生入口：  python scripts/refurbish_intake.py --wild --source <源项目目录> --target projects/<项目名>
   毕业生入口：python scripts/refurbish_intake.py --graduate --target projects/saas-workflow-agent
 
 脚本自动做：
@@ -317,5 +317,16 @@ def main():
         sys.exit(1)
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     main()

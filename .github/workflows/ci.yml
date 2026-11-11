@@ -26,11 +26,19 @@ jobs:
           find . -name "*.py" -not -path "./.git/*" -not -path "*/__pycache__/*" -print0 | xargs -0 python -m py_compile
           echo "✅ All Python files pass syntax check"
 
-      - name: Install workflow CLI
-        run: pip install -e .
+      - name: Install workflow CLI (with test deps)
+        run: pip install -e ".[test]"
 
       - name: Verify CLI works
         run: wf --help
+
+      - name: Workflow consistency checks
+        run: |
+          wf steps --check
+          wf queue --check --allow-missing
+
+      - name: Workflow self-tests (含负向漂移 fixture)
+        run: python -m pytest scripts/tests -q
 
       - name: Security scan (hardcoded secrets)
         run: python scripts/security_scan_secrets.py .

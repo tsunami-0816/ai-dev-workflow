@@ -25,7 +25,7 @@ TEMPLATE_HEADER = """# 失败与返工日志
 > 第 10 步复盘时直接基于本表做归因分析，替代「凭记忆写复盘」。
 > 2026-10-28 起新增「影响文件」「复现命令」两列（旧记录无此两列，属正常）。
 > 2026-10-29 起新增「触发规则」列：记录这次是哪条工作流规则兜住了这个坑（如 R13 数据重置），
-> 供主控 §8.0 规则登记表补源与 step11 体检统计。可留空，不额外增加流程步骤。
+> 供 WORKFLOW_规则库.md §8.0 规则登记表补源与 step11 体检统计。可留空，不额外增加流程步骤。
 
 | 时间 | 步骤 | 失败类别 | 问题描述 | AI 所犯错误 | 人工卡点发现的 AI 遗漏 | 修复轮次 | 根因分类 | 影响文件 | 复现命令 | 触发规则 |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -145,5 +145,16 @@ def main():
         print("返工最多的步骤 Top3:", ", ".join(f"{s}({n}次)" for s, n in top))
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     main()

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
 作品集画像扫描器（step00.2）
-扫描 D:\\lg\\project\\ 下每个项目目录，提取技术栈和中间件，输出 00_作品集画像库.json。
+扫描作品集根目录下每个项目目录，提取技术栈和中间件，输出 00_作品集画像库.json。
 专治「已经做了 3 个 RAG，又做第 4 个」。
 
 使用方法：
-    python scripts/portfolio_scanner.py [--root D:\\lg\\project] [--out 00_作品集画像库.json]
+    python scripts/portfolio_scanner.py [--root <作品集根目录>] [--out 00_作品集画像库.json]
+根目录缺省为「工作流仓库的上一级目录」，换机器 / 换仓库名都无需改代码。
 """
 
 import argparse
@@ -62,12 +63,34 @@ SKILL_MAP = [
     (r"allure-pytest", "Allure"),
     (r"locust", "Locust 压测"),
     (r"selenium|playwright", "Web UI 自动化"),
-    # 前端
-    (r"\"vue\"", "Vue"),
+    # Go 生态（go.mod / gin / gorm / etcd）
+    (r"gin-gonic|\"gin\"|/gin\b", "Gin"),
+    (r"gorm.io/gorm|\"gorm\"", "GORM"),
+    (r"go.etcd.io/etcd|\"etcd\"", "etcd 服务发现"),
+    (r"zapap|\"go.uber.org/zap\"", "Zap 日志"),
+    (r"logrus", "Logrus"),
+    (r"viper", "Viper 配置"),
+    (r"rabbitmq/amqp091-go|amqp", "RabbitMQ"),
+    (r"go-redis|redis/go-redis", "Redis (Go)"),
+    (r"gorilla/websocket|nhooyr.io/websocket|\"gorilla\"", "WebSocket (Go)"),
+    # Rust / Tauri 生态（Cargo.toml）
+    (r"tauri", "Tauri 桌面"),
+    (r"serde", "Serde 序列化"),
+    (r"tokio", "Tokio 异步运行时"),
+    (r"sqlx", "SQLx Rust SQL"),
+    (r"reqwest", "Reqwest HTTP"),
+    # 前端现代栈
+    (r"\"vue\"|vue3|vue-router", "Vue"),
     (r"\"react\"", "React"),
+    (r"\"typescript\"", "TypeScript"),
     (r"element-plus|element-ui", "Element UI"),
     (r"antd|ant-design", "Ant Design"),
+    (r"antv|@antv/x6", "AntV X6 画布"),
+    (r"echarts", "ECharts"),
+    (r"pinia", "Pinia"),
+    (r"vite", "Vite"),
     (r"axios", "Axios"),
+    (r"tailwind", "Tailwind CSS"),
     # 基础设施
     (r"docker-compose|docker compose", "Docker Compose"),
     (r"nginx", "Nginx"),
@@ -114,7 +137,8 @@ def scan_project(proj_dir: Path) -> dict:
     # 扫依赖文件
     all_text = ""
     for fname in ["pom.xml", "build.gradle", "requirements.txt", "pyproject.toml",
-                  "package.json", "docker-compose.yml", "docker-compose.yaml",
+                  "package.json", "go.mod", "Cargo.toml",
+                  "docker-compose.yml", "docker-compose.yaml",
                   "application.yml", "application.yaml", "application.properties"]:
         # 在项目根和 backend/ 下找
         for base in [proj_dir, proj_dir / "05_代码" / "backend", proj_dir / "backend"]:
@@ -136,9 +160,14 @@ def has_artifact_at(d: Path) -> bool:
     )
 
 
+# 默认作品集根目录 = 工作流仓库的上一级；不写死盘符，换机器 / 换仓库名同样成立。
+DEFAULT_ROOT = Path(__file__).resolve().parents[2]
+WF_ROOT = Path(__file__).resolve().parents[1]
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", default=r"D:\lg\project", help="作品集根目录")
+    ap.add_argument("--root", default=str(DEFAULT_ROOT), help="作品集根目录（默认：工作流仓库的上一级）")
     ap.add_argument("--out", default="00_作品集画像库.json", help="输出 JSON 路径")
     args = ap.parse_args()
 
@@ -158,8 +187,8 @@ def main():
             continue
         targets.append(child)
 
-    # 2) 工作流测试/projects/ 下的子项目单独扫（这些是工作流产出的项目）
-    wf_projects = root / "工作流测试" / "projects"
+    # 2) 工作流仓库 projects/ 下的子项目单独扫（按脚本位置推导，不依赖仓库目录名）
+    wf_projects = WF_ROOT / "projects"
     if wf_projects.exists():
         for child in sorted(wf_projects.iterdir()):
             if not child.is_dir():
@@ -188,7 +217,11 @@ def main():
         seen.add(d)
         if not has_artifact_at(d):
             continue
-        print(f"扫描: {d.relative_to(root)}")
+        try:
+            shown = d.relative_to(root)
+        except ValueError:
+            shown = d
+        print(f"扫描: {shown}")
         info = scan_project(d)
         projects.append(info)
         print(f"  → {len(info['tech_stack'])} 个技能点: {', '.join(info['tech_stack'][:8])}")
@@ -202,5 +235,16 @@ def main():
     return 0
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     sys.exit(main())

@@ -193,7 +193,18 @@ def main(cases_file: str):
     return 0 if passed == len(results) else 1
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     if len(sys.argv) < 2:
         print("用法: python scripts/p0_regression_test.py <p0_cases.json>")
         sys.exit(1)

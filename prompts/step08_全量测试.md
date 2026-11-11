@@ -6,11 +6,28 @@
   - **pytest 四层自动化测试框架**（`08_测试/qa-automation/`）
   - 《全量测试用例清单》
   - **Bug 全部记入项目根目录 `_问题台账.md`**（只列 P0/P1 必修，P2/P3 标 `deferred`）——不另建 BUGLIST.md
-  - **性能测试报告**（Python 轻量压测 + JMeter 交叉验证）
+  - **性能测试报告**（压测工具按协议选型；HTTP/JSON 用 JMeter 交叉复核，私有二进制/Protobuf 允许自研客户端，写明降级边界）
   - **Allure 可视化测试报告**
+
+---
+
+## 效果度量
+
+- **目标**：自动化测试全部跑通，基线量化指标逐条有验证归属
+- **成功标准**：
+  1. pytest 一键跑通 0 failed
+  2. 基线每个量化指标都有验证归属（自动化断言 or 人工验证方法）
+  3. P0 用例覆盖所有核心链路
+  4. 性能测试报告含 TPS 瓶颈分析
+- **失败信号**：
+  1. pytest 有 failed
+  2. 基线指标"未验证"
+  3. 用例依赖历史数据（重置后必挂）
+  4. 只看 code=200 不校验字段值
+- **度量方式**：`pytest -q` 全绿 + 基线指标验证表逐条打勾
   - 8-1 修复：代码片段 + 修改影响分析 + 自测说明
   - 8-2 回归结果**写回台账**（`fixed` → `verified`、轮次日志）——不另产《第二轮回归测试报告》
-  - **GitHub Actions CI 配置**（push 自动跑自动化用例）
+  - **GitHub Actions CI 配置文件落盘**（本地 collect-only 绿；远程 Actions 跑通与 README badge 归 10.5 回填）
 - **规则**：本轮只修 P0/P1，P2/P3 标 `deferred` 留到下版本；修复不限轮次，按收敛判据（台账 open P0/P1 数须下降；同一根因 3 次无效或问题数回升 → 回流第 3 步），通过后进入第 9 步。
 
 ---
@@ -182,12 +199,12 @@ qa-automation/
 - 压测目标：选 1~2 个核心读接口（登录、列表查询等，不依赖外部 LLM）
 - 输出指标：平均 RT、P95 RT、TPS、错误率
 
-### 8.5.2 JMeter 交叉验证
+### 8.5.2 第二工具交叉验证（#96 工具按协议选型）
 
-在 `qa-automation/jmeter/` 下写一个最小 JMX（线程组 + HTTP 请求 + 聚合报告），命令行跑：
-```
-jmeter -n -t xxx.jmx -l result.jtl
-```
+压测工具按协议选，不硬套 JMeter：
+- **HTTP/JSON 项目**：在 `qa-automation/jmeter/` 下写最小 JMX（线程组 + HTTP 请求 + 聚合报告），命令行跑 `jmeter -n -t xxx.jmx -l result.jtl` 做交叉复核。
+- **自定义二进制 / Protobuf / 私有 TCP·UDP 协议项目**：JMeter 原生 Sampler 只能发固定文本/手写十六进制，动态序列化要在脚本引擎里另写一套客户端，成本高收益低。允许以**自研多线程客户端（Python/C++）作主压测工具**；第二工具交叉验证可选（同语言双客户端对账，或协议解析对账），但性能报告必须写明：降级原因、用了哪个工具、**未做第二工具交叉**的边界。
+- **禁止交付跑不起来的骨架**：协议不匹配时不要求产出不可运行的 jmx 占位文件；本机未装 JMeter 同样如实记降级，不编造 JMeter 数据。
 
 ### 8.5.3 瓶颈分析（写进 perf-report.md）
 ```
@@ -207,11 +224,28 @@ jmeter -n -t xxx.jmx -l result.jtl
 2. 跑 `allure generate reports/allure-results -o reports/html --clean`
 3. 报告截图作为测试交付物
 
-### 8.6.2 GitHub Actions CI
-在项目根目录 `.github/workflows/test.yml` 配 CI：
-- push 到 main 时自动跑 `pytest --collect-only`（语法检查 + 用例收集）
-- 不需要真连数据库（CI 环境没有中间件），保证 badge 永远绿
-- README 顶部加 CI badge
+### 8.6.2 GitHub Actions CI 配置（#95 与 10.5 拆分）
+
+**本步（step8）只做到**：
+- 在项目根目录 `.github/workflows/test.yml` 落 CI 配置文件；
+- 本地跑 `pytest --collect-only`（语法检查 + 用例收集）绿即可；CI 不需要真连数据库（环境无中间件）。
+
+**归 step10.5 建仓 push 后回填**（本步不要求、也不可达）：
+- 远程 Actions 实际跑通；
+- README 顶部 CI badge 的 SVG 地址与绿标——badge 由远程 Actions 按分支生成，无远程仓时既无 URL 也不可能显示绿；README 先留占位注释注明「URL 待 10.5 建仓回填」，不要在 step8 伪造 badge 链接。
+
+## 8.7 探针测试闭合 `[❓]` 项（R22 配套，仅翻新线）
+
+> **适用范围（先判路线，别给生产线硬造）**：
+> - 看板「路线=翻新」**且实际走过 F1/F2**（项目里有 F1 逆向产物的 `[❓]` 项或 `F2_体检/` 的《待确认业务规则清单》）→ 本节必做；
+> - 生产线项目（看板「路线=生产」）或毕业生入口跳过 F1 → **本节写一行「不适用」即可**，不要为凑这条去补造 F1/F2 文档。
+
+- 汇总待确认项：F1 逆向设计书里的 `[❓: 待确认]` + F2《待确认业务规则清单》里的条目
+- 每条二选一，不许悬空：
+  1. **探针测试闭合**：写最小可复现探针（pytest 用例 / 真实 HTTP 调用 / DB 查询 / 日志追踪），验证实际行为并回填结论到 F1 文档（`[❓]` 改为 `[✅: 文件:行号]` 或 `[🔶: 推断 + 依据]`）；探针用例放进 `qa-automation/testcases/` 并纳入本轮全量回归
+  2. **显式 deferred**：确实验不了的（无环境 / 无数据 / 外部系统），标 `deferred` 并写明原因，同步写进 10.6 简历「诚实边界」
+- 报告里给计数：`[❓]` 总数 / 已闭合数 / deferred 数，**禁止把 `[❓]` 项带进交付**
+- 生产线项目：在本步报告「测试范围」处写一行「R22 探针闭合：不适用（路线=生产，无 F1/F2 ❓ 项）」
 
 ---
 
@@ -223,8 +257,9 @@ jmeter -n -t xxx.jmx -l result.jtl
 - [ ] **每条 P1 在台账改 `verified` 之前，已用 `python scripts/log_failure.py <项目目录> --step 8 --category "<类别>" ... --rule R10` 记入 `_失败日志.md`**（不记不许标 verified；门禁 `LOG_GAP_WARNING` 比对缺口）
 - [ ] 「轮次日志」已记录本轮 open P0/P1 数，且单调下降；P2/P3 标 `deferred`
 - [ ] 已知 Bug 用 xfail 标记，修复后自动转 PASS
-- [ ] **性能测试完成**：有 Python + JMeter 双工具数据表，有瓶颈分析和调优建议
+- [ ] **性能测试完成**：压测工具按协议选型（HTTP/JSON 用 JMeter；私有协议允许自研客户端并写明降级边界），有数据表、瓶颈分析和调优建议
 - [ ] Allure 报告能生成，截图交付
-- [ ] GitHub Actions CI 配好，README 有绿 badge
+- [ ] CI 配置文件 `.github/workflows/test.yml` 落盘 + 本地 `pytest --collect-only` 绿；远程 Actions 跑通与 README badge 留待 10.5 回填
 - [ ] 基线指标验证表已产出，每个量化指标都有验证归属
+- [ ] **R22 探针测试闭合（仅路线=翻新且走过 F1/F2）**：`[❓]` 项全部探针闭合或显式 deferred，报告有「总数/闭合数/deferred 数」；生产线项目已写「不适用（路线=生产）」
 - [ ] P2/P3 与未覆盖场景登记，移交第 10 步下版本规划

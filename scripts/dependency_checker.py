@@ -10,6 +10,9 @@
     Python 走 `pip install --dry-run --ignore-installed -r requirements.txt`
     Maven  走 `mvn -B dependency:tree`（失败即视为不可解析）
 工具缺失（无 pip / 无 mvn）时跳过并显式提示，不判失败。
+
+退出码：0 = 全部依赖真实存在（且 --solve 时可解）；1 = 有问题，或目录里没有可校验的依赖文件
+（没找到依赖文件/解析出 0 条时打印「❌ 未找到依赖文件，无法判定」，不再假绿）。
 """
 
 import argparse
@@ -254,7 +257,16 @@ def main(root_dir: str, solve: bool = False):
                 print(f"  ⚠️  {name}:{ver} 网络校验失败，请手动确认")
 
     if not file_found:
-        print("⚠️  未找到 requirements.txt / package.json / pom.xml，请确认项目目录")
+        print("❌ 未找到依赖文件，无法判定")
+        print("   需要 requirements.txt / package.json / pom.xml（含子目录，最多 4 层）才能校验；")
+        print("   目录里一个都没有 ≠「依赖全部真实」，请确认项目根目录是否正确。")
+        return 1
+
+    if checked == 0:
+        print("❌ 未找到依赖文件，无法判定")
+        print("   找到了依赖文件，但没解析出任何可校验的依赖条目"
+              "（文件为空 / 全是范围版本或 Maven 属性引用 / 格式不识别）。")
+        return 1
 
     # 依赖可解性（可选）
     if solve:
@@ -271,7 +283,18 @@ def main(root_dir: str, solve: bool = False):
         return 0
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     parser = argparse.ArgumentParser(description="依赖版本真实性与可解性校验")
     parser.add_argument("root", nargs="?", default=".", help="项目根目录")
     parser.add_argument("--solve", action="store_true",

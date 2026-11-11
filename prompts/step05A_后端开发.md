@@ -8,6 +8,29 @@
 
 ---
 
+## 效果度量
+
+- **目标**：产出可运行的后端代码，装依赖/起服务/核心接口可访问
+- **启动前 checklist（M1 环境启动域）**：
+  1. 端口分配：从 `WORKFLOW_端口分配表.md` 取项目端口前缀，确认端口没被占
+  2. 依赖锁定：requirements.txt / pom.xml 锁版本，有 lock 文件（requirements.txt / pom.xml）
+  3. 配置文件：复制 `.env.example.template` 为 `.env`，填入实际值，配置项和代码一一对应
+  4. 中间件：复制 `docker-compose.yml.template` 为 `docker-compose.yml`，改端口后 `docker compose up -d` 能起来
+  5. 配置探活：`python scripts/env_preflight.py --verify-config` 全绿
+- **成功标准**：
+  1. `pip install` / `mvn compile` 成功
+  2. 服务能启动，健康检查 URL 返回 200
+  3. 每条 P0 链路至少跑通一次最小闭环
+  4. OpenAPI 契约文件 paths > 0（导出前必须校验，paths=0 不覆盖已有文件）
+- **失败信号**：
+  1. 装依赖失败（版本冲突 / 包不存在）
+  2. 起服务报 ERROR（Bean 装配失败 / 端口被占）
+  3. 核心接口 404 / 500
+  4. 5.5 reviewer 打回
+- **度量方式**：`env_preflight.py --smoke <健康检查URL>` 全绿 + 5.5 reviewer 通过
+
+---
+
 ## 提示词
 
 ```

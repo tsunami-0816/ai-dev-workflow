@@ -23,12 +23,34 @@ SCAN_SKIP_DIRS = {"node_modules", "dist", "build", "__pycache__", ".venv", "venv
 
 
 def export_openapi(url: str, out_path: str):
-    """从运行中的后端导出 OpenAPI 契约"""
+    """从运行中的后端导出 OpenAPI 契约
+    契约导出保护（来源：SparrowScheduler 误导出 0 路径覆盖有效 openapi.json）：
+    如果新契约 paths=0 且已有文件存在且 paths>0，拒绝覆盖，报错退出。
+    """
     with urllib.request.urlopen(url, timeout=15) as resp:
         data = json.loads(resp.read().decode())
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(out_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     paths = data.get("paths", {})
+
+    # 契约导出保护
+    out = Path(out_path)
+    if len(paths) == 0 and out.exists():
+        try:
+            old = json.loads(out.read_text(encoding="utf-8"))
+            old_paths = old.get("paths", {})
+            if len(old_paths) > 0:
+                print(f"❌ 导出失败：新契约 paths=0，但已有文件 paths={len(old_paths)}")
+                print(f"   拒绝覆盖，保留旧契约。请检查导出地址是否正确（Spring Boot 用 /v3/api-docs，FastAPI 用 /openapi.json）")
+                return 1
+        except (json.JSONDecodeError, KeyError):
+            pass  # 旧文件损坏，允许覆盖
+
+    if len(paths) == 0:
+        print(f"❌ 导出失败：契约 paths=0")
+        print(f"   请检查导出地址是否正确（Spring Boot 用 /v3/api-docs，FastAPI 用 /openapi.json）")
+        return 1
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✅ 契约已导出到 {out_path}")
     print(f"   共 {len(paths)} 个接口路径")
     for p in sorted(paths):
@@ -275,7 +297,18 @@ def run_check(contract_path: str, frontend_dir: str, headers: list[str] | None =
     return code
 
 
+def _force_utf8_output():
+    """Windows 默认 cp936/GBK 控制台下打印中文/emoji 会 UnicodeEncodeError；入口处统一切 UTF-8。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
+    _force_utf8_output()
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)

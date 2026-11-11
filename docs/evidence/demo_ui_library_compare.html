@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI 库对比 Demo · Element Plus vs Arco Design vs Naive UI</title>
+<style>
+/* ============== 三套设计令牌（完整独立的组件视觉系统） ============== */
+
+/* ---------- 库 1：Element Plus（你们现在用的） ---------- */
+.lib-ep {
+  /* 主色 */
+  --primary: #409EFF;
+  --primary-light: #66B1FF;
+  --primary-dark: #337ECC;
+
+  /* 语义色 */
+  --success: #67C23A;
+  --warning: #E6A23C;
+  --danger: #F56C6C;
+  --info: #909399;
+
+  /* 中性色阶 */
+  --text-1: #303133;   /* 主要文字 */
+  --text-2: #606266;   /* 常规文字 */
+  --text-3: #909399;   /* 次要文字 */
+  --text-4: #C0C4CC;   /* 占位/禁用 */
+
+  --border: #DCDFE6;          /* 标准边框 */
+  --border-light: #E4E7ED;    /* 浅边框 */
+  --border-lighter: #EBEEF5;  /* 更浅 */
+
+  --bg-page: #F5F7FA;         /* 页面底 */
+  --bg-card: #FFFFFF;         /* 卡片底 */
+  --bg-header: #FAFAFA;       /* 表头底 */
+  --bg-hover: #F5F7FA;        /* hover 底 */
+  --bg-active: #ECF5FF;       /* 激活底（极淡主色） */
+
+  /* 阴影 —— Element Plus 是硬阴影，层次分明 */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-2: 0 2px 12px rgba(0,0,0,0.10);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.12);
+  --shadow-dialog: 0 4px 20px rgba(0,0,0,0.15);
+
+  /* 圆角 —— 比较保守，传统后台风 */
+  --radius-btn: 4px;
+  --radius-input: 4px;
+  --radius-card: 4px;
+  --radius-tag: 4px;
+  --radius-badge: 10px;
+
+  /* 侧边栏 */
+  --sidebar-bg: #304156;
+  --sidebar-logo-bg: #263445;
+  --sidebar-text: #BFCBD9;
+  --sidebar-active-bg: #263445;
+  --sidebar-active-text: #FFFFFF;
+
+  /* 表格斑马纹 */
+  --table-stripe: #FAFAFA;
+}
+
+/* ---------- 库 2：Arco Design Vue（字节跳动出品） ---------- */
+.lib-arco {
+  --primary: #165DFF;
+  --primary-light: #4080FF;
+  --primary-dark: #0E42D2;
+
+  --success: #00B42A;
+  --warning: #FF7D00;
+  --danger: #F53F3F;
+  --info: #86909C;
+
+  --text-1: #1D2129;
+  --text-2: #4E5969;
+  --text-3: #86909C;
+  --text-4: #C9CDD4;
+
+  --border: #E5E6EB;
+  --border-light: #F2F3F5;
+  --border-lighter: #F7F8FA;
+
+  --bg-page: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --bg-header: #F2F3F5;
+  --bg-hover: #F2F3F5;
+  --bg-active: #E8F3FF;
+
+  /* 阴影 —— Arco 更柔和、扩散更开 */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-2: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-dialog: 0 4px 16px rgba(0,0,0,0.10);
+
+  /* 圆角 —— 中等 */
+  --radius-btn: 4px;
+  --radius-input: 4px;
+  --radius-card: 8px;
+  --radius-tag: 2px;      /* Arco 标签几乎是直角 */
+  --radius-badge: 10px;
+
+  /* 侧边栏 —— Arco 默认是白底侧栏！ */
+  --sidebar-bg: #FFFFFF;
+  --sidebar-logo-bg: #FFFFFF;
+  --sidebar-text: #4E5969;
+  --sidebar-active-bg: #E8F3FF;
+  --sidebar-active-text: #165DFF;
+
+  /* 表格 —— Arco 没有默认斑马纹 */
+  --table-stripe: transparent;
+}
+
+/* ---------- 库 3：Naive UI ---------- */
+.lib-naive {
+  --primary: #18A058;
+  --primary-light: #36AD6A;
+  --primary-dark: #128149;
+
+  --success: #18A058;
+  --warning: #F0A020;
+  --danger: #D03050;
+  --info: #909399;
+
+  --text-1: #1F2329;
+  --text-2: #4E5969;
+  --text-3: #8F959E;
+  --text-4: #C9CDD4;
+
+  /* Naive UI 几乎不靠边框，靠阴影和背景区分 */
+  --border: #E5E7EB;
+  --border-light: #F0F2F5;
+  --border-lighter: transparent;
+
+  --bg-page: #F2F4F7;
+  --bg-card: #FFFFFF;
+  --bg-header: #FAFAFA;
+  --bg-hover: #F5F5F5;
+  --bg-active: transparent;
+
+  /* 阴影 —— Naive 最大最柔和，有 blur 感 */
+  --shadow-1: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-2: 0 4px 16px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.10), 0 0 1px rgba(0,0,0,0.06);
+  --shadow-dialog: 0 12px 40px rgba(0,0,0,0.14), 0 0 1px rgba(0,0,0,0.08);
+
+  /* 圆角 —— Naive 最大最圆润 */
+  --radius-btn: 6px;
+  --radius-input: 6px;
+  --radius-card: 14px;
+  --radius-tag: 6px;
+  --radius-badge: 10px;
+
+  /* 侧边栏 —— Naive 默认白底 + 只有主色高亮，没有底色条 */
+  --sidebar-bg: #FFFFFF;
+  --sidebar-logo-bg: #FFFFFF;
+  --sidebar-text: #4E5969;
+  --sidebar-active-bg: transparent;
+  --sidebar-active-text: #18A058;
+
+  /* 表格 —— Naive 紧凑 */
+  --table-stripe: #FAFAFA;
+}
+
+
+/* ============== 全局基础 ============== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+               'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  background: var(--bg-page);
+  color: var(--text-1);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ============== 库选择器（顶部悬浮） ============== */
+.lib-switcher {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: #fff;
+  border-radius: 100px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 1px solid #e5e6eb;
+}
+
+.lib-switcher button {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4E5969;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lib-switcher button:hover { background: #F2F3F5; }
+
+.lib-switcher button.active[data-lib="ep"]     { background: #409EFF; color: #fff; }
+.lib-switcher button.active[data-lib="arco"]   { background: #165DFF; color: #fff; }
+.lib-switcher button.active[data-lib="naive"]  { background: #18A058; color: #fff; }
+
+.lib-switcher .lib-chip {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #fff;
+}
+
+.lib-switcher button[data-lib="ep"]    .lib-chip { background: #409EFF; }
+.lib-switcher button[data-lib="arco"]  .lib-chip { background: #165DFF; }
+.lib-switcher button[data-lib="naive"] .lib-chip { background: #18A058; }
+
+
+/* ============== 侧边栏（三种库完全不同） ============== */
+.sidebar {
+  width: 220px;
+  background: var(--sidebar-bg);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s ease;
+}
+
+/* Logo 区 */
+.logo {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  background: var(--sidebar-logo-bg);
+  font-weight: 700;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* EP 版：白字在深色底 */
+.lib-ep .logo { color: #fff; }
+.lib-ep .logo-mark { background: #409EFF; }
+
+/* Arco / Naive 版：黑字在白底 */
+.lib-arco .logo { color: var(--text-1); border-bottom: 1px solid var(--border-light); }
+.lib-naive .logo { color: var(--text-1); }
+
+/* 菜单 */
+.menu {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+
+.menu-group {
+  padding: 16px 20px 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 13.5px;
+  transition: all 0.15s;
+  position: relative;
+}
+.menu-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* EP 版：深色侧栏 + 白色字 + 选中时左条 + 底色 */
+.lib-ep .menu-group { color: rgba(255,255,255,0.35); }
+.lib-ep .menu-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.lib-ep .menu-item.active {
+  background: rgba(64,158,255,0.2);
+  color: #fff;
+  border-left: 3px solid var(--primary);
+}
+
+/* Arco 版：白底侧栏 + 深灰字 + 选中时主色文字 + 淡主色底 */
+.lib-arco .menu-group { color: var(--text-3); }
+.lib-arco .menu-item:hover { background: var(--bg-hover); }
+.lib-arco .menu-item.active {
+  background: var(--bg-active);
+  color: var(--primary);
+  font-weight: 600;
+}
+.lib-arco .menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px; bottom: 8px;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Naive 版：白底侧栏 + 深灰字 + 选中时只有主色文字（无底色） + 左侧粗圆条 */
+.lib-naive .menu-group { color: var(--text-4); }
+.lib-naive .menu-item:hover { color: var(--text-1); }
+.lib-naive .menu-item.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+.lib-naive .menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 4px; height: 18px;
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
+}
+
+
+/* ============== 主区域 ============== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Navbar */
+.navbar {
+  height: 60px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* EP：顶栏白底硬边框 */
+.lib-ep .navbar { border-bottom-color: var(--border-light); }
+
+/* Arco / Naive：更细的边框 */
+
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.nav-breadcrumb { font-size: 13px; color: var(--text-3); }
+.nav-breadcrumb span { color: var(--text-1); font-weight: 500; }
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 12px; font-weight: 500;
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* 版本差异 */
+.lib-ep .status-pill { background: #F0F9EB; color: #67C23A; border: 1px solid #E1F3D8; }
+.lib-ep .status-dot { background: #67C23A; }
+.lib-arco .status-pill { background: #E8FFEA; color: #00B42A; }
+.lib-arco .status-dot { background: #00B42A; }
+.lib-naive .status-pill { background: #18A05822; color: #128149; }
+.lib-naive .status-dot { background: #18A058; }
+
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 13px;
+}
+
+
+/* ============== 内容区 ============== */
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  padding-top: 88px;
+}
+
+/* --- 组件气质对比区 --- */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  margin-top: 8px;
+}
+.section-label .title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.section-label .desc {
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 3px 10px;
+  background: var(--bg-hover);
+  border-radius: 100px;
+}
+
+.section-label-ep   .title::before { content: ''; display:inline-block; width:3px; height:18px; background:#409EFF; border-radius:2px; margin-right:4px; vertical-align:-2px; }
+.section-label-arco .title::before { content: ''; display:inline-block; width:3px; height:18px; background:#165DFF; border-radius:2px; margin-right:4px; vertical-align:-2px; }
+.section-label-naive.title::before { content: ''; display:inline-block; width:3px; height:18px; background:#18A058; border-radius:2px; margin-right:4px; vertical-align:-2px; }
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.compare-cell {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-lighter);
+  padding: 20px;
+  box-shadow: var(--shadow-1);
+}
+
+/* Naive 的卡片几乎没边框，靠阴影 */
+.lib-naive .compare-cell {
+  border-color: transparent;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 0 1px rgba(0,0,0,0.04);
+}
+
+/* Arco 的卡片边框极淡 */
+.lib-arco .compare-cell { border-color: #F2F3F5; }
+
+.compare-cell-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+/* ---------- 按钮 ---------- */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+/* Element Plus 按钮：有边框、方正、有 hover 位移感 */
+.lib-ep .btn {
+  border-radius: var(--radius-btn);
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+.lib-ep .btn-default {
+  background: #fff;
+  border-color: #DCDFE6;
+  color: #606266;
+}
+.lib-ep .btn-default:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.lib-ep .btn-primary {
+  background: #409EFF;
+  border-color: #409EFF;
+  color: #fff;
+}
+.lib-ep .btn-primary:hover {
+  background: #66B1FF;
+  border-color: #66B1FF;
+}
+.lib-ep .btn-success {
+  background: #67C23A;
+  border-color: #67C23A;
+  color: #fff;
+}
+.lib-ep .btn-success:hover { background: #85CE61; border-color: #85CE61; }
+
+/* Arco 按钮：无边框感、扁平、更圆一点、主色更克制 */
+.lib-arco .btn {
+  border-radius: var(--radius-btn);
+  font-family: inherit;
+}
+.lib-arco .btn-default {
+  background: #fff;
+  border: 1px solid #E5E6EB;
+  color: #1D2129;
+}
+.lib-arco .btn-default:hover {
+  border-color: #165DFF;
+  color: #165DFF;
+}
+.lib-arco .btn-primary {
+  background: #165DFF;
+  color: #fff;
+}
+.lib-arco .btn-primary:hover { background: #4080FF; }
+.lib-arco .btn-success {
+  background: #00B42A;
+  color: #fff;
+}
+.lib-arco .btn-success:hover { background: #23C343; }
+
+/* Naive 按钮：最圆润、几乎无边框、更扁的背景色、有字重 */
+.lib-naive .btn {
+  border-radius: var(--radius-btn);
+  font-family: inherit;
+  font-weight: 600;
+}
+.lib-naive .btn-default {
+  background: #F2F3F5;
+  color: #1F2329;
+}
+.lib-naive .btn-default:hover { background: #E5E6EB; }
+.lib-naive .btn-primary {
+  background: #18A058;
+  color: #fff;
+}
+.lib-naive .btn-primary:hover { background: #36AD6A; }
+.lib-naive .btn-success {
+  background: #2080F0;
+  color: #fff;
+}
+.lib-naive .btn-success:hover { background: #4098FC; }
+
+/* ---------- 输入框 ---------- */
+.input-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.input {
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  width: 180px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.lib-ep .input {
+  border: 1px solid #DCDFE6;
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: #606266;
+}
+.lib-ep .input:focus {
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64,158,255,0.1);
+}
+
+.lib-arco .input {
+  border: 1px solid #E5E6EB;
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: #1D2129;
+}
+.lib-arco .input:focus {
+  border-color: #165DFF;
+  box-shadow: 0 0 0 2px rgba(22,93,255,0.1);
+}
+
+.lib-naive .input {
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: #1F2329;
+  font-weight: 500;
+}
+.lib-naive .input:focus {
+  border-color: #18A058;
+  box-shadow: 0 0 0 2px rgba(24,160,88,0.15);
+}
+
+/* ---------- 标签 ---------- */
+.tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag {
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* EP：半透明底 + 彩色文字 + 细边框 */
+.lib-ep .tag {
+  border-radius: var(--radius-tag);
+  border: 1px solid transparent;
+}
+.lib-ep .tag-success { background: #F0F9EB; color: #67C23A; border-color: #E1F3D8; }
+.lib-ep .tag-danger  { background: #FEF0F0; color: #F56C6C; border-color: #FDE2E2; }
+.lib-ep .tag-warning { background: #FDF6EC; color: #E6A23C; border-color: #FAECD8; }
+.lib-ep .tag-info    { background: #F4F4F5; color: #909399; border-color: #E9E9EB; }
+
+/* Arco：半透明 + 彩色文字 + 无边框 + 几乎直角 */
+.lib-arco .tag {
+  border-radius: var(--radius-tag);
+}
+.lib-arco .tag-success { background: #E8FFEA; color: #00B42A; }
+.lib-arco .tag-danger  { background: #FFECE8; color: #F53F3F; }
+.lib-arco .tag-warning { background: #FFF7E8; color: #FF7D00; }
+.lib-arco .tag-info    { background: #F2F3F5; color: #4E5969; }
+
+/* Naive：实心彩色底 + 白字 + 圆角 */
+.lib-naive .tag {
+  border-radius: var(--radius-tag);
+  color: #fff;
+  font-weight: 600;
+}
+.lib-naive .tag-success { background: #18A058; }
+.lib-naive .tag-danger  { background: #D03050; }
+.lib-naive .tag-warning { background: #F0A020; }
+.lib-naive .tag-info    { background: #8F959E; }
+
+
+/* ============== Dashboard 组件 ============== */
+
+/* 统计卡 */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  padding: 22px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* EP 统计卡：边框 + 硬阴影 + 直角 + hover 抬起 */
+.lib-ep .stat-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+}
+.lib-ep .stat-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+
+/* Arco 统计卡：极淡边框 + 中圆角 */
+.lib-arco .stat-card {
+  border: 1px solid #F2F3F5;
+  border-radius: var(--radius-card);
+}
+.lib-arco .stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Naive 统计卡：无边框 + 大圆角 + 柔和阴影 */
+.lib-naive .stat-card {
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.lib-naive .stat-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  transform: translateY(-2px);
+}
+
+/* 统计卡图标容器 */
+.stat-icon-wrap {
+  width: 56px; height: 56px;
+  flex-shrink: 0;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* EP：方形 + 渐变 + 直角 */
+.lib-ep .stat-icon-wrap {
+  border-radius: var(--radius-btn);
+}
+.lib-ep .stat-icon-wrap.c1 { background: linear-gradient(135deg,#409EFF,#66B1FF); }
+.lib-ep .stat-icon-wrap.c2 { background: linear-gradient(135deg,#E6A23C,#F0C78A); }
+.lib-ep .stat-icon-wrap.c3 { background: linear-gradient(135deg,#909399,#B1B3B8); }
+.lib-ep .stat-icon-wrap.c4 { background: linear-gradient(135deg,#67C23A,#85CE61); }
+
+/* Arco：方形 + 纯色 + 中等圆角 */
+.lib-arco .stat-icon-wrap {
+  border-radius: var(--radius-btn);
+}
+.lib-arco .stat-icon-wrap.c1 { background: #165DFF; }
+.lib-arco .stat-icon-wrap.c2 { background: #FF7D00; }
+.lib-arco .stat-icon-wrap.c3 { background: #86909C; }
+.lib-arco .stat-icon-wrap.c4 { background: #00B42A; }
+
+/* Naive：圆形 + 纯色 + 柔和投影 */
+.lib-naive .stat-icon-wrap {
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.lib-naive .stat-icon-wrap.c1 { background: #18A058; }
+.lib-naive .stat-icon-wrap.c2 { background: #2080F0; }
+.lib-naive .stat-icon-wrap.c3 { background: #F0A020; }
+.lib-naive .stat-icon-wrap.c4 { background: #D03050; }
+
+.stat-info { flex: 1; }
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+.stat-sub {
+  font-size: 12px;
+  margin-top: 6px;
+  display: flex;
+  gap: 12px;
+}
+
+/* 内容卡 */
+.content-card {
+  background: var(--bg-card);
+  margin-bottom: 16px;
+  padding: 20px;
+}
+
+.lib-ep .content-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-card);
+}
+.lib-arco .content-card {
+  border: 1px solid #F2F3F5;
+  border-radius: var(--radius-card);
+}
+.lib-naive .content-card {
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* 表格 */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.data-table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-lighter);
+  color: var(--text-2);
+}
+
+/* EP 表头：灰底 */
+.lib-ep .data-table th {
+  background: #FAFAFA;
+  color: #606266;
+  border-bottom: 1px solid var(--border-light);
+}
+.lib-ep .data-table tr:nth-child(even) td { background: #FAFAFA; }
+
+/* Arco 表头：更细的背景 */
+.lib-arco .data-table th {
+  background: #F7F8FA;
+  color: #4E5969;
+  border-bottom: 1px solid #F2F3F5;
+  font-weight: 600;
+}
+.lib-arco .data-table td { border-bottom-color: #F2F3F5; }
+
+/* Naive 表头：最克制 */
+.lib-naive .data-table th {
+  background: transparent;
+  color: #8F959E;
+  border-bottom: 1px solid #E5E7EB;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.lib-naive .data-table tr:nth-child(even) td { background: #FAFAFA; }
+.lib-naive .data-table td { border-bottom-color: #F0F2F5; }
+
+
+/* ============== 底部说明 ============== */
+.comparison-footer {
+  margin-top: 48px;
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-lighter);
+}
+.comparison-footer h3 {
+  font-size: 16px;
+  color: var(--text-1);
+  margin-bottom: 12px;
+}
+.comparison-footer p {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.8;
+}
+
+.lib-naive .comparison-footer {
+  border-color: transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.lib-arco .comparison-footer { border-color: #F2F3F5; }
+
+</style>
+</head>
+<body class="lib-ep">
+
+<!-- 库选择器 -->
+<div class="lib-switcher">
+  <button class="active" data-lib="ep">
+    <span class="lib-chip">E</span>
+    Element Plus
+  </button>
+  <button data-lib="arco">
+    <span class="lib-chip">A</span>
+    Arco Design Vue
+  </button>
+  <button data-lib="naive">
+    <span class="lib-chip">N</span>
+    Naive UI
+  </button>
+</div>
+
+<div id="app">
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">S</div>
+      <span>Sparrow</span>
+    </div>
+    <nav class="menu">
+      <div class="menu-group">概览</div>
+      <div class="menu-item active">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        监控看板
+      </div>
+      <div class="menu-group">核心</div>
+      <div class="menu-item">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        任务管理
+      </div>
+      <div class="menu-item">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        延时消息
+      </div>
+      <div class="menu-item">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        告警中心
+      </div>
+      <div class="menu-item">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        执行器节点
+      </div>
+      <div class="menu-group">日志</div>
+      <div class="menu-item">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        执行日志
+      </div>
+    </nav>
+  </aside>
+
+  <!-- 主区域 -->
+  <div class="main">
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="nav-left">
+        <div class="nav-breadcrumb">首页 / <span>监控看板</span></div>
+      </div>
+      <div class="nav-right">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          12 个执行器在线
+        </div>
+        <div class="avatar">LG</div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ 第一部分：组件气质对比 ============ -->
+      <div class="section-label section-label-ep">
+        <div class="title">同一个 Dashboard · 三套视觉语言</div>
+        <div class="desc">点击顶部切换按钮，观察真正的差异</div>
+      </div>
+
+      <!-- 统计卡 -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon-wrap c1">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">128</div>
+            <div class="stat-label">任务总数</div>
+            <div class="stat-sub">
+              <span style="color:var(--success)">运行中 45</span>
+              <span style="color:var(--text-3)">已停止 83</span>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap c2">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">1,256</div>
+            <div class="stat-label">今日执行次数</div>
+            <div class="stat-sub">
+              <span style="color:var(--success)">成功 1,233</span>
+              <span style="color:var(--danger)">失败 23</span>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap c3">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">45</div>
+            <div class="stat-label">延时消息堆积</div>
+            <div class="stat-sub"><span style="color:var(--text-3)">待触发</span></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap c4">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">12 / 15</div>
+            <div class="stat-label">在线执行器</div>
+            <div class="stat-sub"><span style="color:var(--success)">在线率 80%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日志表格（最能看出差异） -->
+      <div class="content-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-size:15px; font-weight:600; color:var(--text-1);">最新执行日志</div>
+          <span style="font-size:13px; color:var(--primary); cursor:pointer;">查看全部 →</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>任务名称</th>
+              <th>执行器地址</th>
+              <th>状态</th>
+              <th>耗时</th>
+              <th>触发时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>数据同步任务</td>
+              <td>192.168.1.10:9999</td>
+              <td><span class="tag tag-success">成功</span></td>
+              <td style="color:var(--success); font-weight:500;">1.25 s</td>
+              <td>2024-03-15 14:30</td>
+            </tr>
+            <tr>
+              <td>报表生成任务</td>
+              <td>192.168.1.11:9999</td>
+              <td><span class="tag tag-success">成功</span></td>
+              <td style="color:var(--warning); font-weight:500;">3.50 s</td>
+              <td>2024-03-15 14:25</td>
+            </tr>
+            <tr>
+              <td>消息推送任务</td>
+              <td>192.168.1.12:9999</td>
+              <td><span class="tag tag-danger">失败</span></td>
+              <td style="color:var(--success); font-weight:500;">0.80 s</td>
+              <td>2024-03-15 14:20</td>
+            </tr>
+            <tr>
+              <td>订单清理任务</td>
+              <td>192.168.1.10:9999</td>
+              <td><span class="tag tag-success">成功</span></td>
+              <td style="color:var(--success); font-weight:500;">0.52 s</td>
+              <td>2024-03-15 14:15</td>
+            </tr>
+            <tr>
+              <td>缓存刷新任务</td>
+              <td>192.168.1.11:9999</td>
+              <td><span class="tag tag-warning">超时</span></td>
+              <td style="color:var(--danger); font-weight:500;">30.0 s</td>
+              <td>2024-03-15 14:10</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============ 第二部分：按钮/输入框/标签 细节对比 ============ -->
+      <div class="section-label section-label-ep" style="margin-top:48px;">
+        <div class="title">组件气质细节 · 按钮 / 输入框 / 标签</div>
+        <div class="desc">三库并排看差异，比换色更重要</div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-cell">
+          <div class="compare-cell-title">按钮 Button</div>
+          <div class="btn-row">
+            <button class="btn btn-default">默认按钮</button>
+            <button class="btn btn-primary">主按钮</button>
+            <button class="btn btn-success">成功</button>
+          </div>
+        </div>
+        <div class="compare-cell">
+          <div class="compare-cell-title">输入框 Input</div>
+          <div class="input-row">
+            <input class="input" placeholder="请输入关键字">
+          </div>
+        </div>
+        <div class="compare-cell">
+          <div class="compare-cell-title">标签 Tag</div>
+          <div class="tag-row">
+            <span class="tag tag-success">在线</span>
+            <span class="tag tag-danger">故障</span>
+            <span class="tag tag-warning">警告</span>
+            <span class="tag tag-info">未知</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 底部说明 ============ -->
+      <div class="comparison-footer">
+        <h3>三套库的核心哲学差异</h3>
+        <p style="margin-bottom:12px;">
+          <strong style="color:var(--primary)">Element Plus</strong>：传统后台管理风，组件有清晰的边框和层次，学习成本最低。
+          适合 To B 的运维/工具平台。但 <span style="color:var(--danger)">最容易做出"长得都一样"的东西</span>，因为它的视觉签名太强，
+          换色不能改变它"是 Element Plus"这件事。
+        </p>
+        <p style="margin-bottom:12px;">
+          <strong style="color:var(--primary)">Arco Design Vue</strong>（字节跳动）：白底侧栏 + 克制的蓝色主色 + 极淡边框。
+          组件更扁平、更轻，没有 Element Plus 那种"厚重感"。品牌记忆点比 EP 弱，
+          <span style="color:var(--success)">换色后更容易变成"你的"风格</span>。
+        </p>
+        <p>
+          <strong style="color:var(--primary)">Naive UI</strong>：圆角最大、阴影最柔和、配色最活泼。
+          默认是绿色主色，而且标签/徽章是实心彩色（另外两个库是半透明+文字色）。
+          <span style="color:var(--success)">视觉上最有"现代感"和"设计感"</span>，但对不熟悉的开发者上手需要适应。
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// 库切换
+document.querySelectorAll('.lib-switcher button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const lib = btn.dataset.lib;
+    document.body.className = 'lib-' + lib;
+    document.querySelectorAll('.lib-switcher button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 更新 section label 装饰
+    const labels = document.querySelectorAll('.section-label');
+    labels.forEach(l => {
+      l.classList.remove('section-label-ep','section-label-arco','section-label-naive');
+      l.classList.add('section-label-' + lib);
+    });
+  });
+});
+</script>
+</body>
+</html>
