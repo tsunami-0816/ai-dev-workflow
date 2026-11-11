@@ -23,7 +23,7 @@ SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", ".idea", ".
 # 工作流测试目录下，哪些子目录属于"工作流自身资源"而不是"产出的子项目"
 WORKFLOW_INTERNAL_DIRS = {"scripts", "prompts", "skills", "docs", "workflow",
                           "workflow_cli", "workflow_cli.egg-info", ".cursor", ".trae",
-                          ".github", ".pytest_cache", ".screenshots", "step00_产出_20261027"}
+                          ".github", ".pytest_cache", ".screenshots"}
 
 # 依赖关键词 → 技能点（粗匹配，够用就行）
 SKILL_MAP = [
@@ -184,6 +184,8 @@ def main():
         if not child.is_dir():
             continue
         if child.name.startswith(".") or child.name in SKIP_DIRS:
+            continue
+        if child.name.startswith("step00_产出_"):
             continue
         targets.append(child)
 
