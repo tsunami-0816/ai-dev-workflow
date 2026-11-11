@@ -107,17 +107,17 @@
 
 | # | 落地位置 | 台账/文档落点 | commit |
 |---|---|---|---|
-| 93 | `prompts/step06_本地运行与冒烟.md` §6.0 第 7.1 条「Agent 预走查清单后端项」 | 提示词本身；复用 R6/#78 卡点交付物协议 | 待回填 |
-| 82 | `projects/_TEMPLATE_新项目/` 9 份产物模板（`05.5_代码Review/代码Review报告.md`、`06.5_契约/契约校验记录.md`、`07_联调/联调检查清单.md`、`07_联调/数据重置记录.md`、`08_测试/基线指标验证表.md`、`08.5_安全扫描/docs/安全扫描报告.md`、`09_验收/最终验收清单与报告.md`、`10_交付/交付复盘.md`、`10_交付/交付包与上线方案.md`）预置表头与门禁关键字 | 模板目录；关键字对照 `workflow/steps.yaml` 各 artifact keywords | 待回填 |
-| 95 | `prompts/step08_全量测试.md` §8.6.2 拆分（step8 仅 CI 配置落盘 + 本地 collect-only 绿；远程 Actions + README badge 归 10.5 回填）；`workflow/steps.yaml` step8 产物未把 badge 列必达 | 提示词本身 + steps.yaml | 待回填 |
-| 96 | `prompts/step08_全量测试.md` §8.5.2「工具按协议选型」（HTTP/JSON 用 JMeter；私有二进制/Protobuf 允许自研客户端，写明降级边界，不产出不可运行 jmx 骨架） | 提示词本身 | 待回填 |
-| 97 | `scripts/workflow_completion_check.py`：`FORBID_CONTEXT_EXEMPT` 语境豁免表 + `_scan_forbid` 逐行扫描，只禁结论性否定 | 脚本实现粒度缺陷，不新增 R 规则；对应 R14 如实归属口径 | 待回填 |
-| 98 | `workflow/steps.yaml` 三条目（`06_冒烟/前端UI质量报告.md`、`06_冒烟/taste审美检测报告.md`、`06.5_契约/openapi.json`）标 `requires_frontend: true`；`scripts/workflow_completion_check.py` `_has_frontend` 纯后端跳过 | steps.yaml + 门禁脚本 | 待回填 |
-| 99 | `scripts/workflow_completion_check.py` `_normalize_design_mode` 设计模式归一化（否定语境优先），optional mode 精确匹配枚举，不再子串包含 | 门禁脚本；对应 R24 模式口径 | 待回填 |
-| 100 | `scripts/prepush_check.py` `_is_env_template` 按后缀模式识别（`.env.example*` / `.env.sample*` / `.env.*.template` / `.env.*.tpl`），不再枚举文件名 | prepush 硬闸脚本 | 待回填 |
-| 101 | `scripts/prepush_check.py` `TYPE_NAMES` + `_looks_type_name`（类型名/局部变量白名单）并入 `_is_false_positive`；`PLACEHOLDER_TOKENS` 扩充 dev-local/not-used/unused 等 | prepush 硬闸脚本；夹具/种子 sql 继续走 `.secretignore` | 待回填 |
-| 102 | `projects/_TEMPLATE_新项目/.gitignore.template` 运行时数据写显式 `runtime/data/`，预留 `!**/qa-automation/data/` 夹具例外段 | 模板目录 | 待回填 |
-| 103 | `scripts/workflow_completion_check.py` BOARD_STALE 改行级解析：跳过标题行/状态取值枚举行，表格行只看状态列、产物路径非空视为已回写 | 门禁脚本；看板模板固定结构配套 | 待回填 |
+| 93 | `prompts/step06_本地运行与冒烟.md` §6.0 第 7.1 条「Agent 预走查清单后端项」 | 提示词本身；复用 R6/#78 卡点交付物协议 | aa9aad1 |
+| 82 | `projects/_TEMPLATE_新项目/` 9 份产物模板（`05.5_代码Review/代码Review报告.md`、`06.5_契约/契约校验记录.md`、`07_联调/联调检查清单.md`、`07_联调/数据重置记录.md`、`08_测试/基线指标验证表.md`、`08.5_安全扫描/docs/安全扫描报告.md`、`09_验收/最终验收清单与报告.md`、`10_交付/交付复盘.md`、`10_交付/交付包与上线方案.md`）预置表头与门禁关键字 | 模板目录；关键字对照 `workflow/steps.yaml` 各 artifact keywords | aa9aad1 |
+| 95 | `prompts/step08_全量测试.md` §8.6.2 拆分（step8 仅 CI 配置落盘 + 本地 collect-only 绿；远程 Actions + README badge 归 10.5 回填）；`workflow/steps.yaml` step8 产物未把 badge 列必达 | 提示词本身 + steps.yaml | aa9aad1 |
+| 96 | `prompts/step08_全量测试.md` §8.5.2「工具按协议选型」（HTTP/JSON 用 JMeter；私有二进制/Protobuf 允许自研客户端，写明降级边界，不产出不可运行 jmx 骨架） | 提示词本身 | aa9aad1 |
+| 97 | `scripts/workflow_completion_check.py`：`FORBID_CONTEXT_EXEMPT` 语境豁免表 + `_scan_forbid` 逐行扫描，只禁结论性否定 | 脚本实现粒度缺陷，不新增 R 规则；对应 R14 如实归属口径 | aa9aad1 |
+| 98 | `workflow/steps.yaml` 三条目（`06_冒烟/前端UI质量报告.md`、`06_冒烟/taste审美检测报告.md`、`06.5_契约/openapi.json`）标 `requires_frontend: true`；`scripts/workflow_completion_check.py` `_has_frontend` 纯后端跳过 | steps.yaml + 门禁脚本 | aa9aad1 |
+| 99 | `scripts/workflow_completion_check.py` `_normalize_design_mode` 设计模式归一化（否定语境优先），optional mode 精确匹配枚举，不再子串包含 | 门禁脚本；对应 R24 模式口径 | aa9aad1 |
+| 100 | `scripts/prepush_check.py` `_is_env_template` 按后缀模式识别（`.env.example*` / `.env.sample*` / `.env.*.template` / `.env.*.tpl`），不再枚举文件名 | prepush 硬闸脚本 | aa9aad1 |
+| 101 | `scripts/prepush_check.py` `TYPE_NAMES` + `_looks_type_name`（类型名/局部变量白名单）并入 `_is_false_positive`；`PLACEHOLDER_TOKENS` 扩充 dev-local/not-used/unused 等 | prepush 硬闸脚本；夹具/种子 sql 继续走 `.secretignore` | aa9aad1 |
+| 102 | `projects/_TEMPLATE_新项目/.gitignore.template` 运行时数据写显式 `runtime/data/`，预留 `!**/qa-automation/data/` 夹具例外段 | 模板目录 | aa9aad1 |
+| 103 | `scripts/workflow_completion_check.py` BOARD_STALE 改行级解析：跳过标题行/状态取值枚举行，表格行只看状态列、产物路径非空视为已回写 | 门禁脚本；看板模板固定结构配套 | aa9aad1 |
 
 ---
 
