@@ -172,6 +172,8 @@ steps:
         min_bytes: 60
         # #98 纯后端无前端项目自动跳过
         requires_frontend: true
+        # 依赖本机技能库（skills/ 被 gitignore）；缺库时门禁显式降级为跳过，不算缺产物
+        requires_skill: taste-skill
 
   - id: "6.5"
     name: 接口契约校验

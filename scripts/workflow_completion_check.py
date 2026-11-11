@@ -108,6 +108,7 @@ def _gate_item(art: dict, step: dict, is_refurbish: bool) -> dict:
         "mode": art.get("mode") or "",
         "requires_frontend": bool(art.get("requires_frontend")),
         "requires_http_api": bool(art.get("requires_http_api")),
+        "requires_skill": art.get("requires_skill") or "",
     }
 
 
@@ -190,6 +191,12 @@ def _has_http_api(project_root: Path) -> bool:
     if re.search(r"接口形态\*{0,2}[：:]\s*(二进制|非\s*HTTP|Protobuf|KCP|WebSocket-only)", text):
         return False
     return True
+
+
+def _has_skill(name: str) -> bool:
+    """本机技能库是否存在（skills/ 被 gitignore，缺库时应显式降级而非误判缺产物）。"""
+    root = Path(__file__).resolve().parent.parent
+    return (root / "skills" / "active" / name).exists()
 
 
 def _has_frontend(project_root: Path) -> bool:
@@ -310,6 +317,13 @@ def check_one(project_root: Path, item: dict) -> dict:
     # 非 HTTP 接口形态（二进制/Protobuf/KCP 等）：无 OpenAPI 可导出，跳过（#98 补口）
     if item.get("requires_http_api") and not _has_http_api(project_root):
         result["skipped"] = "看板接口形态非 HTTP，无 OpenAPI 可导出，跳过"
+        result["details"] = result["skipped"]
+        result["status"] = "OK"
+        return result
+
+    # 依赖本机技能库的产物（如 taste 检测）：缺库时显式降级，不把「没装 skill」误判成「没交报告」
+    if item.get("requires_skill") and not _has_skill(item["requires_skill"]):
+        result["skipped"] = f"本机缺少技能库 {item['requires_skill']}，降级跳过"
         result["details"] = result["skipped"]
         result["status"] = "OK"
         return result

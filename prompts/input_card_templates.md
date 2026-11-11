@@ -20,6 +20,54 @@ sources:            # 上游产物引用，必须真实存在于项目目录内
 
 ---
 
+## step1 项目基线输入卡
+
+> 位置：`01_项目基线说明书.md.input_card.yaml`（根级步骤的卡与产物同名）
+> 由 step00 冻结原始描述后生成；step1 产出基线时补齐 `baseline_ref / scope_ref`
+
+```yaml
+step: "1"
+project: <项目名>
+updated_at: "2026-11-11 14:30"
+sources:
+  - 00_原始项目描述.md
+baseline_ref: 01_项目基线说明书.md
+scope_ref: 01_项目基线说明书.md#3-范围界定
+```
+
+---
+
+## step4 任务拆解输入卡
+
+> 位置：`04_任务拆解与开发规范.md.input_card.yaml`
+> 由 step3 架构评审结论产出后生成；任务项必须能映射到基线 criterion
+
+```yaml
+step: "4"
+project: <项目名>
+updated_at: "2026-11-11 14:30"
+sources:
+  - 02_架构设计/第一轮技术架构设计文档.md
+  - 03_评审报告/第一轮架构评审报告.md
+arch_ref: 02_架构设计/第一轮技术架构设计文档.md
+tasks:
+  - task_id: T01
+    desc: <任务描述>
+    risk: 中
+    criterion_ref: C01
+scope:
+  files_in_scope:
+    - 05_代码/backend/**
+  out_of_scope:
+    - 05_代码/frontend/**
+limits:
+  max_files: 60
+  max_attempts: 5
+  timeout_min: 120
+```
+
+---
+
 ## step5A 后端开发输入卡
 
 > 位置：`05_代码/backend/input_card.yaml`

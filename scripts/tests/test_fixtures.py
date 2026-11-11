@@ -353,6 +353,19 @@ def test_gate_f2_ui_report_skipped_without_frontend(tmp_path):
     assert r["status"] == "OK" and r.get("skipped"), r
 
 
+def test_gate_taste_skipped_without_skill(tmp_path, monkeypatch):
+    """本机缺 taste-skill 时显式降级跳过，不把「没装 skill」误判成「没交报告」"""
+    import workflow_completion_check as gate
+
+    monkeypatch.setattr(gate, "_has_skill", lambda name: False)
+    item = gate._gate_item(
+        _item("06_冒烟/taste审美检测报告.md", requires_skill="taste-skill"),
+        {"id": "6", "fallback": ["6"]}, False,
+    )
+    r = gate.check_one(tmp_path, item)
+    assert r["status"] == "OK" and "技能库" in r.get("skipped", ""), r
+
+
 def test_g8_baseline_missing_is_warned(tmp_path):
     """基线缺失不再静默豁免：旁路观察期告警，strict 转阻塞"""
     from design_impl_check import check_project

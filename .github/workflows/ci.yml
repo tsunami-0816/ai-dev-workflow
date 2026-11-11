@@ -43,5 +43,5 @@ jobs:
       - name: Security scan (hardcoded secrets)
         run: python scripts/security_scan_secrets.py .
 
-      - name: Dependency check (example project backend)
-        run: python scripts/dependency_checker.py "projects/生产异常答疑AI助手/05_代码/backend"
+      - name: Dependency check (fixed fixture, not a project)
+        run: python scripts/dependency_checker.py "scripts/tests/fixtures/backend"
