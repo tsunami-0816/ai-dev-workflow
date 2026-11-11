@@ -119,6 +119,25 @@
 | 102 | `projects/_TEMPLATE_新项目/.gitignore.template` 运行时数据写显式 `runtime/data/`，预留 `!**/qa-automation/data/` 夹具例外段 | 模板目录 | aa9aad1 |
 | 103 | `scripts/workflow_completion_check.py` BOARD_STALE 改行级解析：跳过标题行/状态取值枚举行，表格行只看状态列、产物路径非空视为已回写 | 门禁脚本；看板模板固定结构配套 | aa9aad1 |
 
+### 2026-11-11 前沿对齐方案落地（G1–G11，方案见 `WORKFLOW_详细优化方案_2026-11-11.md`）
+
+> 本次 11 组采纳项落在 schema / 脚本 / 提示词 / 模板 / steps.yaml / 卡点协议层；新增 R 规则 0 条。新脚本先旁路观察一个项目，连续无误报再转阻塞闸；历史项目豁免。commit 短 hash 于工作流仓推送后回填。
+
+| # | 落地位置 | 台账/文档落点 | commit |
+|---|---|---|---|
+| 104 | G1 输入卡 Schema 校验：新增 `workflow/input_card_schema.yaml`、`scripts/input_card_check.py`；`workflow/steps.yaml` 各步补 `input_card` 字段；执行约定 §四 卡校验硬规则；卡点协议新增「输入卡校验闸」；`prompts/input_card_templates.md` 对齐字段 | schema + 脚本 + steps.yaml + 执行约定 + 卡点协议；单测 `test_g1_g8_g10.py` | 待回填 |
+| 105 | G2 计划范围与限额：step04/5A/5B 输入卡补 `scope`（files_in_scope/out_of_scope）与 `limits`（max_files/max_attempts/timeout_min）；校验并入 `input_card_check.py`（相交报红、限额正整数） | 提示词 + 校验脚本；依赖 #104 | 待回填 |
+| 106 | G3 失败响应四分类 + 振荡检测：执行约定 §二 加 stop/retry/human/transient 表与振荡规则；`_问题台账.md` 轮次日志加 `response_type`/`findings_count`；`scripts/log_failure.py` 加 `--response-type` 枚举与日志列 | 执行约定 + 台账模板 + 失败日志脚本 | 待回填 |
+| 107 | G4 安全轻量前置：5A/5B 完成前跑 `security_scan_secrets.py --sast` 留证，命中硬伤回修不带进 5.5；step02/5A 新依赖过 `dependency_checker.py --solve`；与 8.5 深度闸分层不替代 | 提示词（step02/5A/5B）；复用现有脚本 | 待回填 |
+| 108 | G5 风险四级 + 审批绑 commit：step04 风险枚举扩 低/中/高/关键；5.5 关键项具名人工确认并填 `approved_commit: <SHA>`，新 commit 审批作废；看板模板补审批字段位；关键动作清单（生产部署/密钥/改门禁定义）agent 永不自行执行 | 提示词（step04/5.5）+ 看板模板 | 待回填 |
+| 109 | G6 测试有效性审查：5.5 Review 加「测试有效性」层（断言打真实业务字段/状态，非仅 mock 返回值/状态码；mock 不得替换被测抽象）；step08 框架硬规则第 11 条同口径；假绿用例记台账路由回 step8 | 提示词（5.5/step08） | 待回填 |
+| 110 | G7 轻量度量台账：新增 `projects/_TEMPLATE_新项目/_运行度量.md`（步骤/起止/耗时/轮次/报红/失败条数/评分）；数据取自看板/台账/失败日志/评审报告，不新增采集脚本；step10/11 聚合 | 模板目录 | 待回填 |
+| 111 | G8 验收条目挂接：step01 基线指标给 `criterion_id`（C01…）；step04 映射表加「验收指标」列挂 `criterion_ref`；`design_impl_check.py` stage10 核对基线 C 编号 100% 挂接、无悬空引用；基线无 C 编号时豁免 | 提示词（step01/step04）+ 映射核对脚本；单测覆盖 | 待回填 |
+| 112 | G9 门面页方向稿前置：step02 定稿后、5B 动工前出 `02_架构设计/门面页方向稿.md` + 1~2 张方向稿；卡点协议加条件触发的 👤 方向确认；5B 按稿实现；仅 landing/portfolio/标注门面页，业务页不触发；R24 三版发散保留兜底 | 提示词（step02/5B）+ 卡点协议 | 待回填 |
+| 113 | G10 断点标记 + 恢复决策树：新增 `scripts/checkpoint.py`（mark/done/status）；`.checkpoint/<step>.json`；执行约定 §一 2.2 断点优先恢复清单；5A 幂等规范；`.gitignore.template` 排除 `.checkpoint/`；本期不做自动崩溃重启/跨机恢复 | 脚本 + 执行约定 + 模板 gitignore；单测覆盖 | 待回填 |
+| 114 | G11 全局 API Key 仓库约定：step02 识别外部 API 时从 `D:\lg\project\resources\api-keys.env` 复制到项目 `.env`，项目内不复存原件；仓库文件补用途/来源/新增日期登记格式；泄露立即吊销；随首个带外部 API 项目试点 | 提示词（step02）+ 全局仓库注释 | 待回填 |
+| 116 | 观察期自动转硬闸：新增 `workflow/gate_states.yaml`（闸口 observe/strict 状态 + 观察计数/误报累计）+ `scripts/_gate_states.py` 共享模块 + `scripts/gate_gatekeeper.py`（review 按项目观察日志自动翻 strict / status / mark-fp）；G1、G8 两闸脚本改为读状态文件决定阻塞/旁路，observe 写 `.gate_observations/` 日志；step10 复盘跑 review、step11 体检核对状态 | 状态文件 + 脚本 + 提示词（step10/step11）+ 卡点协议；补单测 | 待回填 |
+
 ---
 
 ## 二、2026-11-05 起新增（未归档）
@@ -126,7 +145,7 @@
 | # | 日期 | 来源 | 问题/建议 | 改法 | 状态 |
 |---|---|---|---|---|---|
 | **93** | 2026-11-05 | step6 | 阶段二人工走查全靠用户手动点，Agent 不先验证一遍就丢给用户，用户走查时经常踩到 Agent 本该提前发现的低级 bug（如 KeyError/404/参数名错） | step6 阶段二增加「Agent 先走一遍」环节：Agent 用 API 调用逐项走完走查清单的后端链路，把能自动验证的都先过一遍，只把需要前端视觉确认的留给用户；走查结果写入冒烟记录，用户只需复核而非从零走 | ✅**已采纳**（2026-11-11 落地，归档见文末「2026-11-11 step11 落地」小节） |
-| 79 | 2026-11-05 | step6 | API key 散落在各个项目 .env 里，新项目要用时找不到；且容易不小心传到 GitHub | 全局资源目录 D:\lg\project\resources\api-keys.env 作为唯一 key 仓库，新项目从这里复制；step8.5 安全扫描加 git log -p \| grep -i "sk-" 检查 git 历史 key 泄露；泄露立即提醒用户去控制台吊销 | ⏸️**暂缓**（2026-11-11 step11 triage）：git 历史密钥扫描已被 `prepush_check.py` 覆盖；全局 key 目录是跨项目资源约定，本项目无外部 API key、无散落实证，信息不足，再看 1–2 个带外部 key 的项目再定。 |
+| 79 | 2026-11-05 | step6 | API key 散落在各个项目 .env 里，新项目要用时找不到；且容易不小心传到 GitHub | 全局资源目录 D:\lg\project\resources\api-keys.env 作为唯一 key 仓库，新项目从这里复制；git 历史密钥扫描由 `prepush_check.py` 兜底；泄露立即提醒用户去控制台吊销 | ✅**已采纳**（2026-11-11 用户拍板）：目录与 `api-keys.env` 已存在（仓外、不被 git 追踪）；落地约定：新项目需外部 LLM/API 时主动从目录取用、项目目录不复存 key 原件；随首个带外部 API 的项目试点验证。详见 `WORKFLOW_改进方案_2026-11-11_前沿对齐.md` G11。 |
 | 80 | 2026-11-05 | step5B/精修模式 | tailwind.config.js 改配色/圆角/阴影后，vite HMR 不会自动重新生成自定义类，页面白屏或样式不生效 | 精修模式改完 tailwind.config.js 后必须手动重启 dev server（kill 旧进程 + npm run dev），写进精修模式的操作手册 | ⏸️**暂缓**（2026-11-11 step11 triage）：前端精修模式专属细节，本项目纯后端无前端；属 R24 操作手册补充，出现精修前端项目时再 triage，不立全局规则。 |
 | 81 | 2026-11-05 | step7/RAG | fastembed/HuggingFace 模型国内网络下载失败（Google Storage 被墙），本地 embedding 方案直接不可用 | RAG 架构设计阶段增加「embedding 方案网络可达性校验」：优先用云厂商 OpenAI 兼容 embedding API（千问/智谱/OpenAI），本地 fastembed 作为备选并标注国内网络风险 | ⏸️**暂缓**（2026-11-11 step11 triage）：RAG 方向专属，本项目无 RAG；出现本地 embedding 的 RAG 项目时再评估是否进 step02 架构闸门。 |
 | 82 | 2026-11-05 | step10.0/门禁 | workflow_completion_check.py 的关键字检查（UI质量报告要 error/warning/advisory/对比度/padding、设计实施映射表要特定表头列），产物模板不预置这些词会被门禁判红 | 各步骤产物模板（06_冒烟/前端UI质量报告.md、_设计实施映射表.md）预置门禁要求的关键字和表头列，Agent 填空即可，不用临时凑关键字 | ✅**已采纳**（2026-11-11 落地，归档见文末「2026-11-11 step11 落地」小节） |
@@ -150,6 +169,7 @@
 | 101 | 2026-11-11 | 10.5 prepush · cpp-game-server-kit | Password Assignment 正则误伤 proto 类型名、局部令牌变量名（old/new）、语义占位串（`dev-local-no-jwt-not-used`） | `prepush_check.py` 规则加类型名/大写常量/局部变量白名单，扩充占位词表（`dev-local`、`not-used`、`fake-*` 等）；测试夹具/种子 sql 继续走 `.secretignore` | ✅**已采纳**（2026-11-11 落地，归档见文末「2026-11-11 step11 落地」小节） |
 | 102 | 2026-11-11 | 模板/.gitignore · cpp-game-server-kit | `.gitignore` 的 `data/` 通配误伤任意层级同名目录，把 `qa-automation/data/test_accounts.yaml` 测试夹具排除，CI clone 后 collect 缺文件 | `projects/_TEMPLATE_新项目/.gitignore.template` 运行时数据目录写显式相对路径（如 `runtime/data/`），为测试夹具目录预留 `!**/qa-automation/data/` 例外段；10.5 模板说明同步 | ✅**已采纳**（2026-11-11 落地，归档见文末「2026-11-11 step11 落地」小节） |
 | 103 | 2026-11-11 | 10.0 门禁 BOARD_STALE · cpp-game-server-kit | 看板一致性检查按全文子串扫「进行中/未开始/卡在人工/当前卡点」，把模板固定文本（`## 当前卡点` 段标题、「状态取值：…」枚举说明行）和备注列措辞误判为看板滞后；历史项目靠全文闭环词豁免，本项目 10.6 待办未写闭环词即被误伤 | `workflow_completion_check.py` BOARD_STALE 改行级解析：跳过 markdown 标题行与「状态取值」枚举行；表格行只看状态列、产物路径列非空视为已回写；非表格行保留闭环词豁免。属门禁脚本粒度缺陷，不新增 R 规则 | ✅**已采纳**（2026-11-11 落地，归档见文末「2026-11-11 step11 落地」小节） |
+| 115 | 2026-11-11 | 候选独立项目 · 研发效能度量看板 | 方案 §4 提出把 G7 轻量度量台账（轮次/报红/失败条数/评分/耗时）聚合成跨项目效能看板；当前先留 `_运行度量.md` 轻量台账，不建平台 | **未开工**：列为候选独立项目，须走 step00 选题流程（JD 对账 / 缺口分析 / 硬件约束 / 硬骨头判定）拍板后再立项；本期不做度量平台、不新增采集脚本。来源：`WORKFLOW_详细优化方案_2026-11-11.md` §4 | ⏸️**候选**（2026-11-11 triage）：不进当前流水线，立项另走 step00 |
 
 ---
 

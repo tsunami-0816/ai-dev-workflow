@@ -88,6 +88,7 @@ qa-automation/
 8. **异步/执行类用例显式等终态**：SSE/MQ/引擎执行类用例必须轮询到终态（`SUCCESS/FAILED`）并设上限超时，禁止 `sleep` 固定时长后直接断言
 9. **ApiClient 构造函数必须自动 set_token**：`request_util.py` 的 ApiClient `__init__` 接收 token 后，必须立刻 `self.session.headers["Authorization"] = f"Bearer {token}"`，不能只存到实例属性忘了加 header——否则 10 条用例会假 401（来源：nestjs-agent-workbench 2026-11-08）
 10. **assert_ok 必须同时接受 200 和 201**：NestJS/Spring Boot POST 默认返回 201 Created，FastAPI/Express 返回 200。断言写 `status_code == 200` 会让所有 POST 用例假失败。直接写 `assert resp.status_code in (200, 201)`
+11. **断言必须打真实业务字段/状态（G6 测试有效性）**：禁止只断言 HTTP 200 / 201 就当通过；响应体里的业务字段、落库状态、可见结果必须有断言。mock 只能替代外部依赖，不得把被测业务抽象本身替换成固定返回；发现假绿用例记入 `_问题台账.md`，按「测试遗漏」回流补齐，不得标 `✅已验证`。
 
 ---
 

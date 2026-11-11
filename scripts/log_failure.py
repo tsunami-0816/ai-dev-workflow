@@ -5,9 +5,11 @@
 第 10 步复盘时直接读取这份日志做归因分析。
 
 用法：
-  python scripts/log_failure.py <项目目录> --step 6 --category "真实运行报错" --desc "npm install 报 ERESOLVE 依赖冲突" --ai-error "AI 编写的 package.json 中 react 版本与 antd 不兼容" --impact-file "frontend/package.json" --repro "npm install" --human-catch "" --rounds 2 --root-cause "幻觉依赖版本" --rule R8
+  python scripts/log_failure.py <项目目录> --step 6 --category "真实运行报错" --desc "npm install 报 ERESOLVE 依赖冲突" --ai-error "AI 编写的 package.json 中 react 版本与 antd 不兼容" --impact-file "frontend/package.json" --repro "npm install" --human-catch "" --rounds 2 --root-cause "幻觉依赖版本" --rule R8 --response-type retry
 
 可选 --rule：标注这次是哪条工作流规则兜住了这个坑（R<编号>），留空写「—」。
+可选 --response-type（G3）：失败响应四分类 stop / retry / human / transient，默认 retry；
+口径见 WORKFLOW_执行约定.md §二「失败响应四分类」。
 
 必填项说明：--step / --category / --desc / --impact-file / --repro 缺失或步骤名不在白名单内直接拒写，
 避免出现「第第7步步」这类笔误与「没留复现命令」这类不可复盘记录。
@@ -27,8 +29,8 @@ TEMPLATE_HEADER = """# 失败与返工日志
 > 2026-10-29 起新增「触发规则」列：记录这次是哪条工作流规则兜住了这个坑（如 R13 数据重置），
 > 供 WORKFLOW_规则库.md §8.0 规则登记表补源与 step11 体检统计。可留空，不额外增加流程步骤。
 
-| 时间 | 步骤 | 失败类别 | 问题描述 | AI 所犯错误 | 人工卡点发现的 AI 遗漏 | 修复轮次 | 根因分类 | 影响文件 | 复现命令 | 触发规则 |
-|---|---|---|---|---|---|---|---|---|---|---|
+| 时间 | 步骤 | 失败类别 | 问题描述 | AI 所犯错误 | 人工卡点发现的 AI 遗漏 | 修复轮次 | 根因分类 | 影响文件 | 复现命令 | 触发规则 | 响应类型 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
 """
 
 VALID_STEPS = {"0", "1", "2", "3", "4", "5A", "5B", "5.5", "6", "6.5", "7", "7.5",
@@ -56,6 +58,9 @@ ROOT_CAUSES = [
 ]
 
 HUMAN_CATCH_REQUIRED = ("人工卡点拦截", "验收不通过")
+
+# G3 失败响应四分类（口径见执行约定 §二）
+RESPONSE_TYPES = ["stop", "retry", "human", "transient"]
 
 
 def _cell(value: str) -> str:
@@ -86,6 +91,8 @@ def main():
     ap.add_argument("--impact-file", required=True, help="影响文件（多个用逗号分隔，必填）")
     ap.add_argument("--repro", required=True, help="复现命令/操作（必填，便于第 10 步复盘）")
     ap.add_argument("--rule", default="", help="本次是哪条工作流规则兜住/失效（如 R13），可留空")
+    ap.add_argument("--response-type", default="retry", choices=RESPONSE_TYPES,
+                    help="失败响应类型：stop/retry/human/transient（G3），默认 retry")
     args = ap.parse_args()
 
     try:
@@ -123,7 +130,8 @@ def main():
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     row = (f"| {now} | 第{step}步 | {_cell(args.category)} | {_cell(args.desc)} | "
            f"{_cell(args.ai_error)} | {_cell(args.human_catch)} | {rounds} | "
-           f"{_cell(args.root_cause)} | {_cell(args.impact_file)} | {_cell(args.repro)} | {rule or '—'} |\n")
+           f"{_cell(args.root_cause)} | {_cell(args.impact_file)} | {_cell(args.repro)} | {rule or '—'} | "
+           f"{args.response_type} |\n")
 
     with open(log_path, "a", encoding="utf-8") as f:
         f.write(row)

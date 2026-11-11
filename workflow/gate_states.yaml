@@ -1,0 +1,34 @@
+# 新闸观察期状态（方案 §8：连续 threshold_projects 个项目无误报后，由 gate_gatekeeper.py 自动转阻塞硬闸）
+#
+# status 口径：
+#   observe = 旁路观察期：校验不绿先 ⚠️ 警告、不挡开工/交付；
+#   strict  = 阻塞硬闸：校验不绿即 exit 1，回上一步补齐。
+#
+# 自动转闸判据（review 命令，step10/11 复盘跑）：
+#   - 本项目该闸观察日志里没有误报（false_positive=true）→ observed_projects +1；
+#   - 达到 threshold_projects → 自动翻 strict，记 activated_at / activated_project；
+#   - 出现误报 → observed_projects 清零、false_positives 累计，继续 observe。
+#
+# 本文件的 observed_projects / false_positives / activated_* 由脚本自动维护，不要手改。
+# 脚本读不到本文件或解析失败时，保守按 observe 旁路处理（R12：先怀疑脚本，不误阻塞）。
+
+gates:
+  input_card:
+    display: G1 输入卡校验闸
+    status: observe
+    threshold_projects: 1
+    observed_projects: 0
+    false_positives: 0
+    since: 2026-11-11
+    activated_at: null
+    activated_project: null
+
+  criterion_mapping:
+    display: G8 指标挂接核对
+    status: observe
+    threshold_projects: 1
+    observed_projects: 0
+    false_positives: 0
+    since: 2026-11-11
+    activated_at: null
+    activated_project: null

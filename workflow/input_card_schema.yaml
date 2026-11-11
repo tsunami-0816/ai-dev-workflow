@@ -1,0 +1,73 @@
+# 输入卡 Schema（G1 · 2026-11-11 落地）
+# 校验脚本：scripts/input_card_check.py <step> <card.yaml> --project <项目目录>
+# 设计依据：WORKFLOW_详细优化方案_2026-11-11.md §3 G1 / G2
+# 历史项目豁免：本闸门上线前创建的项目不强制（复用 10.0 门禁历史项目口径，不追溯）。
+# 新规则落点：本 schema + 校验脚本 + steps.yaml 的 input_card 字段 + 执行约定 §四 硬规则（R16 落点闸）。
+
+version: 1
+
+# ---------- 通用字段（所有步骤必填） ----------
+common:
+  required: [step, project, updated_at, sources]
+  fields:
+    step:
+      type: str
+      enum: ["1", "2", "3", "4", "5A", "5B", "5.5", "6", "6.5", "7", "7.5",
+             "8", "8.5", "9", "10", "10.0", "10.5", "10.6", "11"]
+    project:
+      type: str
+      nonempty: true
+    updated_at:
+      type: str
+      pattern: '^\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?$'
+    sources:
+      type: list
+      item_type: str
+      nonempty: true
+      # 引用路径必须落在项目目录内（越出目录即报红）；传 --project 时再校验真实存在
+      within_project: true
+
+# ---------- 分步骤扩展字段（方案 §3 G1 表） ----------
+step_specific:
+  "1":
+    required: [baseline_ref, scope_ref]
+  "2":
+    required: [baseline_ref, hardware_limit]
+    optional: [ports]
+  "4":
+    required: [arch_ref, tasks, scope, limits]
+  "5A":
+    required: [arch_ref, tasks, mock_policy, ports, scope, limits]
+  "5B":
+    required: [arch_ref, tasks, mock_ref, ports, scope, limits]
+  "6":
+    required: [code_dirs, start_commands, probe_urls, p0_ref]
+  "7":
+    required: [ledger_ref, contract_ref]
+  "8":
+    required: [baseline_ref, ledger_ref, cases_ref]
+  "9":
+    required: [baseline_ref, ledger_ref, security_ref]
+
+# tasks 列表项结构（4 / 5A / 5B）
+task_item:
+  required: [task_id, desc]
+  optional: [endpoint, page, risk, criterion_ref, contract_ref]
+  risk_enum: [低, 中, 高, 关键]
+
+# ---------- G2 范围与限额字段校验 ----------
+scope:
+  parent_field: scope
+  fields: [files_in_scope, out_of_scope]
+  list_items: true
+  # out_of_scope 中的路径模式不得与 files_in_scope 任一项相交（自相矛盾即报红）
+  rule: disjoint_in_and_out
+limits:
+  parent_field: limits
+  fields: [max_files, max_attempts, timeout_min]
+  type: positive_int
+
+# ---------- 端口字段 ----------
+ports:
+  # ports 为 dict，值必须是数字（允许 "8083" 这类数字字符串）
+  value_type: port_number

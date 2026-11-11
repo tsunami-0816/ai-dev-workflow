@@ -22,6 +22,8 @@ mapping:
   fallback: ["4", "5A", "5B", "6"]
   # 10.0 门禁：映射表少于 10 行直接判结构不完整（防 1 行表冒充 100%）
   min_rows: 10
+  # G8 指标挂接核对（criterion 100% 挂接）：当前旁路观察期，check_project 缺省 strict_criterion=false；
+  # 连续一个项目无误报后转阻塞闸（脚本加 --strict-criterion / completion_check 传 true）。
 
 # 设计模块 0.1~0.5：不在 steps 列表里（它没有项目看板，走 projects/_队列/），
 # 但提示词必须存在，由 `wf steps --check` 与 WORKFLOW_步骤定义.md 双向校验。
@@ -48,6 +50,8 @@ steps:
     owner: agent
     prompt: step01_项目基线定义.md
     fallback: ["1"]
+    # G1 输入卡（typed handoff）；校验脚本 scripts/input_card_check.py，历史项目豁免
+    input_card: 01_项目基线说明书.md.input_card.yaml
     artifacts: []
 
   - id: "2"
@@ -55,6 +59,7 @@ steps:
     owner: agent
     prompt: step02_技术架构设计.md
     fallback: ["1", "2"]
+    input_card: 02_架构设计/input_card.yaml
     artifacts: []
 
   - id: "3"
@@ -70,6 +75,7 @@ steps:
     owner: agent
     prompt: step04_任务拆解与开发规范.md
     fallback: ["3", "4"]
+    input_card: 04_任务拆解与开发规范.md.input_card.yaml
     artifacts: []
 
   - id: "5A"
@@ -77,6 +83,7 @@ steps:
     owner: agent
     prompt: step05A_后端开发.md
     fallback: ["4", "5A"]
+    input_card: 05_代码/backend/input_card.yaml
     artifacts: []
 
   - id: "5B"
@@ -84,6 +91,7 @@ steps:
     owner: agent
     prompt: step05B_前端开发.md
     fallback: ["4", "5A", "5B"]
+    input_card: 05_代码/frontend/input_card.yaml
     artifacts:
       # 精修模式下才有（R24）；普通模式不查
       - path: 05_代码/frontend/设计精修记录.md
@@ -115,6 +123,7 @@ steps:
     owner: human
     prompt: step06_本地运行与冒烟.md
     fallback: ["5A", "5B", "6"]
+    input_card: 06_冒烟/input_card.yaml
     artifacts:
       - path: 06_冒烟/冒烟记录.md
         label: step6 本地冒烟记录
@@ -161,6 +170,7 @@ steps:
     owner: agent
     prompt: step07_全链路联调.md
     fallback: ["7"]
+    input_card: 07_联调/input_card.yaml
     artifacts:
       # 问题记入 _问题台账.md，回归结论写回台账状态（不再单独产回归报告）
       - path: 07_联调/联调检查清单.md
@@ -187,6 +197,7 @@ steps:
     owner: agent
     prompt: step08_全量测试.md
     fallback: ["8"]
+    input_card: 08_测试/input_card.yaml
     artifacts:
       - path: 08_测试/p0_cases.json
         label: step8 P0 用例沉淀
@@ -216,6 +227,7 @@ steps:
     owner: human
     prompt: step09_最终验收.md
     fallback: ["9"]
+    input_card: 09_验收/input_card.yaml
     artifacts:
       - path: 09_验收/最终验收清单与报告.md
         label: step9 最终验收报告
@@ -228,6 +240,7 @@ steps:
     owner: agent
     prompt: step10_交付复盘.md
     fallback: ["10"]
+    input_card: 10_交付/input_card.yaml
     artifacts:
       - path: 10_交付/交付复盘.md
         label: step10 交付复盘报告

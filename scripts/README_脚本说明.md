@@ -1,6 +1,6 @@
 # 工作流辅助脚本说明
 
-这些脚本（18 个，含 1 个一次性维护脚本）是把「AI 评 AI」换成「机器校验」的工具，也是失败数据的采集入口。所有脚本入口都会把 stdout/stderr 切成 UTF-8（Windows 默认 cp936/GBK 下打印中文/emoji 不再 `UnicodeEncodeError`）；密钥扫描另支持根目录 `.secretignore` 豁免清单（仅测试夹具/示例）。**运行口径**：Agent 有终端能力时由 Agent 跑，原始输出贴回对话并落盘；Agent 无终端或需要用户本地凭证时由用户跑，把输出贴回。判定标准只有一个：**原始输出必须落盘**，不落盘的结论一律无效。
+这些脚本（21 个，含 1 个一次性维护脚本）是把「AI 评 AI」换成「机器校验」的工具，也是失败数据的采集入口。所有脚本入口都会把 stdout/stderr 切成 UTF-8（Windows 默认 cp936/GBK 下打印中文/emoji 不再 `UnicodeEncodeError`）；密钥扫描另支持根目录 `.secretignore` 豁免清单（仅测试夹具/示例）。**运行口径**：Agent 有终端能力时由 Agent 跑，原始输出贴回对话并落盘；Agent 无终端或需要用户本地凭证时由用户跑，把输出贴回。判定标准只有一个：**原始输出必须落盘**，不落盘的结论一律无效。
 
 | 脚本 | 解决的 AI 问题 | 在工作流哪一步用 |
 |---|---|---|
@@ -10,7 +10,10 @@
 | `prepush_check.py` | push 后密钥/大文件撤不回（公开仓库尤其致命） | 第 10.5 步 GitHub 推送前（push 前必跑） |
 | `api_contract_validator.py` | 前后端接口对不上（沉默的不一致） | 第 6 步冒烟后、第 7 步联调前 |
 | `p0_regression_test.py` | 回归测试靠手点、不可重复 | 第 8 步全量测试（把 P0 用例沉淀为 JSON，回归时自动跑） |
-| `log_failure.py` | 复盘凭记忆、没有失效数据 | 每次返工/卡点拦截时 |
+| `log_failure.py` | 复盘凭记忆、没有失效数据 | 每次返工/卡点拦截时（`--response-type` 记 G3 四分类） |
+| `input_card_check.py` | 步骤交接卡缺字段/引用失效/路径越界/枚举写错，开工前拦不住（G1） | 每步开工前（输入卡校验闸） |
+| `checkpoint.py` | 中断后靠猜看板恢复、整段重跑、重复造数据（G10） | 长步骤 mark/done，新对话恢复时 status 决策树 |
+| `gate_gatekeeper.py` | 新闸长期挂旁路观察期、没人转硬闸（观察期无自动出口） | step10 复盘 / step11 体检：review 按观察日志自动转 strict，status 查状态，mark-fp 标误报 |
 | `portfolio_scanner.py` | 作品集撞车（做了 3 个 RAG 又做第 4 个） | step00.2 作品集画像扫描 |
 | `skills_coverage_checker.py` | JD 要 Kafka 但设计书里只是个名字 | step00 设计书机器闸门（WORKFLOW_卡点协议.md「机器闸门」表，原卡点2）、第 3 步评审 |
 | `split_long_image.py` | JD 长截图 Read 工具直接拒 | step00.1 收 JD 截图时 |
@@ -117,6 +120,8 @@ python scripts/log_failure.py projects/生产异常答疑AI助手 \
 
 **必填字段**：`--step`（白名单：0~4 / 5A / 5B / 6 / 6.5 / 7 / 7.5 / 8 / 8.5 / 9 / 10 / 10.5 / 10.6 / 11）、`--desc`、`--impact-file`、`--repro`；类别为「人工卡点拦截 / 验收不通过」时 `--human-catch` 必填。缺项直接拒写（exit 2），防笔误与不可复盘记录。
 
+**`--response-type`（G3 四分类，2026-11-11 新增）**：`stop`（硬阻断，回上游改设计）/ `retry`（本轮内重试，findings 必须逐轮递减）/ `human`（转人工卡点，振荡第 2 次直接 human）/ `transient`（环境/网络瞬时，探活后重跑）；默认 `retry`。日志表末尾追加「响应类型」列（末尾加列，不动中间列索引，避免破坏现有 by_step 统计解析）。
+
 ---
 
 ## 6. env_preflight.py — 本机环境就绪预检
@@ -197,15 +202,17 @@ python scripts/design_impl_check.py projects/<项目名> --stage 10 --min-rows 1
 
 映射表固定表头（缺列即报 `MAPPING_STRUCTURE`）：
 
-| 编号 | 设计来源 | 设计项（功能/链路） | 端到端链路（输入→处理→输出） | 用户操作路径 | 实现落点 | 状态 | 验证证据 |
+| 编号 | 设计来源 | 设计项（功能/链路） | 验收指标 | 端到端链路（输入→处理→输出） | 用户操作路径 | 实现落点 | 状态 | 验证证据 |
 
 状态四值：`❌未实现` / `⚠️已实现未验证` / `✅已实现已验证` / `✂️明确砍掉`（必须在「验证证据」列写砍掉依据，否则结构报错）。
+
+**stage 10 的「验收指标」挂接核对（G8，2026-11-11 新增）**：基线说明书里的 `criterion_id`（C01、C02…）必须在映射表「验收指标」列逐条挂到对应链路；基线有但映射表没挂、或映射表引用了基线不存在的 C 编号，返回 `MAPPING_CRITERION`。基线里没有任何 C 编号时跳过本项（历史/未改造项目豁免）。**旁路口径（方案 §8）**：缺省为旁路观察期，挂接问题只记 `criterion_warning`、不阻塞交付；连续一个项目无误报后加 `--strict-criterion` 转阻塞闸。
 
 **stage 10 的「验证证据」硬校验（2026-11-08 新增）**：状态 ✅ 的行，「验证证据」不能是空/`—`/`-`/`无`/`待补`/`TODO`，否则返回新状态 `MAPPING_EVIDENCE` 并报缺几条。依据：状态只靠 AI 自填 ✅ 无法防「说自己验证了但没证据」，交付阶段必须能追到接口返回/截图路径/日志片段/测试名。stage 4/6 保持宽松（只查结构/未实现）。
 
 **`min_rows` 条数下限**：由 `workflow/steps.yaml` 的 `mapping.min_rows` 传给门禁（当前 `10`），也可用 `--min-rows` 手动指定；映射表数据行数低于阈值直接 `MAPPING_NOT_READY`（防 1 行表冒充 100%）。
 
-退出码：0 通过 / 1 阻塞（`MAPPING_MISSING` 文件缺失、`MAPPING_STRUCTURE` 结构错、`MAPPING_EMPTY` 无数据行、`MAPPING_NOT_READY` 仍有未实现/未验证或行数不足、`MAPPING_EVIDENCE` ✅ 行缺验证证据） / 2 参数错。
+退出码：0 通过 / 1 阻塞（`MAPPING_MISSING` 文件缺失、`MAPPING_STRUCTURE` 结构错、`MAPPING_EMPTY` 无数据行、`MAPPING_NOT_READY` 仍有未实现/未验证或行数不足、`MAPPING_EVIDENCE` ✅ 行缺验证证据、`MAPPING_CRITERION` 基线指标未挂接/悬空引用） / 2 参数错。
 历史豁免：`workflow/steps.yaml` 的 `mapping.launch_date`（当前 `2026-10-31`）之前创建的项目不阻塞，避免已交付项目复跑变红。
 
 ## 11. workflow_completion_check.py — 第 10.0 完成门禁
@@ -247,6 +254,54 @@ python scripts/prepush_check.py --json
 
 豁免：与密钥扫描共用根目录 `.secretignore`（测试夹具/示例的历史命中会被跳过并计数）。
 注意：它检查的是「你准备 push 的那一刻」的本地仓库，不是远端；红项要先清历史（重置密钥 → `git filter-repo`/BFG 清历史 → 重扫确认）再 push。
+
+## 13. input_card_check.py — 步骤交接卡 Schema 校验（G1/G2）
+
+每步开工前跑，把「交接卡缺字段、引用失效、路径越界、枚举写错、scope 自相矛盾、限额非法」拦在动手之前：
+
+```bash
+python scripts/input_card_check.py 5A projects/<项目名>/05_代码/5A_输入卡.yaml --project projects/<项目名>
+```
+
+- Schema 唯一事实源：`workflow/input_card_schema.yaml`（通用必填 + 分步骤扩展 + task 项 + G2 scope/limits + 端口规则）
+- 校验项：必填字段、`sources`/`arch_ref` 产物存在且不越出项目根、枚举合法（risk/mock_policy 等）、scope 的 in/out 不相交、limits 为正整数、端口在合法区间
+- 退出码：0 全绿或旁路警告 / 1 报红（仅 `--strict` 阻塞闸）/ 2 脚本自身错误
+- **旁路口径（方案 §8）**：缺省为旁路观察期，校验不绿先 ⚠️ 警告、exit 0；连续一个项目无误报后加 `--strict` 转阻塞闸（exit 1，回上一步补卡，卡不绿不动手）
+- 历史项目豁免：门禁上线前创建的项目不强制补卡；误报按 R12 先怀疑脚本
+
+## 14. checkpoint.py — 断点标记 + 恢复决策树（G10）
+
+长步骤中断后靠标记文件恢复，不靠猜看板；恢复不整段重跑：
+
+```bash
+# 开工前标记断点
+python scripts/checkpoint.py mark projects/<项目名> --step 6 --command "npm run dev" --pid 12345 --output-path "06_冒烟/冒烟记录.md"
+# 收口（记录退出码）
+python scripts/checkpoint.py done projects/<项目名> --step 6 --exit-code 0
+# 新对话恢复：读最新断点并给恢复建议
+python scripts/checkpoint.py status projects/<项目名>
+```
+
+- 标记文件：项目根 `.checkpoint/<step>.json`（运行时状态，`.gitignore.template` 已排除，不进 10.0 门禁产物清单）
+- 决策树：① 产物已落盘 + exit_code=0 → 跳过；② pid 仍存活 → 探活等待，不重启；③ 进程死 + exit_code≠0 → 只重跑本步；④ 无标记 → 从本步开始
+- 硬规则：禁止整段从头重跑；恢复第一步永远先 `env_preflight.py --smoke <已知 URL>` 探活，服务活着不重启
+- 本期不做：自动崩溃重启、跨机器恢复、断点状态云端同步。退出码：0 正常 / 2 脚本错误
+
+## 15. gate_gatekeeper.py — 新闸观察期自动转硬闸（G1/G8）
+
+新闸按方案 §8 先旁路观察一个项目，本脚本负责观察期的自动出口，避免长期挂旁路：
+
+```bash
+python scripts/gate_gatekeeper.py status                      # 看各闸 observe/strict、观察计数、误报数
+python scripts/gate_gatekeeper.py review projects/<项目名>    # step10 复盘 / step11 体检跑
+python scripts/gate_gatekeeper.py mark-fp projects/<项目名> --gate input_card --note "路径含括号被误判越界"
+```
+
+- 状态文件：`workflow/gate_states.yaml`（机器维护，`observed_projects` / `false_positives` / `activated_*` 不要手改）
+- 观察日志：`<项目根>/.gate_observations/<gate>.jsonl`，每次 observe 模式跑校验追加一条
+- **review 判据**：本项目该闸观察记录无误报 → 观察计数 +1，达 `threshold_projects`（默认 1）自动翻 `strict`；有误报 → 计数清零、误报累计，继续 observe；本项目没跑过该闸则不计入（幂等，已计入的行打 `counted` 标记）
+- 读不到状态文件或解析失败 → 保守按 observe 旁路，不误阻塞（R12）
+- 配套模块 `_gate_states.py`：状态读取 / 观察日志读写，供 `input_card_check.py`、`design_impl_check.py` 共用
 
 ---
 

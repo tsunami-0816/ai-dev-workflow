@@ -5,6 +5,10 @@
 .env
 .env.local
 .env.*.local
+# G10 断点标记（运行时状态，不入库；不进 10.0 门禁产物清单）
+.checkpoint/
+# 新闸观察日志（G1/G8 旁路观察期记录，运行时数据，不入库）
+.gate_observations/
 # 运行时数据目录写显式相对路径（#102）：不要用裸 `data/` 通配，
 # 否则会把测试夹具目录 qa-automation/data/ 一并排除，CI clone 后用例 collect 缺文件。
 runtime/data/

@@ -28,10 +28,18 @@ mapping.min_rows 传入）；映射表数据行数低于该阈值即报 MAPPING_
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
+import _gate_states as gates  # noqa: E402
+
 DEFAULT_MAPPING_PATH = "_设计实施映射表.md"
+DEFAULT_BASELINE_PATH = "01_项目基线说明书.md"
+
+# G8：基线指标编号 C01、C02…（避免误匹配 D-01）
+CRITERION_RE = re.compile(r"C\d{2,}")
+STATUS_CRITERION = "MAPPING_CRITERION"  # stage 10：基线指标未挂接 / 悬空引用
 
 REQUIRED_COLUMNS = [
     "编号", "设计来源", "设计项", "端到端链路",
@@ -64,6 +72,15 @@ def _cell(value: str) -> str:
     return value.strip().strip("*").strip()
 
 
+def _load_baseline_criteria(root: Path) -> set[str]:
+    """读基线说明书里的 criterion_id（C01…）；基线缺失或无编号返回空集（历史项目豁免）。"""
+    base = root / DEFAULT_BASELINE_PATH
+    if not base.exists():
+        return set()
+    text = base.read_text(encoding="utf-8", errors="ignore")
+    return set(CRITERION_RE.findall(text))
+
+
 def _classify(status_raw: str) -> str:
     """把状态单元格映射到四类之一；无法识别返回 unknown。"""
     s = status_raw.replace(" ", "")
@@ -86,10 +103,13 @@ def _find_header(lines: list[str]) -> tuple[int, dict] | tuple[None, None]:
         joined = " ".join(cells)
         if "状态" in joined and ("设计项" in joined or "编号" in joined):
             idx = {}
+            # 先登记全部列名（精确匹配），支持 G8「验收指标」等扩展列
+            for j, c in enumerate(cells):
+                idx.setdefault(c, j)
             for col in REQUIRED_COLUMNS:
                 for j, c in enumerate(cells):
                     if col in c:
-                        idx[col] = j
+                        idx.setdefault(col, j)
                         break
             return i, idx
     return None, None
@@ -97,10 +117,13 @@ def _find_header(lines: list[str]) -> tuple[int, dict] | tuple[None, None]:
 
 def check_project(project_dir: str | Path, stage: str = "10",
                   mapping_path: str = DEFAULT_MAPPING_PATH,
-                  min_rows: int = 0) -> dict:
+                  min_rows: int = 0,
+                  strict_criterion: bool = False) -> dict:
     """核心核对，返回结构化结果，供 CLI 与 workflow_completion_check.py 共用。
 
     min_rows：映射表数据行数下限（0 = 不限制，由 steps.yaml 的 mapping.min_rows 决定）。
+    strict_criterion：G8 指标挂接核对是否阻塞闸；缺省旁路观察期（只警告、不挡交付），
+    连续一个项目无误报后再置 True 转阻塞（方案 §8 回退策略）。
     """
     root = Path(project_dir).resolve()
     path = root / mapping_path
@@ -120,6 +143,9 @@ def check_project(project_dir: str | Path, stage: str = "10",
         "evidence_missing": 0,
         "evidence_missing_rows": [],
         "invalid_rows": [],
+        "criterion_unmapped": [],
+        "criterion_dangling": [],
+        "criterion_warning": "",
         "mapping_path": str(path),
     }
 
@@ -149,8 +175,8 @@ def check_project(project_dir: str | Path, stage: str = "10",
         if all(set(c) <= set("-: ") for c in cells if c):
             continue  # 分隔行
         def get(col: str) -> str:
-            j = idx[col]
-            return cells[j] if j < len(cells) else ""
+            j = idx.get(col)
+            return cells[j] if j is not None and j < len(cells) else ""
         row_id = get("编号")
         if not row_id:
             continue
@@ -163,6 +189,7 @@ def check_project(project_dir: str | Path, stage: str = "10",
             "impl": get("实现落点"),
             "status_raw": get("状态"),
             "evidence": get("验证证据"),
+            "criterion": get("验收指标"),
             "row": " | ".join(cells),
         })
 
@@ -212,6 +239,20 @@ def check_project(project_dir: str | Path, stage: str = "10",
     else:  # stage 4 只查结构
         blockers = 0
 
+    # G8：stage10 核对基线 criterion 100% 挂接（基线无 C 编号时跳过，历史项目豁免）
+    if delivery:
+        base_crits = _load_baseline_criteria(root)
+        if base_crits:
+            if "验收指标" not in idx:
+                result["status"] = "MAPPING_STRUCTURE"
+                result["details"] = "基线含 C 编号指标，但映射表缺「验收指标」列（G8 挂接列）"
+                return result
+            mapped: set[str] = set()
+            for r in rows:
+                mapped |= set(CRITERION_RE.findall(r["criterion"]))
+            result["criterion_unmapped"] = sorted(base_crits - mapped)
+            result["criterion_dangling"] = sorted(mapped - base_crits)
+
     too_few = min_rows > 0 and result["total"] < min_rows
     if result["invalid_rows"]:
         result["status"] = "MAPPING_STRUCTURE"
@@ -241,6 +282,21 @@ def check_project(project_dir: str | Path, stage: str = "10",
             shown += "…"
         result["details"] = (f"{result['evidence_missing']} 条 ✅ 行「验证证据」为空/占位"
                              f"（交付阶段必须写实测证据：{shown}）")
+    elif result["criterion_unmapped"] or result["criterion_dangling"]:
+        parts = []
+        if result["criterion_unmapped"]:
+            parts.append(f"基线指标未挂接到映射表：{', '.join(result['criterion_unmapped'])}")
+        if result["criterion_dangling"]:
+            parts.append(f"映射表悬空引用了基线不存在的指标：{', '.join(result['criterion_dangling'])}")
+        msg = "；".join(parts)
+        strict = strict_criterion or gates.is_strict("criterion_mapping")
+        if strict:
+            result["status"] = STATUS_CRITERION
+            result["details"] = msg
+        else:
+            # 旁路观察期：记警告与观察日志，不阻塞交付
+            result["criterion_warning"] = msg
+            gates.record_observation(root, "criterion_mapping", len(parts))
     return result
 
 
@@ -254,13 +310,16 @@ def main():
     ap.add_argument("--min-rows", type=int, default=0,
                     help="映射表数据行数下限（0=不限制；门禁由 steps.yaml mapping.min_rows 传入）")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
+    ap.add_argument("--strict-criterion", action="store_true",
+                    help="G8 指标挂接核对转阻塞闸；缺省为旁路观察期，仅警告不阻塞")
     args = ap.parse_args()
 
     if not Path(args.project_dir).is_dir():
         print(f"❌ 项目目录不存在：{args.project_dir}", file=sys.stderr)
         sys.exit(2)
 
-    r = check_project(args.project_dir, args.stage, args.path, min_rows=args.min_rows)
+    r = check_project(args.project_dir, args.stage, args.path, min_rows=args.min_rows,
+                      strict_criterion=args.strict_criterion)
     if args.json:
         print(json.dumps(r, ensure_ascii=False, indent=2))
     else:
@@ -282,8 +341,14 @@ def main():
                 print(f"🔴 {r['details']}")
                 print("   补法：给每条 ✅ 行写实测证据（接口返回/截图路径/日志片段/测试名），"
                       "不能只填「已实现」或「—」。")
+            elif r["status"] == STATUS_CRITERION:
+                print(f"🔴 {r['details']}")
+                print("   补法：在映射表「验收指标」列把基线 C 编号逐条挂到对应链路；删掉基线不存在的悬空引用。")
             else:
                 print("✅ 通过：本阶段无阻塞项")
+            if r.get("criterion_warning"):
+                print(f"⚠️ G8 指标挂接待核（旁路观察期，未阻塞）：{r['criterion_warning']}")
+                print("   观察期内先记录；连续一个项目无误报后加 --strict-criterion 转阻塞闸。")
         print("口径：❌未实现 = 设计里有、代码里没有；⚠️已实现未验证 = 写了但没按用户操作路径跑通过；"
               "✂️砍掉 = 必须附「砍掉依据」并已写进设计书 §8/基线排除范围。")
     sys.exit(0 if r["status"] == "OK" else 1)
