@@ -54,8 +54,19 @@ DESIGN_MODULE_IDS = {str(d["id"]) for d in DESIGN_MODULE_FALLBACK}
 PROMPT_REF_RE = re.compile(r"`(step[^`\s/]*\.md)`")
 # 规则引用 R<数字> / R-<数字>（前后不能沾字母数字，避免误伤 CR2 这类标识）
 RULE_REF_RE = re.compile(r"(?<![A-Za-z0-9_])R(-?\d+)(?!\d)")
-# 区间写法 R1~R21（~ 或全角 ～）
+# 区间写法 R1~R25（~ 或全角 ～）
 RULE_RANGE_RE = re.compile(r"(?<![A-Za-z0-9_])R(\d+)\s*[~～]\s*R(\d+)(?!\d)")
+# P1-2：区间校验同时接受半角连字符（R1-R25），上限必须等于现行最大规则号
+RULE_RANGE_STRICT_RE = re.compile(r"(?<![A-Za-z0-9_])R(\d+)\s*[~～-]\s*R(\d+)(?!\d)")
+# P1-1：规则副本四载体（AGENTS.md 为正文，其余三份只许是同构指针）
+RULE_CARRIERS = [
+    "AGENTS.md",
+    ".github/copilot-instructions.md",
+    ".trae/rules/project_rules.md",
+    ".cursor/rules/workflow.mdc",
+]
+RULE_CARRIER_REQUIRED = ["step00 卡点1", "第 11 步", "R-1", "R-2", "机器校验优先"]
+RULE_CARRIER_STALE = ["主控 §", "§2 步骤表", "§5 卡点", "§6 循环", "§7 看板", "§8 核心规则"]
 
 
 def find_root() -> Path:
@@ -485,7 +496,7 @@ def cmd_steps(args):
             )
 
     # 规则引用 lint：主控 / 专项文件 / prompts / steps.yaml / scripts 里出现的 R<id>
-    # （含 R-1 这类负号 id）必须都在 8.0 登记表里；允许 R1~R21 区间写法（展开后逐个校验）。
+    # （含 R-1 这类负号 id）必须都在 8.0 登记表里；允许 R1~R25 区间写法（展开后逐个校验）。
     sec80 = re.search(r"^## 8\.0 .*?(?=^## )", rulebook_text, re.M | re.S)
     rule_ids = set()
     if not sec80:
@@ -545,6 +556,46 @@ def cmd_steps(args):
                     f"{rel} 引用了 8.0 未登记的规则 {', '.join(unknown)}"
                     "（新增规则必须先补登记表再引用）"
                 )
+
+    # P1-2：规则区间上限必须等于现行最大规则号，防止「R1~R21 原样生效」这类过期口径
+    max_rule = max((int(r[1:]) for r in rule_ids if re.fullmatch(r"R\d+", r)), default=0)
+    range_files = list(probe_files if rule_ids else []) + [
+        root / "WORKFLOW_翻新线设计.md",
+        root / "projects" / TEMPLATE_NAME / "_项目状态.md",
+    ]
+    for f in range_files:
+        if not f.exists():
+            continue
+        text = text_cache.get(f.name)
+        if text is None:
+            text = f.read_text(encoding="utf-8", errors="ignore")
+        for m in RULE_RANGE_STRICT_RE.finditer(text):
+            upper = int(m.group(2))
+            if max_rule and upper != max_rule:
+                try:
+                    rel = f.relative_to(root)
+                except ValueError:
+                    rel = f
+                errors.append(
+                    f"{rel} 规则区间 {m.group(0)} 已过期（当前应为 R1~R{max_rule}，以 8.0 登记表为准）"
+                )
+
+    # P1-1：规则副本一致性（4 个载体必须是同一套「入口 + 4 条底线 + 口令」）
+    for rel in RULE_CARRIERS:
+        carrier = root / rel
+        if not carrier.exists():
+            errors.append(f"规则副本缺失：{rel}（4 个载体必须同步，正文以 AGENTS.md 为准）")
+            continue
+        text = carrier.read_text(encoding="utf-8", errors="ignore")
+        missing = [t for t in RULE_CARRIER_REQUIRED if t not in text]
+        stale = [t for t in RULE_CARRIER_STALE if t in text]
+        if missing:
+            errors.append(f"{rel} 规则副本缺关键词：{'、'.join(missing)}（与 AGENTS.md 不同步）")
+        if stale:
+            errors.append(
+                f"{rel} 规则副本仍引用旧版章节：{'、'.join(stale)}"
+                "（已废除，改指 WORKFLOW_步骤定义/规则库/卡点协议/执行约定）"
+            )
 
     # 主控「总执行顺序」流程图必须覆盖全部步骤 id（防止步骤表改了流程图没改）
     sec0 = re.search(r"^## 总执行顺序.*?(?=^## )", main_text, re.M | re.S)

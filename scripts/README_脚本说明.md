@@ -20,6 +20,7 @@
 | `design_impl_check.py` | **设计书/架构里写了的要素，实际没实现，到冒烟才发现链路压根没写** | 第 4 步（结构）、第 6 步阶段一、第 10.0 门禁（100%+证据） |
 | `design_quality_check.py` | 前端 UI 对比度/小字/padding 拥挤等可量化硬伤 | 第 6 步（R23，包装 impeccable detect） |
 | `design_taste_gate.py` | 页面「一眼 AI 模板味」（居中大标题+三图标卡+柔渐变） | 第 6 步（R23 配套 taste 子项） |
+| `step_gate_check.py` | 第 1/4 步「机器闸门」此前只有 Agent 自检，AI 容易自己判绿 | 第 1 步（基线量化）、第 4 步（扫漏三类段） |
 | `workflow_completion_check.py` | 产物没齐 / 台账没收敛 / 看板与队列状态撕裂就标「已完成」 | 第 10.0 步完成门禁（唯一放行判据） |
 | `refurbish_intake.py` | 翻新线 F0 迁入建档靠手抄、字段漏填 | 翻新线 F0（野生/毕业生两入口） |
 | `rule_usage_stats.py` | 规则只增不减、没人知道哪些在空转 | step11 规则体检（统计触发次数） |

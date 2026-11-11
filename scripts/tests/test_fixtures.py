@@ -35,6 +35,13 @@ SPEC_FILES = [
     "WORKFLOW_执行约定.md",
 ]
 COPIED_ROOT_FILES = SPEC_FILES + ["WORKFLOW_项目队列.md"]
+# P1-1：4 个规则副本载体（AGENTS.md + 三份同构指针）必须在临时副本里，否则 steps --check 判缺失
+COPIED_RULE_CARRIERS = [
+    "AGENTS.md",
+    ".github/copilot-instructions.md",
+    ".trae/rules/project_rules.md",
+    ".cursor/rules/workflow.mdc",
+]
 
 
 def _wf_cmd():
@@ -67,6 +74,10 @@ def _make_fake_root(tmp_path):
     dst.mkdir()
     for name in COPIED_ROOT_FILES:
         shutil.copy2(ROOT / name, dst / name)
+    for rel in COPIED_RULE_CARRIERS:
+        target = dst / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / rel, target)
     shutil.copytree(ROOT / "workflow", dst / "workflow")
     shutil.copytree(ROOT / "prompts", dst / "prompts")
     shutil.copytree(
