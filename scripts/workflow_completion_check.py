@@ -23,6 +23,8 @@ STEPS_FILE = Path(__file__).resolve().parent.parent / "workflow" / "steps.yaml"
 QUEUE_FILE = Path(__file__).resolve().parent.parent / "WORKFLOW_项目队列.md"
 # 门禁上线日期：此日期前创建的项目，台账/10.6 为可选；之后的必查（方案 A，按创建日期切分）
 GATE_LAUNCH_DATE = "2026-10-29"
+# 看板严格回写上线日：此日期前创建的项目，看板滞后降级为警告（不阻塞历史项目）
+BOARD_STRICT_DATE = "2026-11-11"
 # 产物内容闸门默认值（steps.yaml 单个 artifact 可用 min_bytes 覆盖）
 DEFAULT_MIN_BYTES = 32
 # forbid 语境豁免词（#97）：命中禁词的同一行若含下列语境标记，视为「如实归属技术债 / 已修复根因 / 占位口径」，
@@ -388,10 +390,8 @@ def check_board_consistency(root: Path) -> dict:
         ("当前卡点", "看板仍写有[当前卡点]"),
         ("当前阶段：**", "看板[当前阶段]字段未更新为已闭环"),
     ]
-    # 但要排除"已完成"语境：如"第6步 已完成"
-    # 简单判定：如果看板文本里出现"项目已交付"/"已闭环"/"门禁全绿"等闭环词，就不算
-    closed_markers = ["项目已交付", "已闭环", "门禁全绿", "项目完成", "MVP 验收通过"]
-    is_closed_word = any(m in text for m in closed_markers)
+    # 表格状态列：只有明确完成态才算已回写（2026-11-11 起不再凭产物路径列跳过）
+    done_states = ("已完成", "通过", "不适用", "闭环", "已交付")
 
     found_danger = []
     seen_danger = set()
@@ -409,24 +409,26 @@ def check_board_consistency(root: Path) -> dict:
         # 跳过「状态取值：…」枚举说明行：列出合法状态词，不代表当前状态
         if "状态取值" in stripped:
             continue
+        # 跳过模板字段的取值枚举行（如「总体状态：未开始 / 进行中 / …」），真实状态行不含斜杠枚举
+        if "总体状态" in stripped and "/" in stripped:
+            continue
 
         if stripped.startswith("|"):
             # 表格行：只解析状态列（第 3 列），产物路径/备注列里的词不算滞后
             cells = [c.strip() for c in stripped.split("|")[1:-1]]
             if len(cells) >= 3:
                 state_col = cells[2]
-                path_col = cells[3] if len(cells) >= 4 else ""
                 for marker, desc in danger_markers:
                     if marker == "当前阶段：**":
                         continue
                     if marker in state_col:
-                        # 产物路径列非空 = 产物已登记、看板已回写，仅待人工确认，不算未回写
-                        if path_col:
+                        # 状态列已是完成态才跳过；「未开始 + 路径非空」照样判滞后
+                        if any(s in state_col for s in done_states):
                             continue
                         _add(desc)
             continue
 
-        # 非表格行：当前阶段行单独判；其余危险词受闭环词豁免大闸
+        # 非表格行：当前阶段行单独判；其余危险词不再受全局闭环词豁免
         for marker, desc in danger_markers:
             if marker not in line:
                 continue
@@ -434,12 +436,17 @@ def check_board_consistency(root: Path) -> dict:
                 if "已完成" in line or "已交付" in line or "闭环" in line:
                     break
                 _add(desc)
-            elif not is_closed_word:
+            else:
                 _add(desc)
 
     if found_danger:
-        info["status"] = "BOARD_STALE"
-        info["details"] = "；".join(found_danger)
+        created = _project_created_date(root)
+        if created and created < BOARD_STRICT_DATE:
+            info["status"] = "BOARD_FRESH_WARNING"
+            info["details"] = "旧项目看板回写不严格，降级警告：" + "；".join(found_danger)
+        else:
+            info["status"] = "BOARD_STALE"
+            info["details"] = "；".join(found_danger)
 
     # mtime 新鲜度：产物比看板新 >10 分钟，警告
     artifact_files = [root / it["path"] for it in GATE_ITEMS if (root / it["path"]).exists()]

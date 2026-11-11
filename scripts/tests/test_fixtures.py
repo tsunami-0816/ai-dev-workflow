@@ -361,3 +361,66 @@ def test_g8_baseline_missing_is_warned(tmp_path):
     strict = check_project(root, stage="10", min_rows=0, strict_criterion=True)
     assert strict["status"] == "MAPPING_CRITERION", strict
     assert "BASELINE_MISSING" in strict["details"]
+
+
+# ---------- 6. 看板一致性闸：路径列不能再豁免「未开始」，旧项目降级 ----------
+
+BOARD_TABLE = (
+    "| 步骤 | 名称 | 状态 | 产物路径 | 完成时间 | 备注 |\n"
+    "|---|---|---|---|---|---|\n"
+    "| 1 | 基线 | {state} | `01_项目基线说明书.md` | | |\n"
+)
+
+
+def _board(created: str, stage: str, state: str, extra: str = "") -> str:
+    return (
+        "# 项目状态看板\n\n"
+        f"- 创建日期：{created}\n"
+        f"- 当前阶段：**{stage}**\n"
+        f"- 总体状态：未开始 / 进行中 / 卡在人工 / 已交付\n{extra}\n"
+        + BOARD_TABLE.format(state=state)
+    )
+
+
+def test_board_path_filled_but_state_not_started_is_stale(tmp_path):
+    """产物路径列非空 + 状态列「未开始」→ 仍判 BOARD_STALE"""
+    import workflow_completion_check as gate
+
+    (tmp_path / "_项目状态.md").write_text(
+        _board("2026-11-11", "第 1 步 · 项目基线定义（未开始）", "未开始"), encoding="utf-8"
+    )
+    r = gate.check_board_consistency(tmp_path)
+    assert r["status"] == "BOARD_STALE", r
+
+
+def test_board_closed_word_in_body_does_not_mask_table(tmp_path):
+    """正文写「项目已闭环」不能豁免表格里的「未开始」"""
+    import workflow_completion_check as gate
+
+    (tmp_path / "_项目状态.md").write_text(
+        _board("2026-11-11", "第 1 步", "未开始", extra="\n> 项目已闭环\n"), encoding="utf-8"
+    )
+    r = gate.check_board_consistency(tmp_path)
+    assert r["status"] == "BOARD_STALE", r
+
+
+def test_board_all_done_is_ok(tmp_path):
+    """当前阶段已完成且表格完成态 → OK"""
+    import workflow_completion_check as gate
+
+    (tmp_path / "_项目状态.md").write_text(
+        _board("2026-11-11", "已完成（第 11 步）", "已完成"), encoding="utf-8"
+    )
+    r = gate.check_board_consistency(tmp_path)
+    assert r["status"] == "OK", r
+
+
+def test_board_stale_old_project_downgraded(tmp_path):
+    """创建日期早于 2026-11-11 的旧项目：同样滞后 → BOARD_FRESH_WARNING"""
+    import workflow_completion_check as gate
+
+    (tmp_path / "_项目状态.md").write_text(
+        _board("2026-11-01", "第 1 步", "未开始"), encoding="utf-8"
+    )
+    r = gate.check_board_consistency(tmp_path)
+    assert r["status"] == "BOARD_FRESH_WARNING", r
