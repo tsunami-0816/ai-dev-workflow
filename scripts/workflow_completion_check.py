@@ -126,8 +126,9 @@ def load_gate_items() -> list:
     for step in load_steps():
         step_id = str(step["id"])
         is_refurbish_step = step_id.startswith("F")
-        if is_refurbish_step:
-            # 翻新线步骤的 artifacts 不在此处无条件展开——由 main() 按路线字段二次过滤
+        is_incremental_step = step_id.startswith("I")
+        if is_refurbish_step or is_incremental_step:
+            # 翻新线/迭代线步骤的 artifacts 不在此处无条件展开——由 main() 按路线字段二次过滤
             continue
         for art in step.get("artifacts") or []:
             items.append(_gate_item(art, step, is_refurbish=False))
@@ -146,14 +147,64 @@ def load_refurbish_gate_items() -> list:
     return items
 
 
+def load_incremental_gate_items() -> list:
+    """迭代线专属步骤的 artifacts（I0/I1）。仅当看板「路线=迭代」时才并入 GATE_ITEMS。"""
+    items = []
+    for step in load_steps():
+        step_id = str(step["id"])
+        if not step_id.startswith("I"):
+            continue
+        for art in step.get("artifacts") or []:
+            items.append(_gate_item(art, step, is_refurbish=False))
+    return items
+
+
 def _read_project_route(project_root: Path) -> str:
-    """读看板「路线」字段。缺失默认 '生产'；显式写 '翻新' 返回 '翻新'。"""
+    """读看板「路线」字段。缺失默认 '生产'；显式写 '翻新'/'迭代' 返回对应路线。"""
     board = project_root / "_项目状态.md"
     if not board.exists():
         return "生产"
     text = board.read_text(encoding="utf-8", errors="ignore")
-    m = re.search(r"\*\*路线\*\*：\s*(生产|翻新)", text)
+    m = re.search(r"\*\*路线\*\*：\s*(生产|翻新|迭代)", text)
     return m.group(1) if m else "生产"
+
+
+def _read_incremental_round(project_root: Path) -> str:
+    """读看板「迭代轮次」（如 v2）。取不到返回空串。"""
+    board = project_root / "_项目状态.md"
+    if not board.exists():
+        return ""
+    text = board.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r"迭代轮次\*{0,2}[：:]\s*(v\d+)", text)
+    return m.group(1) if m else ""
+
+
+def _resolve_incremental_path(project_root: Path, rel_path: str) -> Path:
+    """迭代线轮次目录解析（C2.1）：08_测试/ 下产物落本轮次目录。
+
+    顺序：① 看板轮次拼精确路径；② glob `v*` 目录，看板轮次优先，否则取最新 mtime；
+    ③ 都找不到回退 v1 根目录路径。内容校验只作用解析到的当前轮文件，不误伤 v1 产物。
+    """
+    p = project_root / rel_path
+    if not rel_path.startswith("08_测试/"):
+        return p
+    name = Path(rel_path).name
+    parent = Path(rel_path).parent
+    round_tag = _read_incremental_round(project_root)
+    if round_tag:
+        cand = project_root / parent / round_tag / name
+        if cand.exists():
+            return cand
+    round_dirs = [d for d in (project_root / parent).glob("v*") if d.is_dir()]
+    if round_dirs:
+        if round_tag:
+            matched = [d for d in round_dirs if d.name == round_tag]
+            if matched and (matched[0] / name).exists():
+                return matched[0] / name
+        latest = max(round_dirs, key=lambda d: d.stat().st_mtime)
+        if (latest / name).exists():
+            return latest / name
+    return p
 
 
 def _read_design_mode(project_root: Path) -> str:
@@ -275,11 +326,18 @@ def check_one(project_root: Path, item: dict) -> dict:
       READ_ERROR      文件读取失败
     """
     # path 是主路径，alt 是历史项目可能用的旧路径（任一存在即算落盘）
+    # 迭代线：08_测试/ 下产物先解析到本轮次目录（_resolve_incremental_path），再回退 v1 根目录
     candidates = [item["path"]] + list(item.get("alt") or [])
-    path = project_root / item["path"]
+    route = _read_project_route(project_root)
+
+    def _resolve(c: str) -> Path:
+        return _resolve_incremental_path(project_root, c) if route == "迭代" else project_root / c
+
+    path = _resolve(item["path"])
     for c in candidates:
-        if (project_root / c).exists():
-            path = project_root / c
+        cand = _resolve(c)
+        if cand.exists():
+            path = cand
             break
     try:
         min_bytes = int(item.get("min_bytes", DEFAULT_MIN_BYTES))
@@ -680,6 +738,58 @@ def check_job_handoff(project_name: str) -> dict:
     return info
 
 
+def check_incremental_regression(root: Path) -> dict:
+    """迭代线不退化核对（路线=迭代）：核对本轮不退化报告落盘且结论全绿。
+
+    报告由 scripts/incremental_regression_check.py 生成，落 08_测试/<轮次>/不退化报告.md；
+    本项只核对报告存在 + 结论关键字，不重复跑指标比对。路线≠迭代直接跳过。
+    """
+    info = {
+        "path": "08_测试/<轮次>/不退化报告.md",
+        "label": "迭代不退化报告（P0 探活 + 指标不跌破 v1）",
+        "status": "OK",
+        "details": "",
+        "fallback_steps": ["I2", "8"],
+    }
+    if _read_project_route(root) != "迭代":
+        info["details"] = "路线非迭代，跳过"
+        return info
+
+    round_tag = _read_incremental_round(root)
+    parent = root / "08_测试"
+    candidates = []
+    if round_tag:
+        candidates.append(parent / round_tag / "不退化报告.md")
+    round_dirs = [d for d in parent.glob("v*") if d.is_dir()]
+    if round_dirs:
+        if round_tag:
+            matched = [d for d in round_dirs if d.name == round_tag]
+            if matched:
+                candidates.append(matched[0] / "不退化报告.md")
+        latest = max(round_dirs, key=lambda d: d.stat().st_mtime)
+        candidates.append(latest / "不退化报告.md")
+    candidates.append(parent / "不退化报告.md")
+
+    report = next((c for c in candidates if c.exists()), None)
+    if report is None:
+        info["status"] = "REGRESSION_MISSING"
+        info["details"] = "本轮次目录下未找到不退化报告.md（先跑 incremental_regression_check.py）"
+        return info
+
+    content = report.read_text(encoding="utf-8", errors="ignore")
+    hits = _scan_forbid(content, ["未通过", "跌破", "回归失败", "P0 未通过"])
+    if hits:
+        info["status"] = "REGRESSION_NEGATIVE"
+        info["details"] = f"不退化报告命中未守住结论：{'、'.join(hits[:5])}"
+        return info
+    if not any(k in content for k in ("守住", "全绿", "通过", "不退化")):
+        info["status"] = "REGRESSION_NO_KEYWORD"
+        info["details"] = "报告未含守住/全绿/通过类结论关键字"
+        return info
+    info["details"] = f"报告：{report.relative_to(root)}"
+    return info
+
+
 def main():
     ap = argparse.ArgumentParser(description="工作流完成门禁检查")
     ap.add_argument("project_dir", help="项目目录，如 projects/xxx")
@@ -715,11 +825,13 @@ def main():
     # 读取项目创建日期（按方案 A 区分台账必查/可选）
     created_date = _read_project_create_date(root)
 
-    # 读看板路线字段：生产线查 GATE_ITEMS；翻新线追加 load_refurbish_gate_items()
+    # 读看板路线字段：生产线查 GATE_ITEMS；翻新线追加翻新线专属 items；迭代线追加迭代线专属 items
     route = _read_project_route(root)
     gate_items = list(GATE_ITEMS)  # 生产线全部 items
     if route == "翻新":
         gate_items.extend(load_refurbish_gate_items())
+    if route == "迭代":
+        gate_items.extend(load_incremental_gate_items())
 
     results = [check_one(root, item) for item in gate_items]
     # 追加问题台账收敛检查（按创建日期判断可选/必查）+ 看板一致性检查
@@ -728,11 +840,13 @@ def main():
     log_gap_result = check_log_gap(root)
     mapping_result = check_mapping(root, created_date)
     job_handoff_result = check_job_handoff(project_name)
+    regression_result = check_incremental_regression(root)
     results.append(ledger_result)
     results.append(board_result)
     results.append(log_gap_result)
     results.append(mapping_result)
     results.append(job_handoff_result)
+    results.append(regression_result)
     failed = [r for r in results
               if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING", "JOB_HANDOFF")]
 
@@ -774,6 +888,9 @@ def main():
                 "MAPPING_STRUCTURE": "🔴",
                 "MAPPING_NOT_READY": "🔴",
                 "MAPPING_EVIDENCE": "🔴",
+                "REGRESSION_MISSING": "🔴",
+                "REGRESSION_NEGATIVE": "🔴",
+                "REGRESSION_NO_KEYWORD": "⚠️ ",
             }.get(r["status"], "💥")
             line = f"{icon} {r['label']:<28} {r['path']}"
             if r["status"] == "OK" and r.get("skipped"):
@@ -798,6 +915,8 @@ def main():
                 line += f"  [失败日志缺口（不阻塞）：{r.get('details','')}]"
             elif r["status"] == "JOB_HANDOFF":
                 line += f"  [求职侧联动：{r.get('details','')}]"
+            elif r["status"] in ("REGRESSION_MISSING", "REGRESSION_NEGATIVE", "REGRESSION_NO_KEYWORD"):
+                line += f"  [不退化核对：{r.get('details','')}]"
             elif r["status"] == "LEDGER_OPEN":
                 line += f"  [台账未收敛：{r.get('details','')}]"
             elif r["status"] in ("MAPPING_MISSING", "MAPPING_EMPTY", "MAPPING_STRUCTURE",

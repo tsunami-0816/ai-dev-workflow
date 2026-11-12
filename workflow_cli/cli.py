@@ -50,6 +50,8 @@ DESIGN_MODULE_FALLBACK = [
     {"id": "0.5", "name": "一页纸项目设计书", "prompt": None},
 ]
 DESIGN_MODULE_IDS = {str(d["id"]) for d in DESIGN_MODULE_FALLBACK}
+# 迭代线复用段：I2/I3 复用生产线中段/尾段，不登记 steps.yaml，步骤定义表里出现但不参与双向集合校验
+REUSE_SEGMENT_IDS = {"I2", "I3"}
 # WORKFLOW_步骤定义.md 步骤表里反引号包着的提示词文件名（只认 prompts/ 下的 stepXX_*.md）
 PROMPT_REF_RE = re.compile(r"`(step[^`\s/]*\.md)`")
 # 规则引用 R<数字> / R-<数字>（前后不能沾字母数字，避免误伤 CR2 这类标识）
@@ -65,7 +67,7 @@ RULE_CARRIERS = [
     ".trae/rules/project_rules.md",
     ".cursor/rules/workflow.mdc",
 ]
-RULE_CARRIER_REQUIRED = ["step00 卡点1", "第 11 步", "R-1", "R-2", "机器校验优先"]
+RULE_CARRIER_REQUIRED = ["step00 卡点1", "第 11 步", "R-1", "R-2", "R-3", "机器校验优先"]
 RULE_CARRIER_STALE = ["主控 §", "§2 步骤表", "§5 卡点", "§6 循环", "§7 看板", "§8 核心规则"]
 
 
@@ -229,12 +231,17 @@ def _infer_facts(root: Path, name: str, gate, current_state: str = "") -> dict:
         date = b["dates"][0] if b["dates"] else None
         return {"state": "已豁免", "date": date, "checkpoint": exempt_reason or "见豁免清单"}
 
-    # 门禁项与 10.0 脚本同口径：生产线全部 items；看板「路线=翻新」时追加翻新线专属 items
+    # 门禁项与 10.0 脚本同口径：生产线全部 items；路线=翻新追加翻新线专属 items；
+    # 路线=迭代追加迭代线专属 items（I0/I1）
     gate_items = list(gate.GATE_ITEMS)
     route_fn = getattr(gate, "_read_project_route", None)
     refurb_fn = getattr(gate, "load_refurbish_gate_items", None)
-    if route_fn is not None and refurb_fn is not None and route_fn(pdir) == "翻新":
+    route = route_fn(pdir) if route_fn is not None else ""
+    if route == "翻新" and refurb_fn is not None:
         gate_items.extend(refurb_fn())
+    incremental_fn = getattr(gate, "load_incremental_gate_items", None)
+    if route == "迭代" and incremental_fn is not None:
+        gate_items.extend(incremental_fn())
     artifacts_ok = all(gate.check_one(pdir, it)["status"] == "OK" for it in gate_items)
     board_status = gate.check_board_consistency(pdir)["status"]
 
@@ -416,12 +423,12 @@ def cmd_steps(args):
                 )
 
     # 步骤编排表 ↔ steps.yaml/design_module 双向集合：多行少行都报红
-    # 事实源 = WORKFLOW_步骤定义.md「一、生产线步骤编排表」+「二、翻新线步骤」两张表
-    step_tables = re.search(r"^## 一、.*?(?=^## 三、)", stepdef_text, re.M | re.S)
+    # 事实源 = WORKFLOW_步骤定义.md「一、生产线」+「二、翻新线」+「三、迭代线」三张表
+    step_tables = re.search(r"^## 一、.*?(?=^## 四、)", stepdef_text, re.M | re.S)
     step2_ids = set()
     if not step_tables:
         errors.append(
-            "步骤编排表解析失败（找不到 WORKFLOW_步骤定义.md 的「一、生产线步骤编排表」~「三、双模块协议」区间）"
+            "步骤编排表解析失败（找不到 WORKFLOW_步骤定义.md 的「一、生产线步骤编排表」~「四、双模块协议」区间）"
         )
     else:
         for line in step_tables.group(0).splitlines():
@@ -431,8 +438,10 @@ def cmd_steps(args):
             if not cells:
                 continue
             first = cells[0].replace("**", "").strip()
-            if re.fullmatch(r"F\d+|\d+(?:\.\d+)?[AB]?", first):
+            if re.fullmatch(r"F\d+|I\d+|\d+(?:\.\d+)?[AB]?", first):
                 step2_ids.add(first)
+        # I2/I3 为复用段，不登记 steps.yaml，不参与双向集合比对
+        step2_ids -= REUSE_SEGMENT_IDS
         expected_ids = id_set | design_ids
         if not step2_ids:
             errors.append("步骤编排表解析失败（未识别到任何步骤 id）")
@@ -506,20 +515,27 @@ def cmd_steps(args):
         if not rule_ids:
             errors.append("8.0 规则登记表解析失败（未识别到任何 R<id> 行）")
 
-    # 翻新线 R-1/R-2 单独校验：8.0 必须有登记行，且步骤定义 §3.4 协议 / 卡点协议卡点表都要有落点引用
-    for rid in ("R-1", "R-2"):
+    # 路线专属卡点规则单独校验：8.0 必须有登记行，且步骤定义协议段 / 卡点协议卡点表都要有落点引用
+    # R-1/R-2 落在步骤定义 §3.4 翻新线协议；R-3 落在 §3.5 迭代线协议
+    ROUTE_RULE_PROTOCOL = {
+        "R-1": ("步骤定义 §3.4", r"^### 3\.4 .*?(?=^## |^### )"),
+        "R-2": ("步骤定义 §3.4", r"^### 3\.4 .*?(?=^## |^### )"),
+        "R-3": ("步骤定义 §3.5", r"^### 3\.5 .*?(?=^## |^### )"),
+    }
+    for rid in ("R-1", "R-2", "R-3"):
         if rid not in rule_ids:
-            errors.append(f"8.0 登记表缺少翻新线规则 {rid} 行（id 不回收，翻新线卡点同样要登记）")
+            errors.append(f"8.0 登记表缺少路线专属规则 {rid} 行（id 不回收，路线卡点同样要登记）")
             continue
+        proto_label, proto_pat = ROUTE_RULE_PROTOCOL[rid]
         for label, sec_pat, text in (
-            ("步骤定义 §3.4", r"^### 3\.4 .*?(?=^## |^### )", stepdef_text),
+            (proto_label, proto_pat, stepdef_text),
             ("卡点协议 人工卡点表", r"^## 一、.*?(?=^## 二、|^### )", gates_text),
         ):
             sec = re.search(sec_pat, text, re.M | re.S)
             if not sec:
                 errors.append(f"{label} 章节解析失败")
             elif rid not in sec.group(0):
-                errors.append(f"{label} 未引用翻新线卡点 {rid}（8.0 登记后必须在协议/卡点章节有落点）")
+                errors.append(f"{label} 未引用路线卡点 {rid}（8.0 登记后必须在协议/卡点章节有落点）")
 
     if rule_ids:
         text_cache = {
