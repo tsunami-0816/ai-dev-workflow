@@ -89,6 +89,8 @@ qa-automation/
 9. **ApiClient 构造函数必须自动 set_token**：`request_util.py` 的 ApiClient `__init__` 接收 token 后，必须立刻 `self.session.headers["Authorization"] = f"Bearer {token}"`，不能只存到实例属性忘了加 header——否则 10 条用例会假 401（来源：nestjs-agent-workbench 2026-11-08）
 10. **assert_ok 必须同时接受 200 和 201**：NestJS/Spring Boot POST 默认返回 201 Created，FastAPI/Express 返回 200。断言写 `status_code == 200` 会让所有 POST 用例假失败。直接写 `assert resp.status_code in (200, 201)`
 11. **断言必须打真实业务字段/状态（G6 测试有效性）**：禁止只断言 HTTP 200 / 201 就当通过；响应体里的业务字段、落库状态、可见结果必须有断言。mock 只能替代外部依赖，不得把被测业务抽象本身替换成固定返回；发现假绿用例记入 `_问题台账.md`，按「测试遗漏」回流补齐，不得标 `✅已验证`。
+12. **并发/线程模型改动必须有并发确定性覆盖（G6 配套）**：涉及连接线程模型、并发重入、互斥锁/忙拒绝、共享可变状态的改动，必须有并发探针（多线程/多请求真实并发）或进程内屏障单测确定性验证临界分支；只跑串行用例不算覆盖并发分支（来源：dev-metrics-dashboard ISS-S8-002 SQLite 连接跨线程复用并发下压测 500，8.5 R2 补屏障单测 `test_concurrent_collect_busy_rejected` 才确定性覆盖忙拒绝分支）。
+13. **自研测试/压测脚本落盘后必须自跑一次留证**：`perf_test.py`、自研客户端、辅助脚本落盘后必须真实执行一次（空跑 / `--help` / 最小参数通过），退出码或最小输出留证；只写不跑不算完成（来源：dev-metrics-dashboard ISS-S8-004 `perf_test.py` global 声明顺序 SyntaxError，脚本首轮起不来）。
 
 ---
 

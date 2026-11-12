@@ -25,6 +25,8 @@
 | SparrowScheduler | 8087 | ✅ 已完成 | 单模块 Spring Boot（sparrow-admin，2026-11-02 翻新线分配；Docker prod 映射 8090） |
 | shopmate-ai | **8088** | ✅ 已完成 | FastAPI 主服务（2026-11-04 启动分配） |
 | nestjs-agent-workbench | **8089** | 🔨 进行中 | NestJS 主服务（2026-11-08 启动分配） |
+| dev-metrics-dashboard | **8091** | 🔨 进行中 | FastAPI 主服务（2026-11-11 启动分配，设计书预分配核实） |
+| react-taro-microfrontend | 复用 8083 | 🔨 进行中 | 不新写后端，复用 #7 saas-workflow-agent Spring Boot 接口（2026-11-11 并行启动） |
 | 预留 | 8090 | | |
 
 ## 前端端口分配池（5173 起递增）
@@ -39,6 +41,8 @@
 | SparrowScheduler | 5181 | ✅ 已完成 | Vite dev（2026-11-02 翻新线分配；Docker web 映射 3002） |
 | shopmate-ai | **5182** | ✅ 已完成 | Vite dev（2026-11-04 启动分配） |
 | nestjs-agent-workbench | **5183** | 🔨 进行中 | Vite dev（2026-11-08 启动分配） |
+| dev-metrics-dashboard | **5184** | 🔨 进行中 | Vite dev（2026-11-11 启动分配，设计书预分配核实） |
+| react-taro-microfrontend | **5185** | 🔨 进行中 | Taro4/Vite dev H5 端（2026-11-11 并行启动分配；后端复用 #7 saas-workflow-agent 8083，不新分配后端端口） |
 
 ## 开工时自动分配规则（env_preflight.py）
 

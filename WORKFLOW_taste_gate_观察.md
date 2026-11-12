@@ -11,3 +11,5 @@
 | 日期 | 项目 | 项目类型 | URL | inspect 退出码 | FAIL 数 | 人工标注（真问题/误报/未看） | 备注 |
 |---|---|---|---|---|---|---|---|
 | 2026-11-08 | nestjs-agent-workbench | b2b-admin | http://localhost:5183 | 1 | 4 | 未看 | |
+| 2026-11-11 | dev-metrics-dashboard | internal-tool | http://127.0.0.1:8091/ | 1 | 3 | 真问题 2 / 误报 1 | 真问题：字号 48%<13px（P3）、口径角标距边 9px（P3），均 deferred；误报：热力图单色相=状态编码非数据系列，建议 allow 白名单。另 5 路由 inspect 复测，根因页 overflow 134px 已在本轮修复 |
+| 2026-11-12 | react-taro-microfrontend | portfolio | http://127.0.0.1:5185/index.html | 1 | 11 | 真问题 1 / 误报 7 / 待 T24 3 | 真问题：no-title 缺 h1 语义（P3，Q-008 deferred）。误报/不适用：font-fallback（系统字体非 webfont）、first-action（Taro Button 未被识别为 button）、few-pictures/no-footage/no-hero（后台门面非 landing）、off-centre（flex 居中被边距算法误判）、dev-server（环境提示）。待 T24 冻结期：shadow、hero-void、still-page。仅扫登录页首屏，其余页留阶段二人工走查 |
