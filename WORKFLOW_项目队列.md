@@ -23,7 +23,7 @@
 | nestjs-agent-workbench | 生产 | Node.js NestJS AI对话工作台（补Node.js缺口，WebSocket流式+JWT/RBAC） | `projects/_队列/nestjs-agent-workbench/00_项目设计书.md` | 已完成 | 垦驱智能Agent岗（求职侧设计台） | 2026-11-08 | 2026-11-08 | 无（门禁全绿） |
 | SparrowScheduler | 翻新 | 分布式任务调度平台（翻新线·野生入口） | `projects/SparrowScheduler/00_项目设计书.md` | 已完成 | 野生入口迁入 | 2026-11-02 | 2026-11-03 | 无（门禁全绿） |
 | cpp-game-server-kit | 生产 | 现代 C++ 游戏服务器基础设施套件（epoll Reactor + 无锁日志 + Protobuf 网关 + KCP 帧同步战斗服） | `projects/_队列/cpp-game-server-kit/00_项目设计书.md` | 已完成 | 求职侧设计台：杭州游梦光年 C++游戏服务端 | - | 2026-11-11 | 无（门禁全绿） |
-| react-taro-microfrontend | 生产 | React 18+Taro4 跨端H5/小程序 + qiankun 微前端挂载Vue3子应用 | `projects/_队列/react-taro-microfrontend/00_项目设计书.md` | 进行中（第 6 步 · 本地运行与冒烟（阶段二人工走查卡点）） | 求职侧设计台：连帆/九凌/高帆/伯遇/垦驱 | 2026-11-11 | - | **当前卡点**：step6 **阶段二 👤 人工走查**。双 dev 已在后台运行（主 http://127.0.0. |
+| react-taro-microfrontend | 生产 | React 18+Taro4 跨端H5/小程序 + qiankun 微前端挂载Vue3子应用 | `projects/_队列/react-taro-microfrontend/00_项目设计书.md` | 进行中（第 8.5 步 · 安全扫描与渗透检查） | 求职侧设计台：连帆/九凌/高帆/伯遇/垦驱 | 2026-11-11 | - | **当前卡点**：👤 **第 8.5 步安全扫描人工卡点（Agent 侧已跑完，等你复核）**。Agent 已代跑 se |
 | tauri-rust-ai-task-desktop | 生产 | Tauri 2 + Rust 桌面 AI 任务工作台（ownership/Tokio异步/thiserror错误处理/rusqlite建模/AI任务状态机与异常恢复） | `projects/_队列/tauri-rust-ai-task-desktop/00_项目设计书.md` | 待开工 | 求职侧设计台：镜跃网络桌面开发(Tauri/Rust) | - | - | 无 |
 | pytorch-inference-service | 生产 | PyTorch微调BERT中文文本分类 + ONNX导出 + FastAPI推理服务 | `projects/_队列/pytorch-inference-service/00_项目设计书.md` | 待开工 | 求职侧设计台：宇佐智能/绍兴猫草 | - | - | 无 |
 | web3-dapp-voting | 生产 | Solidity ERC20+投票合约 + Hardhat本地链 + React+MetaMask DApp | `projects/_队列/web3-dapp-voting/00_项目设计书.md` | 待开工 | 求职侧设计台：坤汇高新Web3 | - | - | 无 |
