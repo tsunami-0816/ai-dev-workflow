@@ -28,6 +28,7 @@
 | pytorch-inference-service | 生产 | PyTorch微调BERT中文文本分类 + ONNX导出 + FastAPI推理服务 | `projects/_队列/pytorch-inference-service/00_项目设计书.md` | 待开工 | 求职侧设计台：宇佐智能/绍兴猫草 | - | - | 无 |
 | web3-dapp-voting | 生产 | Solidity ERC20+投票合约 + Hardhat本地链 + React+MetaMask DApp | `projects/_队列/web3-dapp-voting/00_项目设计书.md` | 待开工 | 求职侧设计台：坤汇高新Web3 | - | - | 无 |
 | sd-image-workflow | 生产 | Stable Diffusion WebUI+ComfyUI+ControlNet 批量电商图生成工作流 | `projects/_队列/sd-image-workflow/00_项目设计书.md` | 待开工 | 求职侧设计台：思元环保/丰度科技 | - | - | 无 |
+| game-npc-dialog-agent | 生产 | 游戏智能 NPC 对话 Agent（LangGraph 多轮人设记忆 + Qdrant 游戏知识库 RAG + function calling 道具/技能/任务查询 + 对话质量回归评测） | `projects/_队列/game-npc-dialog-agent/00_项目设计书.md` | 待开工 | 求职侧设计台：网龙网络 AI研究员-游戏（技术类加分缺口，优先级排在 must_have 硬缺口之后） | - | - | 无 |
 | dev-metrics-dashboard | 生产 | 研发效能度量看板（工作流自用：解析项目产物→SQLite 聚合→FastAPI+ECharts 看板；简历材料附带，按诚实边界写） | `projects/_队列/dev-metrics-dashboard/00_项目设计书.md` | 已完成 | 无来源 JD（改进建议 #115，2026-11-11 卡点1 拍板：自用工具立项） | 2026-11-11 | 2026-11-12 | 无（门禁全绿） |
 
 ---
