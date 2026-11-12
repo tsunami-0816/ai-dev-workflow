@@ -407,3 +407,45 @@ steps:
     prompt: null
     fallback: ["F3", "F4"]
     artifacts: []
+
+# ---------- 迭代线步骤（I0~I3） ----------
+# 对象=已闭环项目加增量能力；I2/I3 复用生产线中段/尾段，不登记独立步骤。
+# 定位与协议见 WORKFLOW_步骤定义.md §三迭代表 + §3.5；设计规格见
+# docs/archive/工作流自迭代档案/2026-11-12/迭代线设计规格_草案.md
+# 迭代线 owner 标记沿用生产线口径；R-3 高风险确认为人工卡点。
+
+  - id: "I0"
+    name: 增量建档
+    # 读 v1 基线/映射/实测指标/失败日志，写增量段；看板补迭代轮次 + 上一轮 commit
+    owner: agent
+    prompt: stepI0_增量建档.md
+    fallback: ["I0"]
+    artifacts:
+      # 迭代线看板字段（路线=迭代、迭代轮次、上一轮 commit）——门禁按看板「路线=迭代」额外查
+      - path: _项目状态.md
+        label: I0 迭代线看板字段（路线=迭代 + 迭代轮次 + 上一轮 commit）
+        keywords: ["路线=迭代", "迭代轮次", "上一轮 commit"]
+        forbid: ["未增量", "结论：不通过"]
+      - path: 01_项目基线说明书.md
+        label: I0 增量基线段（增量范围/影响面/指标归属/不退化基线/回滚预案）
+        keywords: ["增量范围", "影响面", "不退化"]
+        forbid: ["待补", "TODO"]
+        min_bytes: 200
+
+  - id: "I1"
+    name: 增量设计 + 评审
+    # 复用 step02/03 提示词与评审口径；高风险项（删改既有契约/数据模型/对外行为）走 R-3 人工确认
+    owner: human
+    prompt: null
+    fallback: ["I0", "I1"]
+    artifacts:
+      - path: 02_架构设计/增量设计段.md
+        label: I1 增量设计段（改动点/复用/新增/测试点/不退化核对项）
+        keywords: ["改动点", "复用", "新增", "测试点"]
+        forbid: ["待补", "TODO", "结论：不通过"]
+        min_bytes: 200
+      - path: 03_评审报告/增量评审记录.md
+        label: I1 增量评审记录（高风险项 R-3 确认）
+        keywords: ["评审", "增量", "结论"]
+        forbid: ["结论：不通过", "待补", "TODO"]
+        min_bytes: 150
