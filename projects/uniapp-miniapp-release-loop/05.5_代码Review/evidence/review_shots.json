@@ -1,0 +1,32 @@
+{
+  "home": {
+    "rows": 4,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 894,
+    "title": "城市轻写真",
+    "price": "¥399"
+  },
+  "afterScroll": {
+    "rows": 4,
+    "scrollHeight": 894
+  },
+  "detail": {
+    "url": "http://127.0.0.1:5186/#/pages/package/detail?id=1",
+    "title": "城市轻写真",
+    "price": "¥399",
+    "tags": [
+      "室内",
+      "2套服装",
+      "精修8张"
+    ],
+    "photoNote": "样片 4:5",
+    "fold": false,
+    "scrollWidth": 414,
+    "clientWidth": 390
+  },
+  "w375": {
+    "scrollWidth": 375,
+    "clientWidth": 375
+  }
+}

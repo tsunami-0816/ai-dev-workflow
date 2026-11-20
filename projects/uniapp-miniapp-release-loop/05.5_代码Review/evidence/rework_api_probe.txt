@@ -1,0 +1,13 @@
+﻿PASS | GET /api/packages | status=200 total=4
+PASS | GET /api/packages/2 | status=200
+PASS | POST login demo | status=200 userId=1
+PASS | POST login demo2 | status=200 userId=2
+PASS | POST booking (demo first) | status=200 bookingId=1 dup=false
+PASS | POST booking (demo repeat → duplicated) | status=200 bookingId=1 dup=true
+PASS | POST booking (demo2 same contact → 40001, 不返回他人单) | status=400 code=40001 msg=该手机号当天该时段已有预约，请更换手机号或时段
+PASS | POST login openid 无签名 → 40102 | status=401 code=40102 msg=openid 登录仅允许经小程序云函数发起
+PASS | POST login openid 带云签名 → 200 建号 | status=200 userId=3
+PASS | GET packages 云签名错误 → 40102 | status=401 code=40102
+PASS | GET /api/bookings 无 token → 401 | status=401 code=40101
+
+TOTAL=11 FAIL=0

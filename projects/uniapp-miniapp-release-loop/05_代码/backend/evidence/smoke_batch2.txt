@@ -1,0 +1,24 @@
+﻿
+# 1) health
+{"status":"UP","components":{"db":{"status":"UP","details":{"database":"MySQL","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":294972813312,"free":10881818624,"threshold":10485760,"path":"D:\\lg\\project\\工作流测试\\projects\\uniapp-miniapp-release-loop\\05_代码\\backend\\db\\.","exists":true}},"livenessState":{"status":"UP"},"ping":{"status":"UP"},"readinessState":{"status":"UP"},"redis":{"status":"UP","details":{"version":"5.0.14.1"}}},"groups":["liveness","readiness"]}
+
+# 2) packages?page=1&size=4
+{"code":0,"msg":"ok","data":{"list":[{"id":1,"title":"城市轻写真","price":399.00,"coverUrl":"/static/covers/cover-1.jpg","tags":["室内","2套服装","精修8张"],"summary":"室内自然光棚拍，适合日常通勤与社交头像；含妆造基础。","status":1},{"id":2,"title":"复古胶片","price":499.00,"coverUrl":"/static/covers/cover-2.jpg","tags":["外景","胶片质感","精修12张"],"summary":"外景街拍 + 胶片色调整，适合换季纪念与情侣合拍。","status":1},{"id":3,"title":"情侣纪实","price":699.00,"coverUrl":"/static/covers/cover-3.jpg","tags":["双人","外景","精修15张"],"summary":"以日常互动为主的纪实拍摄，含 90 分钟跟拍与 15 张精修。","status":1},{"id":4,"title":"个人写真·夜场","price":599.00,"coverUrl":"/static/covers/cover-4.jpg","tags":["夜景","灯光","精修10张"],"summary":"夜间灯光主题，含冷调/暖调两套布光，出片 10 张。","status":1}],"total":4,"page":1,"size":4}}
+
+# 3) packages/2
+{"code":0,"msg":"ok","data":{"id":2,"title":"复古胶片","price":499.00,"coverUrl":"/static/covers/cover-2.jpg","tags":["外景","胶片质感","精修12张"],"summary":"外景街拍 + 胶片色调整，适合换季纪念与情侣合拍。","status":1}}
+
+# 4) packages/999
+{"code":40401,"msg":"套餐不存在","data":null} HTTP=404
+
+# 5) bookings no token
+{"code":40101,"msg":"未登录或登录态无效","data":null} HTTP=401
+
+# 6) bookings with token (T-501 未实现，预期不是 401)
+{"code":40103,"msg":"登录已过期，请重新登录","data":null} HTTP=401
+
+# 7) logout
+{"code":40103,"msg":"登录已过期，请重新登录","data":null} HTTP=401
+
+# 8) old token after logout
+{"code":40103,"msg":"登录已过期，请重新登录","data":null} HTTP=401

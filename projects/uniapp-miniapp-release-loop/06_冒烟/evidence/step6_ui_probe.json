@@ -1,0 +1,66 @@
+{
+  "375": {
+    "viewport": 375,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalOverflow": 0,
+    "contentLeft": 0,
+    "contentRight": 375,
+    "marginLeft": 0,
+    "marginRight": 0,
+    "h1Count": 0,
+    "buttonCountFirstScreen": 0,
+    "runningAnimations": [
+      "lb-expose-f6d9ab49"
+    ],
+    "cssVarGutter": "24px"
+  },
+  "390": {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "horizontalOverflow": 0,
+    "contentLeft": 0,
+    "contentRight": 390,
+    "marginLeft": 0,
+    "marginRight": 0,
+    "h1Count": 0,
+    "buttonCountFirstScreen": 0,
+    "runningAnimations": [
+      "lb-expose-f6d9ab49"
+    ],
+    "cssVarGutter": "24px"
+  },
+  "414": {
+    "viewport": 414,
+    "scrollWidth": 414,
+    "clientWidth": 414,
+    "horizontalOverflow": 0,
+    "contentLeft": 0,
+    "contentRight": 414,
+    "marginLeft": 0,
+    "marginRight": 0,
+    "h1Count": 0,
+    "buttonCountFirstScreen": 0,
+    "runningAnimations": [
+      "lb-expose-f6d9ab49"
+    ],
+    "cssVarGutter": "24px"
+  },
+  "1440": {
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "horizontalOverflow": 0,
+    "contentLeft": 0,
+    "contentRight": 1440,
+    "marginLeft": 0,
+    "marginRight": 0,
+    "h1Count": 0,
+    "buttonCountFirstScreen": 0,
+    "runningAnimations": [
+      "lb-expose-f6d9ab49"
+    ],
+    "cssVarGutter": "24px"
+  }
+}

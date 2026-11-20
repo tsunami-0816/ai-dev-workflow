@@ -1,0 +1,36 @@
+{
+  "name": "uniapp-booking-miniapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "写真预约 demo · uni-app (Vue3 + TS + Vite) 双端（H5 / 微信小程序）",
+  "scripts": {
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:h5": "uni build",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "check:build": "node scripts/check_build.mjs",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-5030720261117001",
+    "@dcloudio/uni-components": "3.0.0-alpha-5030720261117001",
+    "@dcloudio/uni-h5": "3.0.0-alpha-5030720261117001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5030720261117001",
+    "vue": "3.4.21"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "3.4.31",
+    "@dcloudio/uni-cli-shared": "3.0.0-alpha-5030720261117001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5030720261117001",
+    "@types/node": "^22.20.5",
+    "@vue/runtime-core": "3.4.21",
+    "puppeteer-core": "^22.15.0",
+    "sass": "^1.77.8",
+    "typescript": "5.4.5",
+    "vite": "5.2.8",
+    "vue-tsc": "2.0.29"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

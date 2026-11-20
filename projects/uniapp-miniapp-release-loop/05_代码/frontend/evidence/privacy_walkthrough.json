@@ -1,0 +1,16 @@
+{
+  "privacy": {
+    "title": "隐私协议",
+    "sections": 4,
+    "bodyLen": 302,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "scrollX": 0,
+    "pageLeft": 0,
+    "titleLeft": 24
+  },
+  "hasLink": true,
+  "hash": "#/pages/privacy/index",
+  "navigates": true,
+  "screenshot": "D:\\lg\\project\\工作流测试\\projects\\uniapp-miniapp-release-loop\\05_代码\\frontend\\evidence\\privacy_h5.png"
+}

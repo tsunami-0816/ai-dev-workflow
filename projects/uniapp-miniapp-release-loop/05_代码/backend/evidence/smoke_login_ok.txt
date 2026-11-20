@@ -1,0 +1,2 @@
+﻿{"code":0,"msg":"ok","data":{"token":"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4ZjgzZTBjOS05MDUzLTQzMGEtYWIwZS1jMTliYjI2ODI0MWUiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MDgxMDI1LCJleHAiOjE3OTUwODgyMjV9.7G8BYQweWSADbEtgllnxkHHJABOoDdyKMMu9gdPxU0o","expiresIn":7200,"userId":1,"nickname":"演示用户A"}}
+HTTP=200

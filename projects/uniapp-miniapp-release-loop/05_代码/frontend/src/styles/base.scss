@@ -1,0 +1,65 @@
+@import './tokens.scss';
+
+page {
+  background-color: $ub-ground;
+  color: $ub-paper;
+  font-family: $ub-sans;
+  font-size: $fs-body;
+  line-height: $lh-body;
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+text,
+button,
+input,
+textarea {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: $ub-sans;
+  font-size: $fs-body;
+  line-height: 1.4;
+  color: inherit;
+
+  &::after {
+    border: none;
+  }
+}
+
+/* 装订细线：1px、12% 纸白 */
+.ub-rule {
+  height: 1px;
+  background-color: $ub-line;
+}
+
+/* 等宽数字：档期 / 价格 / 编号 */
+.ub-num {
+  font-family: $ub-mono;
+  font-size: $fs-num;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.ub-title {
+  font-family: $ub-serif;
+  font-weight: 600;
+  font-size: $fs-display;
+  line-height: $lh-display;
+  letter-spacing: 0.02em;
+}
+
+.ub-small {
+  font-size: $fs-small;
+  color: $ub-silver;
+}
+
+.ub-safe-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}

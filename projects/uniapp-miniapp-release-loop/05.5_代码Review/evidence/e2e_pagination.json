@@ -1,0 +1,17 @@
+{
+  "size": 2,
+  "firstLoadCalls": 2,
+  "beforeRows": 1,
+  "afterRows": 3,
+  "requests": [
+    "page=1&size=2",
+    "page=1&size=2",
+    "page=2&size=2",
+    "page=2&size=2"
+  ],
+  "distinctPages": [
+    "1",
+    "2"
+  ],
+  "pass": true
+}

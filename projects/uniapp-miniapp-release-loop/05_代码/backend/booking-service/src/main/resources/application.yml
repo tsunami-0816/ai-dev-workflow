@@ -1,0 +1,80 @@
+server:
+  port: 8092
+  shutdown: graceful
+
+spring:
+  application:
+    name: booking-service
+  datasource:
+    # 本机共享 MySQL 实例（Docker rag-mysql，宿主 3308）；架构文档原写 3310，
+    # 因 3310 容器未运行，改用已在跑的共享实例，库名/表结构不变（见 evidence/T-401）。
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3308}/${MYSQL_DB:uniapp_booking}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+  data:
+    redis:
+      # 本机 6379 实为 Windows 原生 redis-server（无 AUTH）；dev 专用，8.5 需复核
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+  rabbitmq:
+    host: ${MQ_HOST:127.0.0.1}
+    port: ${MQ_PORT:5672}
+    username: ${MQ_USER:admin}
+    password: ${MQ_PASSWORD:admin}
+    # T-403：生产者同步等 broker confirm，未确认即抛异常（不静默丢消息）
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1s
+        # 重试耗尽后拒绝（不重回队列）→ DLX → booking.notify.dlq
+        default-requeue-rejected: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    # 批次 3 起 MQ 为真实链路（T-403/404），health 需要如实反映 broker 状态
+    rabbit:
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+booking:
+  jwt:
+    # 只放在 .env / 环境变量；默认值为本地开发占位，禁进 git
+    secret: ${JWT_SECRET:dev-only-jwt-secret-change-me-32bytes!!}
+    ttl-hours: 2
+  hmac:
+    secret: ${APP_SECRET:dev-only-hmac-secret-change-me}
+    window-seconds: 60
+  idem:
+    ttl-seconds: 600
+  # 可预约窗口：今天 ~ 今天 + N 天，越界返回 40002
+  window-days: 30
+  cache:
+    package-ttl-seconds: 300
+  cors:
+    allowed-origins: http://127.0.0.1:5186,http://localhost:5186
+
+logging:
+  level:
+    com.uniapp.booking: info

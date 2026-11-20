@@ -1,0 +1,128 @@
+﻿{
+  "row": {
+    "sel": ".row",
+    "text": "01城市轻写真¥399室内 · 2套服装",
+    "rect": {
+      "x": 24,
+      "y": 407,
+      "w": 342,
+      "h": 72
+    },
+    "display": "flex",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "15px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "rowMain": {
+    "sel": ".row-main",
+    "text": "城市轻写真¥399室内 · 2套服装",
+    "rect": {
+      "x": 92,
+      "y": 416,
+      "w": 274,
+      "h": 52
+    },
+    "display": "block",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "15px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "rowLine": {
+    "sel": ".row-line",
+    "text": "城市轻写真¥399",
+    "rect": {
+      "x": 92,
+      "y": 416,
+      "w": 274,
+      "h": 28
+    },
+    "display": "flex",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "15px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "rowLead": {
+    "sel": ".row-lead",
+    "text": "城市轻写真",
+    "rect": {
+      "x": 92,
+      "y": 416,
+      "w": 214,
+      "h": 26
+    },
+    "display": "flex",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "15px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "price": {
+    "sel": ".row-price",
+    "text": "¥399",
+    "rect": {
+      "x": 306,
+      "y": 417,
+      "w": 60,
+      "h": 27
+    },
+    "display": "block",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "16px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "priceSpan": {
+    "sel": ".row-price span",
+    "text": "¥399",
+    "rect": {
+      "x": 334,
+      "y": 422,
+      "w": 32,
+      "h": 16
+    },
+    "display": "inline",
+    "position": "static",
+    "color": "rgb(242, 237, 228)",
+    "fontSize": "16px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  },
+  "rowNo": {
+    "sel": ".row-no",
+    "text": "01",
+    "rect": {
+      "x": 24,
+      "y": 432,
+      "w": 44,
+      "h": 22
+    },
+    "display": "block",
+    "position": "static",
+    "color": "rgb(142, 154, 147)",
+    "fontSize": "13px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible",
+    "zIndex": "auto"
+  }
+}

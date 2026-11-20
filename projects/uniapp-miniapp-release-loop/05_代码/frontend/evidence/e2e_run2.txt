@@ -1,0 +1,68 @@
+﻿[console] debug [vite] connecting...
+[console] debug [vite] connected.
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/modal.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/toast.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/action-sheet.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/location-view.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/location-picker.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/index.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/api.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/app.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/component.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/context.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/hooks.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/util.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/src/api/index.ts
+[console] error Failed to load resource: the server responded with a status of 404 (Not Found)
+[console] verbose [DOM] Password field is not contained in a form: (More info: https://www.chromium.org/developers/design-documents/create-amazing-password-forms) %o
+[api] 200 OPTIONS http://127.0.0.1:8092/api/auth/login
+[api] 200 POST http://127.0.0.1:8092/api/auth/login
+[api] 200 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 200 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 200 GET http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 200 GET http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 200 OPTIONS http://127.0.0.1:8092/api/bookings
+[api] 200 POST http://127.0.0.1:8092/api/bookings
+[api] 200 GET http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 200 GET http://127.0.0.1:8092/api/bookings?page=1&size=20
+{
+  "steps": [
+    {
+      "step": "login",
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "storageKeys": [
+        "ub_token",
+        "ub_user"
+      ],
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4YjM1ZGY0OC03OTQ4LTQ4NmMtYTgxOC1iM2RkMDMyOGQ5N2MiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MDg3MTMwLCJleHAiOjE3OTUwOTQzMzB9.D2rT5S_uG_039z_7R3JD1OmpMvBmAz6ky8NsObAZ2Rg",
+      "meName": "演示用户A",
+      "err": "",
+      "tokenLen": 185
+    },
+    {
+      "step": "submit",
+      "picker": {
+        "hasPicker": true,
+        "hasConfirm": true
+      },
+      "dateValue": "2026-11-19",
+      "contactProbe": {
+        "ok": true,
+        "count": 1,
+        "value": "13800000001",
+        "types": [
+          "number"
+        ]
+      },
+      "doneNo": "No.66",
+      "doneNote": "状态：待确认 · 我们会在 24 小时内联系你",
+      "err": ""
+    },
+    {
+      "step": "myList",
+      "count": 15,
+      "first": "No.66 待确认 城市轻写真 2026-11-19 · 下午 · 138****0001",
+      "loggedIn": true
+    }
+  ]
+}

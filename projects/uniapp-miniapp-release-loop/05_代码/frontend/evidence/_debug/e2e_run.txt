@@ -1,0 +1,96 @@
+﻿[console] debug [vite] connecting...
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/modal.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/action-sheet.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/toast.css
+[console] debug [vite] connected.
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/location-view.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@dcloudio/uni-h5/style/api/location-picker.css
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/index.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/api.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/app.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/component.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/context.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/hooks.js?v=cb2fb806
+[api] 200 GET http://127.0.0.1:5186/node_modules/@vue/devtools-api/lib/esm/api/util.js?v=cb2fb806
+[console] error Failed to load resource: the server responded with a status of 404 (Not Found)
+[api] 200 GET http://127.0.0.1:5186/src/api/index.ts
+[console] verbose [DOM] Password field is not contained in a form: (More info: https://www.chromium.org/developers/design-documents/create-amazing-password-forms) %o
+[api] 200 OPTIONS http://127.0.0.1:8092/api/auth/login
+[api] 200 POST http://127.0.0.1:8092/api/auth/login
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api] 401 OPTIONS http://127.0.0.1:8092/api/bookings?page=1&size=20
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+[console] error Access to XMLHttpRequest at 'http://127.0.0.1:8092/api/bookings?page=1&size=20' from origin 'http://127.0.0.1:5186' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[api-fail] http://127.0.0.1:8092/api/bookings?page=1&size=20 net::ERR_FAILED
+[console] error Failed to load resource: net::ERR_FAILED
+{
+  "steps": [
+    {
+      "step": "login",
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "storageKeys": [
+        "ub_token",
+        "ub_user"
+      ],
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI5OGJlMmJkMS02ZWNhLTQwYjUtYmU3Ni03ODAxMTNkOTIyYTQiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MDg2NDMyLCJleHAiOjE3OTUwOTM2MzJ9.M3RTa-pB-uvGcX10Ei2YeOD9p9zDT49uMZpcl3Tr9h4",
+      "meName": "演示用户A",
+      "err": "",
+      "tokenLen": 185
+    },
+    {
+      "step": "submit",
+      "picker": {
+        "hasPicker": true,
+        "hasConfirm": true
+      },
+      "dateValue": "2026-11-19",
+      "contactProbe": {
+        "ok": true,
+        "count": 1,
+        "value": "13800000001",
+        "types": [
+          "number"
+        ]
+      },
+      "doneNo": "",
+      "doneNote": "",
+      "err": ""
+    },
+    {
+      "step": "myList",
+      "count": 0,
+      "first": "",
+      "loggedIn": true
+    }
+  ]
+}

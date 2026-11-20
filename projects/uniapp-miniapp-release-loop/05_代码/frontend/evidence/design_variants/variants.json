@@ -1,0 +1,88 @@
+[
+  {
+    "version": "A",
+    "layout": "账本单列",
+    "url": "http://127.0.0.1:5186/#/pages/index/index?v=A",
+    "status": "ok",
+    "rows": 4,
+    "heroPrice": "¥399",
+    "photoBleedRight": true,
+    "listPrices": [
+      "¥399",
+      "¥499",
+      "¥699",
+      "¥599"
+    ],
+    "httpStatus": 200,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "docHeight": 878,
+    "horizontalOverflow": false,
+    "screenshot": "D:\\lg\\project\\工作流测试\\projects\\uniapp-miniapp-release-loop\\05_代码\\frontend\\evidence\\design_variants\\A.png",
+    "tapHash": "#/pages/package/detail?id=1",
+    "tapNavigates": true,
+    "w414": {
+      "scrollWidth": 414,
+      "clientWidth": 414,
+      "docHeight": 946,
+      "horizontalOverflow": false
+    }
+  },
+  {
+    "version": "B",
+    "layout": "接触印样栅格",
+    "url": "http://127.0.0.1:5186/#/pages/index/index?v=B",
+    "status": "ok",
+    "cells": 4,
+    "plate": true,
+    "platePrice": "¥399 起",
+    "gridPrice": [
+      "¥399",
+      "¥499",
+      "¥699",
+      "¥599"
+    ],
+    "httpStatus": 304,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "docHeight": 1379,
+    "horizontalOverflow": false,
+    "screenshot": "D:\\lg\\project\\工作流测试\\projects\\uniapp-miniapp-release-loop\\05_代码\\frontend\\evidence\\design_variants\\B.png",
+    "tapHash": "#/pages/package/detail?id=1",
+    "tapNavigates": true,
+    "w414": {
+      "scrollWidth": 414,
+      "clientWidth": 414,
+      "docHeight": 1379,
+      "horizontalOverflow": false
+    }
+  },
+  {
+    "version": "C",
+    "layout": "票根堆叠",
+    "url": "http://127.0.0.1:5186/#/pages/index/index?v=C",
+    "status": "ok",
+    "tickets": 3,
+    "hero": true,
+    "heroPrice": "¥399",
+    "ticketPrices": [
+      "¥499",
+      "¥699",
+      "¥599"
+    ],
+    "httpStatus": 304,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "docHeight": 1099,
+    "horizontalOverflow": false,
+    "screenshot": "D:\\lg\\project\\工作流测试\\projects\\uniapp-miniapp-release-loop\\05_代码\\frontend\\evidence\\design_variants\\C.png",
+    "tapHash": "#/pages/package/detail?id=2",
+    "tapNavigates": true,
+    "w414": {
+      "scrollWidth": 414,
+      "clientWidth": 414,
+      "docHeight": 1099,
+      "horizontalOverflow": false
+    }
+  }
+]

@@ -1,0 +1,28 @@
+T1 openid 无签名（H5 直连） | status=401 code=40102 msg=openid 登录仅允许经小程序云函数发起
+PASS | T1 无签名 openid 必须 401/40102（此前可建号）
+T2 openid + X-Client:cloud 但无签名头 | status=401 code=40102 msg=签名校验失败
+PASS | T2 声称 cloud 却无签名 → 40102
+T3 openid + 云签名但签名错误 | status=401 code=40102 msg=签名校验失败
+PASS | T3 错签 → 40102
+T4 openid + 正确云签名 | status=200 code=0 msg=ok
+PASS | T4 验签通过才允许 openid 建号
+T5 login demo（账号） | status=200 code=0 msg=ok
+T6 login demo2（账号） | status=200 code=0 msg=ok
+PASS | T5/T6 种子账号可登录
+T7 demo 创建预约（新手机号） | status=200 code=0 msg=ok
+PASS | T7 首次创建成功
+T8 demo2 同手机号/同日/同时段 | status=400 code=40001 msg=该手机号当天该时段已有预约，请更换手机号或时段
+PASS | T8 跨账号不得拿到他人单（须 40001 且无 data）
+T9 demo 重复提交（同账号） | status=200 code=0 msg=ok
+PASS | T9 同账号幂等返回首单
+T10 packages page=2 size=2 | status=200 code=0 msg=ok
+PASS | T10 服务端分页第 2 页确有 2 条
+T11 bookings page=1 size=3 | status=200 code=0 msg=ok
+PASS | T11 我的列表分页参数生效
+T12 demo2 列表不含 demo 的单 | status=200 code=0 msg=ok
+PASS | T12 demo2 列表不含 demo 的预约（越权隔离）
+T13 无 token 读我的 | status=401 code=40101 msg=未登录或登录态无效
+PASS | T13 无 token → 401
+PASS | T13 不落 50000 兜底
+TOTAL_ASSERT=13 FAIL=0
+FIXTURE date=2026-11-25 bookingId=5 openidUserId=5

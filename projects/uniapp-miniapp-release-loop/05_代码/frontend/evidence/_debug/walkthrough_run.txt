@@ -1,0 +1,64 @@
+﻿[
+  {
+    "page": "home",
+    "url": "http://127.0.0.1:5186/",
+    "status": "ok",
+    "rows": 4,
+    "prices": [
+      "¥399",
+      "¥499",
+      "¥699",
+      "¥599"
+    ],
+    "heroPrice": "¥399",
+    "tabBarItems": 2,
+    "httpStatus": 200
+  },
+  {
+    "page": "login",
+    "url": "http://127.0.0.1:5186/#/pages/login/index",
+    "status": "ok",
+    "title": "进来坐",
+    "account": "demo",
+    "passwordInput": true,
+    "btn": "登录",
+    "httpStatus": 0
+  },
+  {
+    "page": "detail",
+    "url": "http://127.0.0.1:5186/#/pages/package/detail?id=1",
+    "status": "ok",
+    "title": "城市轻写真",
+    "price": "¥399",
+    "tags": [
+      "室内",
+      "2套服装",
+      "精修8张"
+    ],
+    "fold": "",
+    "cta": "立即预约",
+    "httpStatus": 0
+  },
+  {
+    "page": "form",
+    "url": "http://127.0.0.1:5186/#/pages/booking/form?packageId=1&title=%E5%9F%8E%E5%B8%82%E8%BD%BB%E5%86%99%E7%9C%9F&price=399",
+    "status": "ok",
+    "pkg": "城市轻写真",
+    "slots": [
+      "上午",
+      "下午",
+      "晚间"
+    ],
+    "submit": "确认这一档",
+    "datePicker": true,
+    "httpStatus": 0
+  },
+  {
+    "page": "my",
+    "url": "http://127.0.0.1:5186/#/pages/my/index",
+    "status": "ok",
+    "loggedOut": true,
+    "loginBtn": "去登录",
+    "httpStatus": 0
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "name": "一个小档期demo",
+  "appid": "wx58cd971ff2494b89",
+  "description": "写真预约 demo（uni-app 双端）",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "vueVersion": "3",
+  "uniStatistics": {
+    "enable": false
+  },
+  "h5": {
+    "title": "一个小档期",
+    "router": {
+      "base": "/"
+    }
+  },
+  "mp-weixin": {
+    "appid": "wx58cd971ff2494b89",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "__usePrivacyCheck__": true
+  }
+}

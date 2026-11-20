@@ -1,0 +1,41 @@
+{
+  "steps": [
+    {
+      "step": "login",
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "storageKeys": [
+        "ub_token",
+        "ub_user"
+      ],
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxOTM1MzAyMC0yYjYyLTRmZDUtYjEzMy05OThmZjUzODc1MGQiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MTU5NjM0LCJleHAiOjE3OTUxNjY4MzR9.0OA3OJyLTCe-L4MBdmX-wPSIerQuAoQwCyfxBH8x_Rg",
+      "meName": "演示用户A",
+      "err": "",
+      "tokenLen": 185
+    },
+    {
+      "step": "submit",
+      "picker": {
+        "hasPicker": true,
+        "hasConfirm": true
+      },
+      "dateValue": "2026-11-20",
+      "contactProbe": {
+        "ok": true,
+        "count": 1,
+        "value": "13800000001",
+        "types": [
+          "number"
+        ]
+      },
+      "doneNo": "No.3",
+      "doneNote": "状态：待确认 · 我们会在 24 小时内联系你",
+      "err": ""
+    },
+    {
+      "step": "myList",
+      "count": 3,
+      "first": "No.3 待确认 城市轻写真 2026-11-20 · 下午 · 138****0001",
+      "loggedIn": true
+    }
+  ]
+}

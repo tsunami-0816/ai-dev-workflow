@@ -1,0 +1,37 @@
+/* 设计 token（唯一来源：02_架构设计/门面页方向稿.md §2）
+   改用 CSS 变量：uni-app 这套 alpha 版本不编译 <style lang="scss">，
+   CSS 变量在 H5 与微信小程序（var()）都能用。 */
+:root,
+page {
+  --ub-ground: #0e2b26; /* 底 */
+  --ub-paper: #f2ede4; /* 主字 / 细线基色 */
+  --ub-silver: #8e9a93; /* 次级信息 */
+  --ub-stamp: #c4453a; /* 朱红，只用于状态标记，单屏 ≤3% */
+  --ub-photo: #1b3a33; /* 照片底 / 占位 */
+  --ub-line: rgba(242, 237, 228, 0.12);
+
+  --ub-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', serif;
+  --ub-sans: 'Source Han Sans SC', 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
+  --ub-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --fs-display: 34px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+  --fs-num: 18px;
+  --lh-display: 1.3;
+  --lh-body: 1.7;
+
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 40px;
+  --sp-5: 64px;
+
+  --radius-photo: 0px;
+  --radius-btn: 2px;
+  --radius-tag: 2px;
+
+  --gutter: 24px; /* 页面左右安全边距（375 基准） */
+  --row-h: 72px; /* 清单行高 */
+  --tap-min: 44px;
+}

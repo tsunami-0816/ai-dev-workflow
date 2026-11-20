@@ -1,0 +1,74 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "一个小档期",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/package/detail",
+      "style": {
+        "navigationBarTitleText": "套餐",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/booking/form",
+      "style": {
+        "navigationBarTitleText": "预约",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/my/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/privacy/index",
+      "style": {
+        "navigationBarTitleText": "隐私协议",
+        "navigationBarBackgroundColor": "#0E2B26",
+        "navigationBarTextStyle": "white"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#8E9A93",
+    "selectedColor": "#F2EDE4",
+    "backgroundColor": "#0E2B26",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "档期" },
+      { "pagePath": "pages/my/index", "text": "我的" }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarBackgroundColor": "#0E2B26",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0E2B26",
+    "backgroundColorTop": "#0E2B26",
+    "backgroundColorBottom": "#0E2B26",
+    "h5": {
+      "titleNView": false
+    }
+  }
+}

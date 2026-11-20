@@ -1,0 +1,40 @@
+T-206 云函数冒烟  2026-11-19 18:18:58
+CF_ROOT = D:\lg\project\工作流测试\projects\uniapp-miniapp-release-loop\05_代码\cloud-functions
+
+== 0. 前置 ==
+PASS 后端 /actuator/health = UP | HTTP 200
+
+== 1. apiProxy 8093 ==
+  8093 已在监听，复用（不重复拉起）
+PASS GET /healthz = UP | HTTP 200
+PASS 健康探针（云函数→后端签名链路） | code=0 elapsedMs=8
+PASS packages 转发（size=2） | HTTP 200 code=0 list=2
+PASS packageDetail 转发（id=2） | HTTP 200 code=0
+PASS 未知 action → 400/40001 | HTTP 400 code=40001 msg=未知 action: no-such-action
+PASS 未知字段 userId 被拦 → 40001 | HTTP 400 code=40001 msg=不支持的字段: userId
+PASS login 转发（demo/welcome1） | HTTP 200 userId=1
+
+== 2. 一单可通（写链路穿过云函数） ==
+PASS createBooking 首单 | HTTP 200 code=0 bookingId=65
+PASS createBooking 重发（幂等） | bookingId=65 duplicated=True
+PASS myBookings 可见本单 | total=14 命中=True
+
+== 3. 签名真实性（防伪对照） ==
+PASS 直连后端 + 错误签名 → 401/40102 | code=40102
+PASS 云函数使用错误 APP_SECRET → 401/40102 | HTTP 401 code=40102
+
+== 4. 超时降级（3s 超时 + 重试 1 次 → 50002） ==
+PASS 后端挂起 → 504/50002「网络不稳定，请重试」 | HTTP 504 code=50002 wall=6051ms elapsedMs=6023
+PASS 重试确实发生（总耗时 ≥ 5s） | wall=6051ms
+
+== 5. 请求体上限 1MB ==
+PASS 1.1MB 请求体 → 413/40001 | HTTP 413 code=40001 msg=请求体过大（上限 1048576 字节）
+
+== 6. getOpenid ==
+PASS 缺 MP_APPSECRET → 50001 且提示未配置 | HTTP 500 msg=云开发未配置：缺少 MP_APPSECRET
+PASS code2session 成功路径（mock 微信） | HTTP 200 openid=o_mock_wx_test_appid_goodcode
+PASS 无效 code → 400/40001 | HTTP 400 msg=登录凭证无效或已使用，请重新登录
+
+== 结果 ==
+
+PASS = 19, FAIL = 0, exit = 0

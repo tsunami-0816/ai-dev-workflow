@@ -1,0 +1,2408 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" style="font-size: 32.256px; --status-bar-height: 0px; --top-window-height: 0px; --window-left: 0px; --window-right: 0px; --window-margin: 0px; --tab-bar-height: 50px; --window-top: calc(44px + env(safe-area-inset-top)); --window-bottom: calc(50px + env(safe-area-inset-bottom));"><head>
+    <script>if (typeof globalThis === 'undefined') {
+  window.globalThis = window
+}</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>一个小档期</title>
+  <style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/base.css">/* Reserve the probe fallback before application layers, including lazy styles. */
+@layer uni-field-selection;
+
+/* Keep the legacy class fallback before application and lazy component styles. */
+@supports not (background-color: revert-layer) {
+  .uni-field-selection-probe {
+    background-color: var(--uni-selection-probe-background-color);
+  }
+}
+
+* {
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+       user-select: none;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  font-size: 16px;
+}
+
+uni-app,
+uni-page,
+uni-page-wrapper,
+uni-page-body {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+uni-page-wrapper {
+  position: relative;
+}
+
+#app,
+uni-app,
+uni-page,
+uni-page-wrapper {
+  height: 100%;
+}
+
+/* toast,modal,actionSheet,picker,layout */
+.uni-mask {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* toast,modal,actionSheet,picker */
+.uni-fade-enter-active,
+.uni-fade-leave-active {
+  transition-duration: 0.25s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.uni-fade-enter-from,
+.uni-fade-leave-active {
+  opacity: 0;
+}
+
+.uni-loading,
+uni-button[loading]:before {
+  background-color: transparent;
+  background-image: url('data:image/svg+xml;base64, PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxMDB2MTAwSDB6Ii8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTlFOUU5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTMwKSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iIzk4OTY5NyIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgzMCAxMDUuOTggNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjOUI5OTlBIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDYwIDc1Ljk4IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0EzQTFBMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSg5MCA2NSA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNBQkE5QUEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwIDU4LjY2IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0IyQjJCMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgxNTAgNTQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjQkFCOEI5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDE4MCA1MCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDMkMwQzEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE1MCA0NS45OCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDQkNCQ0IiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTEyMCA0MS4zNCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNEMkQyRDIiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDM1IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0RBREFEQSIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNjAgMjQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTJFMkUyIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAtNS45OCA2NSkiLz48L3N2Zz4=');
+  background-repeat: no-repeat;
+}
+
+.uni-loading {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  animation: uni-loading 1s steps(12, end) infinite;
+  background-size: 100%;
+}
+
+@keyframes uni-loading {
+  0% {
+    transform: rotate3d(0, 0, 1, 0deg);
+  }
+
+  100% {
+    transform: rotate3d(0, 0, 1, 360deg);
+  }
+}
+
+html {
+  /* --UI-BG-0: #ededed; */
+  --primary-color: #007aff;
+  --UI-BG: #fff;
+  --UI-BG-1: #f7f7f7;
+  --UI-BG-2: #fff;
+  --UI-BG-3: #f7f7f7;
+  --UI-BG-4: #4c4c4c;
+  --UI-BG-5: #fff;
+  --UI-FG: #000;
+  --UI-FG-0: rgba(0, 0, 0, 0.9);
+  --UI-FG-HALF: rgba(0, 0, 0, 0.9);
+  --UI-FG-1: rgba(0, 0, 0, 0.5);
+  --UI-FG-2: rgba(0, 0, 0, 0.3);
+  --UI-FG-3: rgba(0, 0, 0, 0.1);
+}
+
+uni-page[data-type] uni-page-body {
+  background-color: transparent;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/async.css">.uni-async-error {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  color: #999;
+  padding: 100px 10px;
+  text-align: center;
+}
+.uni-async-loading {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 50px;
+  text-align: center;
+}
+
+.uni-async-loading .uni-loading {
+  width: 30px;
+  height: 30px;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/pageHead.css">uni-page-head {
+  display: block;
+  box-sizing: border-box;
+}
+
+.uni-page-head {
+  position: fixed;
+  left: var(--window-left);
+  right: var(--window-right);
+  height: 44px;
+  height: calc(44px + constant(safe-area-inset-top));
+  height: calc(44px + env(safe-area-inset-top));
+  padding: 7px 3px;
+  padding-top: calc(7px + constant(safe-area-inset-top));
+  padding-top: calc(7px + env(safe-area-inset-top));
+  display: flex;
+  overflow: hidden;
+  justify-content: space-between;
+  box-sizing: border-box;
+  z-index: 998;
+  color: #fff;
+  background-color: #000;
+  transition-property: all;
+}
+
+.uni-page-head * {
+  box-sizing: border-box;
+}
+
+.uni-page-head .uni-btn-icon {
+  overflow: hidden;
+  min-width: 1em;
+  font-style: normal;
+}
+
+.uni-page-head-titlePenetrate,
+.uni-page-head-titlePenetrate .uni-page-head-bd,
+.uni-page-head-titlePenetrate .uni-page-head-bd * {
+  pointer-events: none;
+}
+
+.uni-page-head-titlePenetrate * {
+  pointer-events: auto;
+}
+
+.uni-page-head.uni-page-head-transparent .uni-page-head-ft > div {
+  justify-content: center;
+}
+
+.uni-page-head ~ .uni-placeholder {
+  width: 100%;
+  height: 44px;
+  height: calc(44px + constant(safe-area-inset-top));
+  height: calc(44px + env(safe-area-inset-top));
+}
+
+.uni-placeholder-titlePenetrate {
+  pointer-events: none;
+}
+
+.uni-page-head-hd {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.uni-page-head-bd {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  min-width: 0;
+  -webkit-user-select: auto;
+     -moz-user-select: auto;
+          user-select: auto;
+}
+
+.uni-page-head-btn {
+  position: relative;
+  width: auto;
+  margin: 0 2px;
+  word-break: keep-all;
+  white-space: pre;
+  cursor: pointer;
+  font-size: 0px;
+}
+
+/* .uni-page-head-btn svg {
+} */
+
+.uni-page-head-transparent .uni-page-head-btn {
+  display: flex;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.uni-page-head-btn-red-dot::after {
+  content: attr(badge-text);
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: red;
+  color: white;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 18px;
+  overflow: hidden;
+  transform: scale(0.5) translate(40%, -40%);
+  transform-origin: 100% 0;
+}
+
+.uni-page-head-btn-red-dot[badge-text]::after {
+  font-size: 12px;
+  width: auto;
+  min-width: 18px;
+  max-width: 42px;
+  text-align: center;
+  padding: 0 3px;
+  transform: scale(0.7) translate(40%, -40%);
+}
+
+.uni-page-head-btn-select svg {
+  vertical-align: middle;
+  margin-left: 2px;
+  transform: rotate(270deg) scale(0.8);
+}
+
+.uni-page-head-search {
+  position: relative;
+  display: flex;
+  flex: 1;
+  margin: 0 2px;
+  line-height: 30px;
+  font-size: 15px;
+}
+
+.uni-page-head-search-input {
+  width: 100%;
+  height: 100%;
+  padding-left: 34px;
+  text-align: left;
+}
+
+.uni-page-head-search-input .uni-input-input:disabled {
+  pointer-events: none;
+}
+
+.uni-page-head-search-placeholder {
+  position: absolute;
+  max-width: 100%;
+  height: 100%;
+  padding-left: 34px;
+  overflow: hidden;
+  word-break: keep-all;
+  white-space: pre;
+}
+
+.uni-page-head-search-placeholder-right {
+  right: 0;
+}
+
+.uni-page-head-search-placeholder-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.uni-page-head-search-icon {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.uni-page-head-ft {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  font-size: 13px;
+}
+
+.uni-page-head__title {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 30px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.uni-page-head__title .uni-loading {
+  width: 16px;
+  height: 16px;
+  margin-top: -3px;
+}
+
+.uni-page-head__title .uni-page-head__title_image {
+  width: auto;
+  height: 26px;
+  vertical-align: middle;
+}
+
+.uni-page-head-shadow {
+  overflow: visible;
+}
+
+.uni-page-head-shadow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 5px;
+  background-size: 100% 100%;
+}
+
+uni-page-head[uni-page-head-type='default'] ~ uni-page-wrapper {
+  height: calc(100% - 44px);
+  height: calc(100% - 44px - constant(safe-area-inset-top));
+  height: calc(100% - 44px - env(safe-area-inset-top));
+}
+
+.uni-page-head-shadow-grey::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-grey.png');
+}
+
+.uni-page-head-shadow-blue::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-blue.png');
+}
+
+.uni-page-head-shadow-green::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-green.png');
+}
+
+.uni-page-head-shadow-orange::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-orange.png');
+}
+
+.uni-page-head-shadow-red::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-red.png');
+}
+
+.uni-page-head-shadow-yellow::after {
+  background-image: url('https://cdn.dcloud.net.cn/img/shadow-yellow.png');
+}
+            
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/tabBar.css">uni-tabbar {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 998;
+}
+
+.uni-tabbar {
+  display: flex;
+  z-index: 998;
+  box-sizing: border-box;
+}
+
+.uni-tabbar-top,
+.uni-tabbar-bottom,
+.uni-tabbar-top .uni-tabbar,
+.uni-tabbar-bottom .uni-tabbar {
+  position: fixed;
+  left: var(--window-left);
+  right: var(--window-right);
+}
+
+.uni-app--showlayout + .uni-tabbar-top,
+.uni-app--showlayout + .uni-tabbar-bottom,
+.uni-app--showlayout + .uni-tabbar-top .uni-tabbar,
+.uni-app--showlayout + .uni-tabbar-bottom .uni-tabbar {
+  left: var(--window-margin);
+  right: var(--window-margin);
+}
+
+.uni-tabbar-bottom .uni-tabbar {
+  bottom: 0;
+  padding-bottom: 0;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.uni-tabbar ~ .uni-placeholder {
+  width: 100%;
+  margin-bottom: 0;
+  margin-bottom: constant(safe-area-inset-bottom);
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.uni-tabbar * {
+  box-sizing: border-box;
+}
+
+.uni-tabbar__item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
+  font-size: 0;
+  text-align: center;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.uni-tabbar__bd {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.uni-tabbar__icon {
+  position: relative;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.uni-tabbar__icon.uni-tabbar__icon__diff {
+  margin-top: 0px;
+  width: 34px;
+  height: 34px;
+}
+
+.uni-tabbar__icon img {
+  width: 100%;
+  height: 100%;
+}
+
+.uni-tabbar__iconfont {
+  font-family: 'UniTabbarIconFont';
+}
+
+.uni-tabbar__label {
+  position: relative;
+  text-align: center;
+  font-size: 10px;
+}
+
+.uni-tabbar-border {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 1px;
+  transform: scaleY(0.5);
+}
+
+.uni-tabbar__reddot {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #f43530;
+  color: #ffffff;
+  transform: translate(40%, 0%);
+}
+
+.uni-tabbar__badge {
+  width: auto;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 16px;
+  min-width: 16px;
+  padding: 0 2px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.uni-tabbar__mid {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  background-size: 100% 100%;
+}
+
+.uni-app--showtabbar uni-page-wrapper {
+  display: block;
+  height: calc(100% - var(--tab-bar-height));
+  height: calc(100% - var(--tab-bar-height) - constant(safe-area-inset-bottom));
+  height: calc(100% - var(--tab-bar-height) - env(safe-area-inset-bottom));
+}
+uni-page[data-type] uni-page-wrapper {
+  height: 100%;
+}
+.uni-app--showtabbar uni-page-wrapper::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: var(--tab-bar-height);
+  height: calc(var(--tab-bar-height) + constant(safe-area-inset-bottom));
+  height: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
+}
+.uni-app--showtabbar
+  uni-page-head[uni-page-head-type='default']
+  ~ uni-page-wrapper {
+  height: calc(100% - 44px - var(--tab-bar-height));
+  height: calc(
+    100% - 44px - constant(safe-area-inset-top) - var(--tab-bar-height) -
+      constant(safe-area-inset-bottom)
+  );
+  height: calc(
+    100% - 44px - env(safe-area-inset-top) - var(--tab-bar-height) -
+      env(safe-area-inset-bottom)
+  );
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/nvue.css">[nvue] uni-view,
+[nvue] uni-label,
+[nvue] uni-swiper-item,
+[nvue] uni-scroll-view {
+  display: flex;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: auto;
+  align-items: stretch;
+  align-content: flex-start;
+}
+
+[nvue] uni-button {
+  margin: 0;
+}
+
+[nvue-dir-row] uni-view,
+[nvue-dir-row] uni-label,
+[nvue-dir-row] uni-swiper-item {
+  flex-direction: row;
+}
+
+[nvue-dir-column] uni-view,
+[nvue-dir-column] uni-label,
+[nvue-dir-column] uni-swiper-item {
+  flex-direction: column;
+}
+
+[nvue-dir-row-reverse] uni-view,
+[nvue-dir-row-reverse] uni-label,
+[nvue-dir-row-reverse] uni-swiper-item {
+  flex-direction: row-reverse;
+}
+
+[nvue-dir-column-reverse] uni-view,
+[nvue-dir-column-reverse] uni-label,
+[nvue-dir-column-reverse] uni-swiper-item {
+  flex-direction: column-reverse;
+}
+
+[nvue] uni-view,
+[nvue] uni-image,
+[nvue] uni-input,
+[nvue] uni-scroll-view,
+[nvue] uni-swiper,
+[nvue] uni-swiper-item,
+[nvue] uni-text,
+[nvue] uni-textarea,
+[nvue] uni-video {
+  position: relative;
+  border: 0px solid #000000;
+  box-sizing: border-box;
+}
+
+[nvue] uni-swiper-item {
+  position: absolute;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/framework/pageRefresh.css">uni-page-refresh {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  display: block;
+  box-sizing: border-box;
+}
+
+.uni-page-refresh {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.117647),
+    0 1px 4px rgba(0, 0, 0, 0.117647);
+  display: none;
+  z-index: 997;
+}
+
+.uni-page-refresh-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.uni-page-refresh--pulling .uni-page-refresh,
+.uni-page-refresh--aborting .uni-page-refresh,
+.uni-page-refresh--reached .uni-page-refresh,
+.uni-page-refresh--refreshing .uni-page-refresh,
+.uni-page-refresh--restoring .uni-page-refresh {
+  display: flex;
+}
+
+.uni-page-refresh--pulling .uni-page-refresh__spinner,
+.uni-page-refresh--aborting .uni-page-refresh__spinner,
+.uni-page-refresh--reached .uni-page-refresh__spinner,
+.uni-page-refresh--refreshing .uni-page-refresh__icon,
+.uni-page-refresh--restoring .uni-page-refresh__icon {
+  display: none;
+}
+
+.uni-page-refresh--refreshing .uni-page-refresh__spinner {
+  transform-origin: center center;
+  animation: uni-page-refresh-rotate 2s linear infinite;
+}
+
+.uni-page-refresh--refreshing .uni-page-refresh__path {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  animation: uni-page-refresh-dash 1.5s ease-in-out infinite,
+    uni-page-refresh-colorful 6s ease-in-out infinite;
+}
+
+@keyframes uni-page-refresh-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes uni-page-refresh-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/input.css">uni-input {
+  display: block;
+  font-size: 16px;
+  line-height: 1.4em;
+  height: 1.4em;
+  min-height: 1.4em;
+  overflow: hidden;
+}
+
+uni-input[hidden] {
+  display: none;
+}
+
+.uni-input-wrapper,
+.uni-input-placeholder,
+.uni-input-form,
+.uni-input-input {
+  outline: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-decoration: inherit;
+}
+
+.uni-input-wrapper,
+.uni-input-form {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.uni-input-placeholder,
+.uni-input-input {
+  width: 100%;
+}
+
+.uni-input-placeholder {
+  position: absolute;
+  top: auto !important;
+  left: 0;
+  color: gray;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: pre;
+  word-break: keep-all;
+  pointer-events: none;
+  line-height: inherit;
+}
+
+.uni-input-input {
+  position: relative;
+  display: block;
+  height: 100%;
+  background: none;
+  color: inherit;
+  opacity: 1;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-indent: inherit;
+  text-transform: inherit;
+  text-shadow: inherit;
+}
+
+.uni-input-input[type='search']::-webkit-search-cancel-button,
+.uni-input-input[type="search"]::-webkit-search-decoration {
+  display: none;
+}
+
+.uni-input-input::-webkit-outer-spin-button,
+.uni-input-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+          appearance: none;
+  margin: 0;
+}
+
+.uni-input-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.uni-input-input:disabled {
+  /* 用于重置iOS14以下禁用状态文字颜色 */
+  -webkit-text-fill-color: currentcolor;
+}
+
+uni-input,
+div:where([uni-input]) {
+  background-color: #ffffff;
+}
+
+.uni-input-placeholder {
+  color: #757575;
+}
+
+@layer uni-field-selection {
+  :where(.uni-field-selection-probe) {
+    background-color: var(--uni-selection-probe-background-color);
+  }
+}
+
+.uni-input-input.uni-field-selection[data-uni-selection]::-moz-selection {
+  background-color: var(--uni-selection-background-color);
+}
+
+.uni-input-input.uni-field-selection[data-uni-selection]::selection {
+  background-color: var(--uni-selection-background-color);
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/api/modal.css">uni-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  display: block;
+  box-sizing: border-box;
+}
+
+.uni-modal {
+  position: fixed;
+  z-index: 999;
+  width: 80%;
+  max-width: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  text-align: center;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.uni-modal * {
+  box-sizing: border-box;
+}
+
+.uni-modal__hd {
+  padding: 1em 1.6em 0.3em;
+}
+
+.uni-modal__title {
+  font-weight: 400;
+  font-size: 18px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.uni-modal__bd {
+  padding: 1.3em 1.6em 1.3em;
+  min-height: 40px;
+  font-size: 15px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: #999999;
+  max-height: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.uni-modal__textarea {
+  resize: none;
+  border: 0;
+  margin: 0;
+  width: 90%;
+  padding: 10px;
+  font-size: 20px;
+  outline: none;
+  border: none;
+  background-color: #eee;
+  text-decoration: inherit;
+  /* 解决单行中文内容会出现滚动条的问题 */
+  line-height: 1.2;
+}
+
+.uni-modal__ft {
+  position: relative;
+  line-height: 48px;
+  font-size: 18px;
+  display: flex;
+}
+
+.uni-modal__ft:after {
+  content: ' ';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 1px;
+  border-top: 1px solid #d5d5d6;
+  color: #d5d5d6;
+  transform-origin: 0 0;
+  transform: scaleY(0.5);
+}
+
+.uni-modal__btn {
+  display: block;
+  flex: 1;
+  color: #3cc51f;
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  position: relative;
+  cursor: pointer;
+}
+
+.uni-modal__btn:active {
+  background-color: #eeeeee;
+}
+
+.uni-modal__btn:after {
+  content: ' ';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  bottom: 0;
+  border-left: 1px solid #d5d5d6;
+  color: #d5d5d6;
+  transform-origin: 0 0;
+  transform: scaleX(0.5);
+}
+
+.uni-modal__btn:first-child:after {
+  display: none;
+}
+
+.uni-modal__btn_default {
+  color: #353535;
+}
+
+.uni-modal__btn_primary {
+  color: #007aff;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/api/toast.css">uni-toast {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  display: block;
+  box-sizing: border-box;
+  pointer-events: none;
+  font-size: 16px;
+}
+
+uni-toast .uni-sample-toast {
+  position: fixed;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: 80%;
+  max-width: min(200px, 80%);
+  box-sizing: border-box;
+  padding: 12px 20px;
+  background-color: rgba(76, 76, 76, 0.95);
+  border-radius: 10px;
+}
+
+uni-toast .uni-simple-toast__text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+  max-width: 100%;
+  word-break: break-word;
+  white-space: normal;
+}
+
+uni-toast .uni-sample-toast.uni-toast--top {
+  top: 12px;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  transform: translateX(-50%);
+}
+
+uni-toast .uni-sample-toast.uni-toast--bottom {
+  top: auto;
+  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+}
+
+uni-toast .uni-mask {
+  pointer-events: auto;
+}
+
+uni-toast .uni-toast {
+  position: fixed;
+  z-index: 999;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(76, 76, 76, 0.95);
+  text-align: center;
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+.uni-toast * {
+  box-sizing: border-box;
+}
+
+uni-toast .uni-toast__icon {
+  margin: 0;
+  flex-shrink: 0;
+  width: 36px!important;
+  height: 36px!important;
+  -o-object-fit: contain;
+     object-fit: contain;
+  vertical-align: baseline!important;
+}
+
+.uni-icon_toast {
+  margin: 15px 0 0;
+}
+
+.uni-icon_toast.uni-icon-success-no-circle:before {
+  color: #ffffff;
+  font-size: 55px;
+}
+
+.uni-icon_toast.uni-loading {
+  margin: 20px 0 0;
+  width: 38px;
+  height: 38px;
+  vertical-align: baseline;
+}
+
+uni-toast .uni-toast__content {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  margin: 16px 0 0;
+  padding: 0 8px;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #ffffff;
+  word-break: break-word;
+  white-space: normal;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/api/action-sheet.css">uni-actionsheet {
+  display: block;
+  box-sizing: border-box;
+}
+
+.uni-actionsheet {
+  position: fixed;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  transform: translate(0, 100%);
+  backface-visibility: hidden;
+  z-index: 999;
+  visibility: hidden;
+  transition: transform 0.3s, visibility 0.3s;
+}
+
+.uni-actionsheet.uni-actionsheet_toggle {
+  visibility: visible;
+  transform: translate(0, 0);
+}
+
+.uni-actionsheet * {
+  box-sizing: border-box;
+}
+
+.uni-actionsheet__menu,
+.uni-actionsheet__action {
+  border-radius: 5px;
+  background-color: #fcfcfd;
+}
+
+.uni-actionsheet__action {
+  margin-top: 6px;
+}
+
+.uni-actionsheet__cell,
+.uni-actionsheet__title {
+  position: relative;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.uni-actionsheet__title {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  color: var(--UI-FG);
+  background-color: #fff;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.uni-actionsheet__cell:before {
+  content: ' ';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 1px;
+  border-top: 1px solid #e5e5e5;
+  color: #e5e5e5;
+  transform-origin: 0 0;
+  transform: scaleY(0.5);
+}
+
+.uni-actionsheet__cell:active {
+  background-color: #ececec;
+}
+
+.uni-actionsheet__cell:first-child:before {
+  display: none;
+}
+
+@media screen and (min-width: 500px) and (min-height: 500px) {
+  .uni-mask.uni-actionsheet__mask {
+    background: none;
+  }
+
+  .uni-actionsheet {
+    width: 300px;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+
+  .uni-actionsheet.uni-actionsheet_toggle {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  .uni-actionsheet__menu {
+    box-shadow: 0px 0 20px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .uni-actionsheet__action {
+    display: none;
+  }
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/resize-sensor.css">@keyframes once-show {
+  from {
+    top: 0;
+  }
+}
+uni-resize-sensor,
+uni-resize-sensor > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+uni-resize-sensor {
+  display: block;
+  z-index: -1;
+  visibility: hidden;
+  animation: once-show 1ms;
+}
+uni-resize-sensor > div > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+uni-resize-sensor > div:first-child > div {
+  width: 100000px;
+  height: 100000px;
+}
+uni-resize-sensor > div:last-child > div {
+  width: 200%;
+  height: 200%;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/swiper.css">uni-swiper {
+  display: block;
+  height: 150px;
+}
+
+uni-swiper[hidden] {
+  display: none;
+}
+
+.uni-swiper-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0);
+}
+
+.uni-swiper-slides {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.uni-swiper-slide-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.uni-swiper-dots {
+  position: absolute;
+  font-size: 0;
+}
+
+.uni-swiper-dots-horizontal {
+  left: 50%;
+  bottom: 10px;
+  text-align: center;
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+}
+
+.uni-swiper-dots-horizontal .uni-swiper-dot {
+  margin-right: 8px;
+}
+
+.uni-swiper-dots-horizontal .uni-swiper-dot:last-child {
+  margin-right: 0;
+}
+
+.uni-swiper-dots-vertical {
+  right: 10px;
+  top: 50%;
+  text-align: right;
+  transform: translate(0, -50%);
+}
+
+.uni-swiper-dots-vertical .uni-swiper-dot {
+  display: block;
+  margin-bottom: 9px;
+}
+
+.uni-swiper-dots-vertical .uni-swiper-dot:last-child {
+  margin-bottom: 0;
+}
+
+.uni-swiper-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-timing-function: ease;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+}
+
+.uni-swiper-dot-active {
+  background-color: #000000;
+}
+
+.uni-swiper-navigation {
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  margin-top: -13px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.uni-swiper-navigation-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.uni-swiper-navigation-hide {
+  opacity: 0;
+  cursor: auto;
+  pointer-events: none;
+}
+
+.uni-swiper-navigation-prev {
+  left: 10px;
+}
+
+.uni-swiper-navigation-prev svg {
+  margin-left: -1px;
+  left: 10px;
+}
+
+.uni-swiper-navigation-prev.uni-swiper-navigation-vertical {
+  top: 18px;
+  left: 50%;
+  margin-left: -13px;
+}
+
+.uni-swiper-navigation-prev.uni-swiper-navigation-vertical svg {
+  transform: rotate(90deg);
+  margin-left: auto;
+  margin-top: -2px;
+}
+
+.uni-swiper-navigation-next {
+  right: 10px;
+}
+
+.uni-swiper-navigation-next svg {
+  transform: rotate(180deg);
+}
+
+.uni-swiper-navigation-next.uni-swiper-navigation-vertical {
+  top: auto;
+  bottom: 5px;
+  left: 50%;
+  margin-left: -13px;
+}
+
+.uni-swiper-navigation-next.uni-swiper-navigation-vertical svg {
+  margin-top: 2px;
+  transform: rotate(270deg);
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/swiper-item.css">uni-swiper-item {
+  display: block;
+  overflow: hidden;
+  will-change: transform;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+uni-swiper-item[hidden] {
+  display: none;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/movable-area.css">uni-movable-area {
+  display: block;
+  position: relative;
+  width: 10px;
+  height: 10px;
+}
+
+uni-movable-area[hidden] {
+  display: none;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/movable-view.css">uni-movable-view {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  cursor: grab;
+}
+
+uni-movable-view[hidden] {
+  display: none;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/api/location-view.css">.uni-system-open-location {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #f8f8f8;
+  z-index: 999;
+}
+
+.uni-system-open-location .map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  bottom: 80px;
+  height: auto;
+}
+
+.uni-system-open-location .info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background-color: white;
+  padding: 15px;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.uni-system-open-location .info>.name {
+  font-size: 17px;
+  color: #111111;
+  /* vue3 一行展示避免被导航图标挡住 */
+  padding-right: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uni-system-open-location .info>.address {
+  font-size: 14px;
+  color: #666666;
+}
+
+.uni-system-open-location .info>.nav {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-top: -25px;
+  background-color: #007aff;
+}
+
+.uni-system-open-location .info>.nav>svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.uni-system-open-location .map-move {
+  position: absolute;
+  bottom: 50px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  line-height: 40px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0px 0 5px 1px rgba(0, 0, 0, 0.3);
+}
+
+.uni-system-open-location .map-move>svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.uni-system-open-location .nav-btn-back {
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.uni-system-open-location .nav-btn-back>svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+.uni-system-open-location .map-content {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.uni-system-open-location .map-content.fix-position {
+  top: -74px;
+  bottom: -44px;
+}
+
+.uni-system-open-location .map-content>iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.uni-system-open-location .actTonav {
+  position: absolute;
+  right: 16px;
+  bottom: 56px;
+  width: 60px;
+  height: 60px;
+  border-radius: 60px;
+}</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/api/location-picker.css">.uni-system-choose-location {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #f8f8f8;
+  z-index: 999;
+}
+
+.uni-system-choose-location .map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 300px;
+}
+
+.uni-system-choose-location .map-location {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 32px;
+  height: 52px;
+  margin-left: -16px;
+  cursor: pointer;
+  background-size: 100%;
+}
+
+.uni-system-choose-location .map-move {
+  position: absolute;
+  bottom: 50px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  line-height: 40px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0px 0 5px 1px rgba(0, 0, 0, 0.3);
+}
+
+.uni-system-choose-location .map-move>svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.uni-system-choose-location .nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  background-color: transparent;
+  background-image: linear-gradient( to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+}
+
+.uni-system-choose-location .nav-btn {
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 44px;
+  padding: 6px;
+  line-height: 32px;
+  font-size: 26px;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.uni-system-choose-location .nav-btn.confirm {
+  left: auto;
+  right: 0;
+}
+
+.uni-system-choose-location .nav-btn.disable {
+  opacity: 0.4;
+}
+
+.uni-system-choose-location .nav-btn>svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* line-height: inherit; */
+  border-radius: 2px;
+  box-sizing: border-box;
+  padding: 3px;
+}
+
+.uni-system-choose-location .nav-btn.confirm>svg {
+  background-color: #007aff;
+  padding: 5px;
+}
+
+.uni-system-choose-location .menu {
+  position: absolute;
+  top: 300px;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  background-color: white;
+}
+
+.uni-system-choose-location .search {
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  padding: 8px;
+  line-height: 34px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.uni-system-choose-location .search-input {
+  flex: 1;
+  height: 100%;
+  border-radius: 5px;
+  padding: 0 5px;
+  background: #ebebeb;
+}
+
+.uni-system-choose-location .search-btn {
+  margin-left: 5px;
+  color: #007aff;
+  font-size: 17px;
+  text-align: center;
+}
+
+.uni-system-choose-location .list {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  padding-bottom: 10px;
+  /* background-color: #f6f6f6; */
+}
+
+.uni-system-choose-location .list-loading {
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+}
+
+.uni-system-choose-location .list-item {
+  position: relative;
+  padding: 10px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.uni-system-choose-location .list-item>svg {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.uni-system-choose-location .list-item.selected>svg {
+  display: block;
+}
+
+.uni-system-choose-location .list-item:not(:last-child)::after {
+  position: absolute;
+  content: "";
+  height: 1px;
+  left: 10px;
+  bottom: 0;
+  width: 100%;
+  background-color: #d3d3d3;
+}
+
+.uni-system-choose-location .list-item-title {
+  font-size: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.uni-system-choose-location .list-item-detail {
+  font-size: 12px;
+  color: #808080;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media screen and (min-width: 800px) {
+  .uni-system-choose-location .map {
+    top: 0;
+    height: 100%;
+  }
+  .uni-system-choose-location .map-move {
+    bottom: 10px;
+    right: 320px;
+  }
+  .uni-system-choose-location .menu {
+    top: 54px;
+    left: auto;
+    right: 10px;
+    width: 300px;
+    bottom: 10px;
+    max-height: 600px;
+    box-shadow: 0px 0 20px 5px rgba(0, 0, 0, 0.3);
+  }
+}</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-h5/style/map.css">uni-map {
+  position: relative;
+  width: 300px;
+  height: 150px;
+  display: block;
+}
+
+uni-map[hidden] {
+  display: none;
+}
+/* 处理高德地图 marker label 默认样式 */
+.amap-marker-label {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+/* 处理高德地图 open-location icon 被遮挡问题 */
+.amap-marker > .amap-icon > img {
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.uni-map-control {
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+.uni-map-control-icon {
+  position: absolute;
+  max-width: initial;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/scroll-view.css">uni-scroll-view {
+  display: block;
+  width: 100%;
+}
+
+uni-scroll-view[hidden] {
+  display: none;
+}
+
+.uni-scroll-view {
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  /* display: flex; 时在安卓下会导致scrollWidth和offsetWidth一样 */
+  height: 100%;
+  max-height: inherit;
+}
+
+.uni-scroll-view-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.uni-scroll-view-scrollbar-hidden {
+  -moz-scrollbars: none;
+  scrollbar-width: none;
+}
+
+.uni-scroll-view-content {
+  width: 100%;
+  height: 100%;
+}</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/src/App.vue?vue&amp;type=style&amp;index=0&amp;lang.scss">/* uni-app 约定文件：可留空，避免编译器告警 */
+:root,
+uni-page-body {
+  --ub-ground: #0e2b26;
+  --ub-paper: #f2ede4;
+  --ub-silver: #8e9a93;
+  --ub-stamp: #c4453a;
+  --ub-photo: #1b3a33;
+  --ub-line: rgba(242, 237, 228, 0.12);
+  --ub-serif: Source Han Serif SC, Noto Serif SC, Songti SC, serif;
+  --ub-sans: Source Han Sans SC, Noto Sans SC, -apple-system, PingFang SC, sans-serif;
+  --ub-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+body {
+  --ub-ground: #0e2b26;
+  --ub-paper: #f2ede4;
+  --ub-silver: #8e9a93;
+  --ub-stamp: #c4453a;
+  --ub-photo: #1b3a33;
+  --ub-line: rgba(242, 237, 228, 0.12);
+  --ub-serif: Source Han Serif SC, Noto Serif SC, Songti SC, serif;
+  --ub-sans: Source Han Sans SC, Noto Sans SC, -apple-system, PingFang SC, sans-serif;
+  --ub-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+uni-page-body {
+  background-color: #0e2b26;
+  color: #f2ede4;
+  font-family: "Source Han Sans SC", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background-color: #0e2b26;
+}
+uni-view,
+uni-text,
+uni-button,
+uni-input,
+uni-textarea {
+  box-sizing: border-box;
+}
+uni-button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: "Source Han Sans SC", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  color: inherit;
+}
+uni-button::after {
+  border: none;
+}
+
+/* 装订细线：1px、12% 纸白 */
+.ub-rule {
+  height: 1px;
+  background-color: rgba(242, 237, 228, 0.12);
+}
+
+/* 等宽数字：档期 / 价格 / 编号 */
+.ub-num {
+  font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.ub-title {
+  font-family: "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+.ub-small {
+  font-size: 13px;
+  color: #8e9a93;
+}
+.ub-safe-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/view.css">uni-view {
+  display: block;
+}
+uni-view[hidden] {
+  display: none;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/text.css">uni-text[selectable] {
+  cursor: auto;
+  -webkit-user-select: text;
+     -moz-user-select: text;
+          user-select: text;
+}
+
+uni-text {
+  white-space: pre-line;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/node_modules/@dcloudio/uni-components/style/button.css">uni-button {
+  position: relative;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 14px;
+  padding-right: 14px;
+  box-sizing: border-box;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 2.55555556;
+  border-radius: 5px;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  color: #000000;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+uni-button[hidden] {
+  display: none !important;
+}
+
+uni-button:after {
+  content: ' ';
+  width: 200%;
+  height: 200%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  transform: scale(0.5);
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+uni-button[native] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+uni-button[native] .uni-button-cover-view-wrapper {
+  border: inherit;
+  border-color: inherit;
+  border-radius: inherit;
+  background-color: inherit;
+}
+
+uni-button[native] .uni-button-cover-view-inner {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+uni-button uni-cover-view {
+  line-height: inherit;
+  white-space: inherit;
+}
+
+uni-button[type='default'] {
+  color: #000000;
+  background-color: #f8f8f8;
+}
+
+uni-button[type='primary'] {
+  color: #ffffff;
+  background-color: #007aff;
+}
+
+uni-button[type='warn'] {
+  color: #ffffff;
+  background-color: #e64340;
+}
+
+uni-button[disabled] {
+  color: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+}
+
+uni-button[disabled][type='default'],
+uni-button[disabled]:not([type]) {
+  color: rgba(0, 0, 0, 0.3);
+  background-color: #f7f7f7;
+}
+
+uni-button[disabled][type='primary'] {
+  background-color: rgba(0, 122, 255, 0.6);
+}
+
+uni-button[disabled][type='warn'] {
+  background-color: #ec8b89;
+}
+
+uni-button[type='primary'][plain] {
+  color: #007aff;
+  border: 1px solid #007aff;
+  background-color: transparent;
+}
+
+uni-button[type='primary'][plain][disabled] {
+  color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+uni-button[type='primary'][plain]:after {
+  border-width: 0;
+}
+
+uni-button[type='default'][plain] {
+  color: #353535;
+  border: 1px solid #353535;
+  background-color: transparent;
+}
+
+uni-button[type='default'][plain][disabled] {
+  color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+uni-button[type='default'][plain]:after {
+  border-width: 0;
+}
+
+uni-button[plain] {
+  color: #353535;
+  border: 1px solid #353535;
+  background-color: transparent;
+}
+
+uni-button[plain][disabled] {
+  color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+uni-button[plain]:after {
+  border-width: 0;
+}
+
+uni-button[plain][native] .uni-button-cover-view-inner {
+  padding: 0;
+}
+
+uni-button[type='warn'][plain] {
+  color: #e64340;
+  border: 1px solid #e64340;
+  background-color: transparent;
+}
+
+uni-button[type='warn'][plain][disabled] {
+  color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+uni-button[type='warn'][plain]:after {
+  border-width: 0;
+}
+
+uni-button[size='mini'] {
+  display: inline-block;
+  line-height: 2.3;
+  font-size: 13px;
+  padding: 0 1.34em;
+}
+
+uni-button[size='mini'][native] {
+  padding: 0;
+}
+
+uni-button[size='mini'][native] .uni-button-cover-view-inner {
+  padding: 0 1.34em;
+}
+
+uni-button[loading]:not([disabled]) {
+  cursor: progress;
+}
+
+uni-button[loading]:before {
+  content: ' ';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  animation: uni-loading 1s steps(12, end) infinite;
+  background-size: 100%;
+}
+
+uni-button[loading][type='primary'] {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: #0062cc;
+}
+
+uni-button[loading][type='primary'][plain] {
+  color: #007aff;
+  background-color: transparent;
+}
+
+uni-button[loading][type='default'] {
+  color: rgba(0, 0, 0, 0.6);
+  background-color: #dedede;
+}
+
+uni-button[loading][type='default'][plain] {
+  color: #353535;
+  background-color: transparent;
+}
+
+uni-button[loading][type='warn'] {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: #ce3c39;
+}
+
+uni-button[loading][type='warn'][plain] {
+  color: #e64340;
+  background-color: transparent;
+}
+
+uni-button[loading][native]:before {
+  content: none;
+}
+
+.button-hover {
+  color: rgba(0, 0, 0, 0.6);
+  background-color: #dedede;
+}
+
+.button-hover[plain] {
+  color: rgba(53, 53, 53, 0.6);
+  border-color: rgba(53, 53, 53, 0.6);
+  background-color: transparent;
+}
+
+.button-hover[type='primary'] {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: #0062cc;
+}
+
+.button-hover[type='primary'][plain] {
+  color: rgba(0, 122, 255, 0.6);
+  border-color: rgba(0, 122, 255, 0.6);
+  background-color: transparent;
+}
+
+.button-hover[type='default'] {
+  color: rgba(0, 0, 0, 0.6);
+  background-color: #dedede;
+}
+
+.button-hover[type='default'][plain] {
+  color: rgba(53, 53, 53, 0.6);
+  border-color: rgba(53, 53, 53, 0.6);
+  background-color: transparent;
+}
+
+.button-hover[type='warn'] {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: #ce3c39;
+}
+
+.button-hover[type='warn'][plain] {
+  color: rgba(230, 67, 64, 0.6);
+  border-color: rgba(230, 67, 64, 0.6);
+  background-color: transparent;
+}
+</style><style type="text/css" data-vite-dev-id="D:/lg/project/工作流测试/projects/uniapp-miniapp-release-loop/05_代码/frontend/src/pages/index/index.vue?vue&amp;type=style&amp;index=0&amp;scoped=83a5a03c&amp;lang.scss">/* uni-app 约定文件：可留空，避免编译器告警 */
+[data-v-83a5a03c]:root,
+uni-page-body[data-v-83a5a03c] {
+  --ub-ground: #0e2b26;
+  --ub-paper: #f2ede4;
+  --ub-silver: #8e9a93;
+  --ub-stamp: #c4453a;
+  --ub-photo: #1b3a33;
+  --ub-line: rgba(242, 237, 228, 0.12);
+  --ub-serif: Source Han Serif SC, Noto Serif SC, Songti SC, serif;
+  --ub-sans: Source Han Sans SC, Noto Sans SC, -apple-system, PingFang SC, sans-serif;
+  --ub-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+body[data-v-83a5a03c] {
+  --ub-ground: #0e2b26;
+  --ub-paper: #f2ede4;
+  --ub-silver: #8e9a93;
+  --ub-stamp: #c4453a;
+  --ub-photo: #1b3a33;
+  --ub-line: rgba(242, 237, 228, 0.12);
+  --ub-serif: Source Han Serif SC, Noto Serif SC, Songti SC, serif;
+  --ub-sans: Source Han Sans SC, Noto Sans SC, -apple-system, PingFang SC, sans-serif;
+  --ub-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.ub-page[data-v-83a5a03c] {
+  min-height: 100vh;
+  padding: 0 24px 96px;
+  background-color: #0e2b26;
+}
+.mast[data-v-83a5a03c] {
+  padding-top: 24px;
+}
+.mast-row[data-v-83a5a03c] {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 0 8px;
+}
+.mast-no[data-v-83a5a03c] {
+  color: #8e9a93;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+.mast-words[data-v-83a5a03c] {
+  font-size: 13px;
+  color: #8e9a93;
+  letter-spacing: 0.08em;
+}
+.hero[data-v-83a5a03c] {
+  display: flex;
+  align-items: flex-start;
+  padding: 24px 0 40px;
+}
+.hero-copy[data-v-83a5a03c] {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16px;
+}
+.hero-title[data-v-83a5a03c] {
+  display: block;
+  color: #f2ede4;
+}
+.hero-sub[data-v-83a5a03c] {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  color: #8e9a93;
+}
+.hero-price[data-v-83a5a03c] {
+  display: block;
+  margin-top: 24px;
+  color: #f2ede4;
+}
+.hero-note[data-v-83a5a03c] {
+  display: block;
+  margin-top: 8px;
+}
+.hero-photo[data-v-83a5a03c] {
+  width: 46%;
+  aspect-ratio: 4/5;
+  margin-right: -24px;
+  background-color: #1b3a33;
+  border-left: 1px solid rgba(242, 237, 228, 0.12);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 16px;
+}
+.photo-note[data-v-83a5a03c] {
+  font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 13px;
+  color: #8e9a93;
+  letter-spacing: 0.08em;
+}
+.hero-rule[data-v-83a5a03c] {
+  margin: 8px 0 0;
+}
+.skeleton[data-v-83a5a03c] {
+  padding: 24px 0;
+}
+.sk-row[data-v-83a5a03c] {
+  height: 72px;
+  display: flex;
+  align-items: center;
+}
+.sk-line[data-v-83a5a03c] {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(242, 237, 228, 0.12);
+  animation: ub-breathe-83a5a03c 1.4s ease-in-out infinite;
+}
+@keyframes ub-breathe-83a5a03c {
+0%, 100% {
+    opacity: 0.35;
+}
+50% {
+    opacity: 0.9;
+}
+}
+.list[data-v-83a5a03c] {
+  padding-top: 8px;
+}
+.row[data-v-83a5a03c] {
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  border-bottom: 1px solid rgba(242, 237, 228, 0.12);
+}
+.row-no[data-v-83a5a03c] {
+  width: 44px;
+  flex: none;
+  color: #8e9a93;
+  font-size: 13px;
+}
+.row-dash[data-v-83a5a03c] {
+  width: 16px;
+  height: 1px;
+  flex: none;
+  margin-right: 8px;
+  background-color: rgba(242, 237, 228, 0.12);
+}
+.row-main[data-v-83a5a03c] {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16px;
+}
+.row-title[data-v-83a5a03c] {
+  display: block;
+  font-family: "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #f2ede4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-tags[data-v-83a5a03c] {
+  display: block;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-right[data-v-83a5a03c] {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+.stamp-dot[data-v-83a5a03c] {
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  background-color: #c4453a;
+}
+.row-price[data-v-83a5a03c] {
+  color: #f2ede4;
+  font-size: 16px;
+}
+.state[data-v-83a5a03c] {
+  padding: 64px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.state-text[data-v-83a5a03c] {
+  font-family: "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  font-size: 20px;
+  color: #f2ede4;
+  margin-bottom: 16px;
+}
+.btn-ghost[data-v-83a5a03c] {
+  min-height: 44px;
+  padding: 0 24px;
+  border: 1px solid rgba(242, 237, 228, 0.12);
+  border-radius: 2px;
+  color: #f2ede4;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+}
+.foot-rule[data-v-83a5a03c] {
+  margin-top: 64px;
+}
+.foot-note[data-v-83a5a03c] {
+  display: block;
+  margin-top: 16px;
+}</style></head>
+  <body data-v-83a5a03c="">
+    <div id="app" data-v-app=""><uni-app class="uni-app--showtabbar"><uni-page data-page="pages/index/index" type="tabBar"><uni-page-head uni-page-head-type="default"><div class="uni-page-head" style="background-color: rgb(14, 43, 38); color: rgb(255, 255, 255);"><div class="uni-page-head-hd"><!----></div><div class="uni-page-head-bd"><div class="uni-page-head__title" style="font-size: 16px; opacity: 1;">一个小档期</div></div><div class="uni-page-head-ft"></div></div><div class="uni-placeholder"></div></uni-page-head><uni-page-refresh><div class="uni-page-refresh" style="margin-top: 44px;"><div class="uni-page-refresh-inner"><svg fill="#2BD009" class="uni-page-refresh__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg><svg class="uni-page-refresh__spinner" width="24" height="24" viewBox="25 25 50 50"><circle stroke="#2BD009" class="uni-page-refresh__path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"></circle></svg></div></div></uni-page-refresh><uni-page-wrapper><uni-page-body data-v-83a5a03c=""><uni-view data-v-83a5a03c="" class="ub-page"><uni-view data-v-83a5a03c="" class="mast"><uni-view data-v-83a5a03c="" class="ub-rule"></uni-view><uni-view data-v-83a5a03c="" class="mast-row"><uni-text data-v-83a5a03c="" class="ub-num mast-no"><span>No.01</span></uni-text><uni-text data-v-83a5a03c="" class="mast-words"><span>约拍 · 档期</span></uni-text></uni-view></uni-view><uni-view data-v-83a5a03c="" class="hero"><uni-view data-v-83a5a03c="" class="hero-copy"><uni-text data-v-83a5a03c="" class="ub-title hero-title"><span>城市轻写真</span></uni-text><uni-text data-v-83a5a03c="" class="hero-sub"><span>室内 · 2套服装</span></uni-text><uni-text data-v-83a5a03c="" class="ub-num hero-price"><span>¥399</span></uni-text><uni-text data-v-83a5a03c="" class="ub-small hero-note"><span>余档 4 个套餐 · 今天起 30 天内</span></uni-text></uni-view><uni-view data-v-83a5a03c="" class="hero-photo"><uni-text data-v-83a5a03c="" class="photo-note"><span>样片 4:5</span></uni-text></uni-view></uni-view><uni-view data-v-83a5a03c="" class="ub-rule hero-rule"></uni-view><uni-view data-v-83a5a03c="" class="list"><uni-view data-v-83a5a03c="" class="row"><uni-text data-v-83a5a03c="" class="ub-num row-no"><span>01</span></uni-text><uni-view data-v-83a5a03c="" class="row-dash"></uni-view><uni-view data-v-83a5a03c="" class="row-main"><uni-text data-v-83a5a03c="" class="row-title"><span>城市轻写真</span></uni-text><uni-text data-v-83a5a03c="" class="ub-small row-tags"><span>室内 · 2套服装</span></uni-text></uni-view><uni-view data-v-83a5a03c="" class="row-right"><!--v-if--><uni-text data-v-83a5a03c="" class="ub-num row-price"><span>¥399</span></uni-text></uni-view></uni-view><uni-view data-v-83a5a03c="" class="row"><uni-text data-v-83a5a03c="" class="ub-num row-no"><span>02</span></uni-text><uni-view data-v-83a5a03c="" class="row-dash"></uni-view><uni-view data-v-83a5a03c="" class="row-main"><uni-text data-v-83a5a03c="" class="row-title"><span>复古胶片</span></uni-text><uni-text data-v-83a5a03c="" class="ub-small row-tags"><span>外景 · 胶片质感</span></uni-text></uni-view><uni-view data-v-83a5a03c="" class="row-right"><!--v-if--><uni-text data-v-83a5a03c="" class="ub-num row-price"><span>¥499</span></uni-text></uni-view></uni-view><uni-view data-v-83a5a03c="" class="row"><uni-text data-v-83a5a03c="" class="ub-num row-no"><span>03</span></uni-text><uni-view data-v-83a5a03c="" class="row-dash"></uni-view><uni-view data-v-83a5a03c="" class="row-main"><uni-text data-v-83a5a03c="" class="row-title"><span>情侣纪实</span></uni-text><uni-text data-v-83a5a03c="" class="ub-small row-tags"><span>双人 · 外景</span></uni-text></uni-view><uni-view data-v-83a5a03c="" class="row-right"><uni-view data-v-83a5a03c="" class="stamp-dot"></uni-view><uni-text data-v-83a5a03c="" class="ub-num row-price"><span>¥699</span></uni-text></uni-view></uni-view><uni-view data-v-83a5a03c="" class="row"><uni-text data-v-83a5a03c="" class="ub-num row-no"><span>04</span></uni-text><uni-view data-v-83a5a03c="" class="row-dash"></uni-view><uni-view data-v-83a5a03c="" class="row-main"><uni-text data-v-83a5a03c="" class="row-title"><span>个人写真·夜场</span></uni-text><uni-text data-v-83a5a03c="" class="ub-small row-tags"><span>夜景 · 灯光</span></uni-text></uni-view><uni-view data-v-83a5a03c="" class="row-right"><!--v-if--><uni-text data-v-83a5a03c="" class="ub-num row-price"><span>¥599</span></uni-text></uni-view></uni-view></uni-view><uni-view data-v-83a5a03c="" class="ub-rule foot-rule"></uni-view><uni-text data-v-83a5a03c="" class="ub-small foot-note"><span>一个小档期 · 只做四本册子的档期</span></uni-text></uni-view></uni-page-body><!----></uni-page-wrapper><!----></uni-page><uni-tabbar class="uni-tabbar-bottom" style=""><div class="uni-tabbar" style="background-color: rgb(14, 43, 38); backdrop-filter: none;"><div class="uni-tabbar-border" style="background-color: rgba(0, 0, 0, 0.33);"></div><div class="uni-tabbar__item"><div class="uni-tabbar__bd" style="height: 50px;"><div class="uni-tabbar__label" style="color: rgb(242, 237, 228); font-size: 10px; line-height: 1.8; margin-top: inherit;">档期</div><!----></div></div><div class="uni-tabbar__item"><div class="uni-tabbar__bd" style="height: 50px;"><div class="uni-tabbar__label" style="color: rgb(142, 154, 147); font-size: 10px; line-height: 1.8; margin-top: inherit;">我的</div><!----></div></div></div><div class="uni-placeholder" style="height: 50px;"></div></uni-tabbar></uni-app></div>
+    <script type="module" src="/src/main.ts"></script>
+  
+
+<div style="position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; z-index: -1; overflow: hidden; visibility: hidden;"><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-top);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 400px; height: 400px;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-top);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 250%; height: 250%;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-left);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 400px; height: 400px;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-left);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 250%; height: 250%;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-right);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 400px; height: 400px;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-right);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 250%; height: 250%;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-bottom);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 400px; height: 400px;"></div></div><div style="position: absolute; width: 100px; height: 200px; box-sizing: border-box; overflow: hidden; padding-bottom: env(safe-area-inset-bottom);"><div style="transition: all; animation: auto ease 0s 1 normal none running none; width: 250%; height: 250%;"></div></div></div></body></html>

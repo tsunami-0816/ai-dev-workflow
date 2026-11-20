@@ -1,0 +1,144 @@
+{
+  "widths": {
+    "375": {
+      "pagePaddingLeft": "24px",
+      "docScrollWidth": 375,
+      "docClientWidth": 375,
+      "heroTitleFont": "34px",
+      "heroPriceFont": "18px",
+      "heroPhoto": {
+        "x": 225,
+        "y": 96,
+        "w": 150,
+        "h": 188
+      },
+      "rowCount": 3,
+      "rowH": 72,
+      "rowTitleFont": "18px",
+      "tabLabelFont": "12px"
+    },
+    "390": {
+      "pagePaddingLeft": "24px",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "heroTitleFont": "34px",
+      "heroPriceFont": "18px",
+      "heroPhoto": {
+        "x": 233,
+        "y": 96,
+        "w": 157,
+        "h": 188
+      },
+      "rowCount": 3,
+      "rowH": 72,
+      "rowTitleFont": "18px",
+      "tabLabelFont": "12px"
+    },
+    "414": {
+      "pagePaddingLeft": "24px",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "heroTitleFont": "34px",
+      "heroPriceFont": "18px",
+      "heroPhoto": {
+        "x": 246,
+        "y": 96,
+        "w": 168,
+        "h": 188
+      },
+      "rowCount": 3,
+      "rowH": 72,
+      "rowTitleFont": "18px",
+      "tabLabelFont": "12px"
+    }
+  },
+  "detail": {
+    "375": {
+      "docScrollWidth": 375,
+      "docClientWidth": 375,
+      "photo": {
+        "x": 0,
+        "y": 392,
+        "w": 375,
+        "h": 469
+      },
+      "photoRatio": 1.25,
+      "titleFont": "34px",
+      "summaryFont": "15px",
+      "section": {
+        "x": 24,
+        "y": 238,
+        "w": 327,
+        "h": 129
+      },
+      "bar": {
+        "x": 0,
+        "y": 763,
+        "w": 375,
+        "h": 81
+      },
+      "overlap": 0,
+      "specTextPresent": false,
+      "gutter": "24px"
+    },
+    "390": {
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "photo": {
+        "x": 0,
+        "y": 392,
+        "w": 390,
+        "h": 488
+      },
+      "photoRatio": 1.25,
+      "titleFont": "34px",
+      "summaryFont": "15px",
+      "section": {
+        "x": 24,
+        "y": 238,
+        "w": 342,
+        "h": 129
+      },
+      "bar": {
+        "x": 0,
+        "y": 763,
+        "w": 390,
+        "h": 81
+      },
+      "overlap": 0,
+      "specTextPresent": false
+    },
+    "414": {
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "photo": {
+        "x": 0,
+        "y": 392,
+        "w": 414,
+        "h": 518
+      },
+      "photoRatio": 1.25,
+      "titleFont": "34px",
+      "summaryFont": "15px",
+      "section": {
+        "x": 24,
+        "y": 238,
+        "w": 366,
+        "h": 129
+      },
+      "bar": {
+        "x": 0,
+        "y": 763,
+        "w": 414,
+        "h": 81
+      },
+      "overlap": 0,
+      "specTextPresent": false
+    }
+  },
+  "form": {
+    "submitH": 48,
+    "controlH": 44,
+    "fieldPaddingTop": "24px"
+  }
+}

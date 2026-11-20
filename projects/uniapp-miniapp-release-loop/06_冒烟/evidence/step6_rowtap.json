@@ -1,0 +1,17 @@
+{
+  "before": {
+    "price": "¥499",
+    "rows": 3,
+    "url": "http://127.0.0.1:5186/#/pages/index/index"
+  },
+  "midTickPrice": "¥268",
+  "after": {
+    "url": "http://127.0.0.1:5186/#/pages/package/detail?id=2",
+    "hasBookBtn": true,
+    "title": "复古胶片",
+    "price": ""
+  },
+  "tickChanged": true,
+  "navigated": true,
+  "pass": true
+}

@@ -1,0 +1,12 @@
+﻿const path=require("node:path");
+const puppeteer=require(path.join(__dirname,"..","..","05_代码","frontend","node_modules","puppeteer-core"));
+const EDGE="C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+(async()=>{const b=await puppeteer.launch({executablePath:EDGE,headless:"new",args:["--no-first-run"]});
+const p=await b.newPage();await p.setViewport({width:390,height:844,deviceScaleFactor:1});
+await p.goto("http://127.0.0.1:5186/#/pages/package/detail?id=3",{waitUntil:"networkidle0",timeout:40000});await sleep(2500);
+const probe=await p.evaluate(()=>{const bar=document.querySelector(".bar");const sum=document.querySelector(".summary");const r1=bar?bar.getBoundingClientRect():null;const r2=sum?sum.getBoundingClientRect():null;return{bar:r1&&{top:Math.round(r1.top),bottom:Math.round(r1.bottom)},summary:r2&&{top:Math.round(r2.top),bottom:Math.round(r2.bottom),text:(sum.textContent||"").slice(0,20)},docPaddingBottom:getComputedStyle(document.querySelector(".ub-page")).paddingBottom,viewport:window.innerHeight}});
+await p.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));await sleep(800);
+const after=await p.evaluate(()=>{const bar=document.querySelector(".bar");const sum=document.querySelector(".summary");const r1=bar.getBoundingClientRect();const r2=sum.getBoundingClientRect();return{barTop:Math.round(r1.top),summaryBottom:Math.round(r2.bottom),overlap:Math.round(r2.bottom-r1.top)}});
+await p.screenshot({path:path.join(__dirname,"review_detail3_bottom.png"),fullPage:false});
+console.log(JSON.stringify({probe,after},null,2));await b.close();})().catch(e=>{console.error("FAIL",e.message);process.exit(1)});

@@ -1,0 +1,16 @@
+{
+  "name": "uniapp-booking-cloud-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "apiProxy / getOpenid 云函数（T-206，零第三方依赖，仅 Node 内置模块）",
+  "main": "apiProxy/index.js",
+  "scripts": {
+    "start:proxy": "node apiProxy/localServer.js",
+    "start:openid": "node getOpenid/localServer.js",
+    "mock:wx": "node test/mockWxServer.js",
+    "mock:hang": "node test/hangServer.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

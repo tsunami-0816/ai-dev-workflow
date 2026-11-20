@@ -1,0 +1,145 @@
+# step4 任务拆解与开发规范输入卡
+step: 4
+project: uniapp-miniapp-release-loop
+updated_at: 2026-11-19
+sources:
+  - 02_架构设计/第二轮技术架构设计文档.md
+  - 03_评审报告/第二轮架构复审报告.md
+  - 01_项目基线说明书.md
+arch_ref: 02_架构设计/第二轮技术架构设计文档.md
+tasks:
+  - task_id: T-101
+    desc: uni-app CLI 工程（Vue3+TS+Vite）搭建，dev:h5 可启动
+    risk: 中
+  - task_id: T-102
+    desc: pages.json 5 页 + tabBar
+    risk: 中
+  - task_id: T-103
+    desc: build:h5 / build:mp-weixin 脚本 + 产物校验
+    risk: 低
+  - task_id: T-104
+    desc: 条件编译骨架（H5 / MP-WEIXIN）
+    risk: 中
+  - task_id: T-201
+    desc: booking-service 工程（继承 enterprise-rag-java parent 3.2.10 / Java 17）
+    risk: 高
+  - task_id: T-202
+    desc: 统一响应包装 + 全局异常 + 错误码表
+    risk: 高
+  - task_id: T-203
+    desc: JWT 鉴权 Filter + 越权拦截 + 登出黑名单
+    risk: 关键
+  - task_id: T-204
+    desc: HMAC 校验（签名/时间窗/nonce 去重）
+    risk: 关键
+  - task_id: T-205
+    desc: POST /api/auth/login 与 logout
+    endpoint: /api/auth/login
+    risk: 关键
+  - task_id: T-206
+    desc: 云函数 apiProxy（签名/超时/重试/双模式）+ getOpenid
+    risk: 关键
+  - task_id: T-207
+    desc: 前端 request.ts 封装（签名/超时/重试/错误码）
+    risk: 中
+  - task_id: T-208
+    desc: 登录页（双形态 + 错误态）
+    page: pages/login/index
+    risk: 中
+  - task_id: T-301
+    desc: GET /api/packages + 单 key 缓存 + 内存分页
+    endpoint: /api/packages
+    risk: 高
+  - task_id: T-302
+    desc: GET /api/packages/{id}
+    endpoint: /api/packages/{id}
+    risk: 中
+  - task_id: T-303
+    desc: 套餐列表页（分页/下拉刷新/骨架屏/空态）
+    page: pages/index/index
+    risk: 中
+  - task_id: T-304
+    desc: 套餐详情页（轮播/标签/折叠）
+    page: pages/package/detail
+    risk: 中
+  - task_id: T-401
+    desc: 4 表 DDL + 唯一索引 + 种子数据
+    risk: 关键
+  - task_id: T-402
+    desc: POST /api/bookings 幂等（返回首单 + duplicated）
+    endpoint: /api/bookings
+    risk: 关键
+  - task_id: T-403
+    desc: RabbitMQ exchange/queue/DLQ + producer
+    risk: 高
+  - task_id: T-404
+    desc: 消费者落 notify_log（幂等 + 重试 + DLQ）
+    risk: 高
+  - task_id: T-405
+    desc: 预约表单页 + 字段级校验
+    page: pages/booking/form
+    risk: 中
+  - task_id: T-406
+    desc: 前端防重复提交
+    risk: 低
+  - task_id: T-501
+    desc: GET /api/bookings 按登录用户过滤
+    endpoint: /api/bookings
+    risk: 关键
+  - task_id: T-502
+    desc: 「我的」页（列表/状态/空态）
+    page: pages/my/index
+    risk: 中
+  - task_id: T-601
+    desc: 隐私协议页 + __usePrivacyCheck__
+    risk: 中
+  - task_id: T-602
+    desc: project.config.json + 体验版上传配置
+    risk: 中
+  - task_id: T-603
+    desc: 提审材料清单 + 发布/回滚模板
+    risk: 低
+  - task_id: T-604
+    desc: 发布证据归档（含降级判定）
+    risk: 中
+  - task_id: T-701
+    desc: 启停脚本 + actuator health + 冒烟 curl 集
+    risk: 关键
+  - task_id: T-702
+    desc: latency_probe.py + check_metrics.py
+    risk: 中
+  - task_id: T-703
+    desc: pytest 分层套件 + Allure
+    risk: 中
+  - task_id: T-704
+    desc: springdoc 导出 openapi + 契约校验
+    risk: 中
+  - task_id: T-705
+    desc: 标注稿 annotations + overlay 叠图
+    risk: 中
+  - task_id: T-706
+    desc: check_overflow.mjs 两档溢出检测
+    risk: 低
+  - task_id: T-707
+    desc: 依赖漏洞扫描 + 6 条渗透用例
+    risk: 关键
+scope:
+  files_in_scope:
+    - 05_代码/backend/**
+    - 05_代码/cloud-functions/**
+    - 05_代码/frontend/**
+    - 06.5_契约/**
+    - 08_测试/**
+    - 10_交付/**
+    - scripts/**
+  out_of_scope:
+    - 02_架构设计/**
+    - 03_评审报告/**
+    - 01_项目基线说明书.md
+    - workflow/**
+    - WORKFLOW_*.md
+    - projects/_队列/**
+limits:
+  max_files: 80
+  max_attempts: 3
+  timeout_min: 300
