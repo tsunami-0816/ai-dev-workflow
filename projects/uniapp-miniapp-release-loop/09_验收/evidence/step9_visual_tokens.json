@@ -1,0 +1,61 @@
+{
+  "ground": {
+    "backgroundColor": "rgb(14, 43, 38)"
+  },
+  "paper": {
+    "color": "rgb(242, 237, 228)"
+  },
+  "silver": {
+    "color": "rgb(142, 154, 147)"
+  },
+  "stamp": {
+    "color": "rgb(142, 154, 147)"
+  },
+  "titleFont": {
+    "fontFamily": "\"Source Han Serif SC\", \"Noto Serif SC\", \"Songti SC\", serif",
+    "fontWeight": "600",
+    "fontSize": "34px",
+    "lineHeight": "44.2px",
+    "letterSpacing": "0.68px"
+  },
+  "bodyFont": {
+    "fontFamily": "\"Source Han Sans SC\", \"Noto Sans SC\", -apple-system, \"PingFang SC\", sans-serif",
+    "fontWeight": "400",
+    "fontSize": "15px",
+    "lineHeight": "25.5px"
+  },
+  "numFont": {
+    "fontFamily": "\"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+    "fontWeight": "400",
+    "fontSize": "13px",
+    "fontVariantNumeric": "tabular-nums"
+  },
+  "btnRadius": null,
+  "rowRadius": {
+    "borderRadius": "0px"
+  },
+  "rowBox": {
+    "w": 327,
+    "h": 72,
+    "left": 24
+  },
+  "heroBox": {
+    "w": 327,
+    "h": 252,
+    "left": 24
+  },
+  "pagePadLeft": {
+    "paddingLeft": "24px",
+    "paddingRight": "24px"
+  },
+  "touchBtn": {
+    "w": 327,
+    "h": 72,
+    "left": 24
+  },
+  "gradients": 0,
+  "shadowCount": 1,
+  "h1": 1,
+  "motion": "lb-expose-f6d9ab49 / 0.48s",
+  "reducedMotionRule": true
+}

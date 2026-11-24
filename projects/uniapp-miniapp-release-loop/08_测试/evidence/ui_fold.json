@@ -1,0 +1,16 @@
+{
+  "pkg": "9001",
+  "before": {
+    "foldVisible": true,
+    "foldText": "展开",
+    "clamped": true,
+    "summaryLen": 87,
+    "title": "长说明临时套餐"
+  },
+  "after": {
+    "foldText": "收起",
+    "clamped": false,
+    "text": "这是一段用于验证折叠分支的长说明：灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯"
+  },
+  "pass": true
+}

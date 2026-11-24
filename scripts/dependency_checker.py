@@ -201,7 +201,47 @@ def parse_pom_xml(filepath: Path) -> list:
     return deps
 
 
-def main(root_dir: str, solve: bool = False):
+def run_cve(root: Path, strict: bool = False) -> list:
+    """依赖 CVE 扫描（可选，前移到第 2 步）。有 pip-audit 时跑 pip-audit，无则提示安装。
+    strict=False：只打印报告，不影响退出码；strict=True：pip-audit 返回非 0 时视为问题。
+    """
+    import shutil as _shutil
+    import subprocess as _subprocess
+    problems = []
+    print("\n=== 依赖 CVE 扫描（--cve）===")
+    if _shutil.which("pip-audit") is None:
+        print("  ⚠️  pip-audit 未安装，跳过；如需：pip install pip-audit")
+        return problems
+    try:
+        proc = _subprocess.run(
+            ["pip-audit", "-f", "json", "--output", "-"],
+            cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=180,
+        )
+    except Exception as e:
+        problems.append(f"⚠️  pip-audit 执行异常: {e}")
+        return problems
+    if proc.returncode == 0:
+        print("  ✅ pip-audit 通过，无已知高危依赖")
+        return problems
+    # 非 0 → 有发现或异常；尝试解析 JSON 报告
+    out = proc.stdout or ""
+    try:
+        import json as _json
+        data = _json.loads(out)
+        vulns = data.get("dependencies") or []
+        total = sum(len(d.get("vulns") or []) for d in vulns)
+        print(f"  ⚠️  pip-audit 发现 {total} 个 CVE（returncode={proc.returncode}）")
+    except Exception:
+        print(f"  ⚠️  pip-audit 非 0 返回，原始输出已打印（无法 JSON 解析，err={proc.stderr.strip()[:200]}）")
+    if strict:
+        problems.append(f"❌ --cve-strict：pip-audit 非 0 返回，禁止放行")
+    else:
+        print("  （非 strict 模式，CVE 只告警不阻塞；完整清单已打印在上方）")
+    return problems
+
+
+def main(root_dir: str, solve: bool = False, cve: bool = False, cve_strict: bool = False):
     root = Path(root_dir).resolve()
     problems = []
     checked = 0
@@ -272,6 +312,11 @@ def main(root_dir: str, solve: bool = False):
     if solve:
         problems.extend(run_solve(root))
 
+    # CVE 扫描（可选，第 2 步前移；8.5 深度扫描不变）
+    if cve:
+        cve_problems = run_cve(root, strict=cve_strict)
+        problems.extend(cve_problems)
+
     print(f"\n{'='*40}")
     print(f"共校验 {checked} 个依赖，发现 {len(problems)} 个问题")
     if problems:
@@ -279,7 +324,7 @@ def main(root_dir: str, solve: bool = False):
         print("\n⚠️  存在问题依赖！请在架构评审阶段修复后再进入开发。")
         return 1
     else:
-        print("✅ 全部依赖版本真实存在" + ("，且依赖可解" if solve else ""))
+        print("✅ 全部依赖版本真实存在" + ("，且依赖可解" if solve else "") + ("，CVE 扫描无高危" if cve else ""))
         return 0
 
 
@@ -299,5 +344,9 @@ if __name__ == "__main__":
     parser.add_argument("root", nargs="?", default=".", help="项目根目录")
     parser.add_argument("--solve", action="store_true",
                         help="追加依赖可解性校验（pip --dry-run / mvn dependency:tree）")
+    parser.add_argument("--cve", action="store_true",
+                        help="追加依赖 CVE 扫描（pip-audit，前移到第 2 步；strict=False 时只告警不阻塞）")
+    parser.add_argument("--cve-strict", action="store_true",
+                        help="--cve-strict 时 pip-audit 非 0 返回视为问题，退出码 1")
     args = parser.parse_args()
-    sys.exit(main(args.root, args.solve))
+    sys.exit(main(args.root, args.solve, args.cve, args.cve_strict))

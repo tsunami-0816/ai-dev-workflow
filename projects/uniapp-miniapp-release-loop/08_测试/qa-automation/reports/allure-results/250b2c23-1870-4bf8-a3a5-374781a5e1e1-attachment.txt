@@ -1,0 +1,1 @@
+[cf] POST / -> 200 55ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3ZTE3YzEzOS1kYmMzLTRiMGYtODEyNC1hNWIzYTE3Y2Y1NzIiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MjAzNDI0LCJleHAiOjE3OTUyMTA2MjR9.feT1yC3MZ3Fef2g2I4BsOTOnXg-X_wkROtmu3RMSyRw", "expiresIn": 7200, "userId": 1, "nickname": "演示用户A"}, "traceId": "cf

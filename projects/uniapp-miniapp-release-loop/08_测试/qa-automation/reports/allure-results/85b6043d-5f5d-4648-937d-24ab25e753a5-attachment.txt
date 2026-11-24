@@ -1,0 +1,1 @@
+[fixture] GET /api/packages/9001 -> 200 4ms {"code": 0, "msg": "ok", "data": {"id": 9001, "title": "长说明临时套餐", "price": 99.0, "coverUrl": "/static/covers/cover-1.jpg", "tags": ["测试"], "summary": "这是一段用于验证折叠分支的长说明：灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯灯", "status": 1}}

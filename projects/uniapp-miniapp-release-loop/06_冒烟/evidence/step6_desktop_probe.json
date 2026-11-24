@@ -1,0 +1,79 @@
+{
+  "cases": [
+    {
+      "name": "375 手机版式未被改动",
+      "pass": true,
+      "m375": {
+        "exists": true,
+        "left": 0,
+        "right": 375,
+        "width": 375,
+        "viewport": 375,
+        "overflow": 0
+      },
+      "rows375": 3
+    },
+    {
+      "name": "1440 首页居中 1040 + 图位归位",
+      "pass": true,
+      "idx": {
+        "exists": true,
+        "left": 200,
+        "right": 1240,
+        "width": 1040,
+        "viewport": 1440,
+        "overflow": 0
+      },
+      "hero": {
+        "photoLeft": 812,
+        "photoRight": 1192,
+        "photoWidth": 380,
+        "photoHeight": 320,
+        "containerRight": 1240,
+        "rowTitleSize": "22px",
+        "rowCount": 3
+      }
+    },
+    {
+      "name": "1440 详情左文右图（4:5）+ 预约栏静态右下",
+      "pass": true,
+      "container": [
+        200,
+        1240
+      ],
+      "titleLeft": 248,
+      "titleRight": 736,
+      "photoLeft": 792,
+      "photoWidth": 400,
+      "photoHeight": 501,
+      "photoRatio": 0.8,
+      "barPosition": "static",
+      "barRight": 1192,
+      "barWidth": 360,
+      "display": "grid",
+      "overflow": 0
+    },
+    {
+      "name": "1440 我的列表双栏",
+      "pass": true,
+      "cards": 19,
+      "columns": 2,
+      "xs": [
+        248,
+        744
+      ],
+      "pageWidth": 1040,
+      "overflow": 0
+    },
+    {
+      "name": "1440 表单收窄 680 + 按钮 320",
+      "pass": true,
+      "pageWidth": 680,
+      "pageLeft": 380,
+      "submitWidth": 320,
+      "overflow": 0
+    }
+  ],
+  "consoleErrors": [],
+  "allPass": true
+}

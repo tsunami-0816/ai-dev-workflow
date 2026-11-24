@@ -1,0 +1,1 @@
+[h5] GET / -> 200 5ms {"_raw": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n  <head>\n    <script>if (typeof globalThis === 'undefined') {\n  window.globalThis = window\n}</script>\n\n    <script type=\"module\" src=\"/@vite/client\"></script>\n\n    <meta charset=\"UTF-8\" />\n    <meta\n      name=\"viewport\"\n      conte

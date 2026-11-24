@@ -1,0 +1,77 @@
+step: "5B"
+project: ecom-scrape-rpa-dashboard
+updated_at: 2026-11-23 17:27
+sources:
+  - 02_架构设计/第二轮技术架构设计文档.md
+  - 04_任务拆解与开发规范.md
+  - 05_代码/backend/input_card.yaml
+arch_ref: 02_架构设计/第二轮技术架构设计文档.md#5.4
+mock_ref: 05_代码/backend/mock_site/app.py + 06.5_契约/openapi.json（5A 产出前先用本文 §5.4 样例 JSON 做本地 stub）
+tasks:
+  - task_id: T25a
+    desc: 路由与骨架（4 页签 + 顶部 mock 黄条 + 统一布局）
+    page: layout
+    risk: 低
+    criterion_ref: C10
+  - task_id: T25b
+    desc: 走势视图 /api/trend（商品+平台+7/30 日筛选，折线 + 异常点标记）
+    page: trend
+    risk: 中
+    criterion_ref: C10
+  - task_id: T25c
+    desc: 平台对比视图 /api/platform-compare（StatTile + 柱图 + 表格）
+    page: compare
+    risk: 中
+    criterion_ref: C10
+  - task_id: T25d
+    desc: TOP 变动视图 /api/top-changes（涨红跌绿 + direction/limit 切换）
+    page: changes
+    risk: 中
+    criterion_ref: C07,C10
+  - task_id: T25e
+    desc: 健康度视图 /api/health（成功率/封禁率/P95 三指标 + 7 日曲线）
+    page: health
+    risk: 中
+    criterion_ref: C02,C10
+  - task_id: T25f
+    desc: 三态（loading/empty/error）+ 503 顶部条 + 请求去重与 1s 防抖
+    page: common
+    risk: 中
+    criterion_ref: C10
+  - task_id: T26
+    desc: docs/finebi_metric_mapping.md（维度/度量/过滤/刷新 + ECharts↔FineBI 对照）
+    page: doc
+    risk: 低
+    criterion_ref: —
+  - task_id: T32
+    desc: mock 环境标识（顶部黄条 + 指标标注 + 报表页脚文案）
+    page: layout
+    risk: 低
+    criterion_ref: C01
+api_contract:
+  trend: "GET /api/trend?sku_id&platform&days=7|30"
+  platform_compare: "GET /api/platform-compare?date&category?"
+  top_changes: "GET /api/top-changes?days=1&direction=up|down&limit=10"
+  health: "GET /api/health?days=7&platform?"
+  tasks: "GET /api/tasks?limit=20"
+conventions:
+  http_client: "axios baseURL=/api, timeout=8000, code!==0 抛 ApiError, 50301 顶部条"
+  colors: "涨=红 #d93025，跌=绿 #1a7f37（A 股口径）"
+  no_client_metrics: "指标计算一律后端，前端只格式化"
+ports:
+  frontend_dev: 5187
+  api: 8094
+scope:
+  files_in_scope:
+    - "05_代码/frontend/**"
+  out_of_scope:
+    - "05_代码/backend/**"
+    - "05_代码/docs/**"
+    - "05_代码/docker-compose.yml"
+    - "02_架构设计/**"
+    - "04_任务拆解与开发规范.md"
+    - "WORKFLOW_*.md"
+limits:
+  max_files: 25
+  max_attempts: 3
+  timeout_min: 420

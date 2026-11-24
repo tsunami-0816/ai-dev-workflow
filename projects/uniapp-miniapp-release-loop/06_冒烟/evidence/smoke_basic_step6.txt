@@ -1,0 +1,10 @@
+﻿=== 冒烟 curl 集 http://127.0.0.1:8092 ===
+PASS GET /actuator/health HTTP=200
+PASS POST /api/auth/login HTTP=200
+PASS GET /api/packages HTTP=200
+PASS GET /api/packages/2 HTTP=200
+PASS POST /api/bookings HTTP=200
+PASS GET /api/bookings HTTP=200
+PASS POST /api/auth/logout HTTP=200
+PASS 登出后旧 token 被拒 HTTP=401
+=== 冒烟全部通过 ===

@@ -1,0 +1,60 @@
+# 站点级配置（L1/L2 / D-02）——被封/改版时改这里即可降级（并发/速率/选择器/超时）
+# rate.qps ∈ (0,1]：1.5s 一个请求 = 0.667（架构 §1.4 写死的"人味"节奏，C03 口径）
+sites:
+  jd:
+    concurrency: 4
+    rate: { qps: 0.667, burst: 1 }
+    timeout: { connect: 5, read: 10 }
+    page_size: 30
+    selectors:
+      item: "li.gl-item"
+      sku_attr: "data-sku"
+      title: ".p-name em"
+      price: ".p-price i"
+      sales: ".p-commit a"
+      shop: ".p-shop a"
+      url: ".p-name a"
+  tmall:
+    concurrency: 2
+    rate: { qps: 0.667, burst: 1 }
+    timeout: { connect: 5, read: 10 }
+    page_size: 30
+    selectors:
+      item: ".product-iWrap"
+      sku_attr: "data-id"
+      title: ".productTitle a"
+      price: ".productPrice em"
+      sales: ".productStatus em"
+      shop: ".shopName a"
+      url: ".productTitle a"
+  pdd:
+    concurrency: 2
+    rate: { qps: 0.667, burst: 1 }
+    timeout: { connect: 5, read: 10 }
+    page_size: 30
+    selectors:
+      item: ".item"
+      sku_attr: "data-goods-id"
+      title: ".goods-title"
+      price: ".price"
+      sales: ".goods-sales"
+      shop: ".store-name"
+      url: "a"
+  douyin:
+    concurrency: 1
+    rate: { qps: 0.5, burst: 1 }
+    timeout: { connect: 5, read: 10 }
+    page_size: 30
+    selectors:
+      item: ".goods-card"
+      sku_attr: "data-id"
+      title: ".goods-title"
+      price: ".price"
+      sales: ".sales"
+      shop: ".shop-name"
+      url: "a"
+  mock:
+    concurrency: 4
+    rate: { qps: 0.667, burst: 1 }
+    timeout: { connect: 5, read: 10 }
+    page_size: 30

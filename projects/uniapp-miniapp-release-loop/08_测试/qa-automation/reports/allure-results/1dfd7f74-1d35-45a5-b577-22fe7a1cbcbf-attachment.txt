@@ -1,0 +1,5 @@
+[demo] POST /api/bookings -> 200 13ms {"code": 0, "msg": "ok", "data": {"bookingId": 252, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 14ms {"code": 0, "msg": "ok", "data": {"bookingId": 253, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 37ms {"code": 0, "msg": "ok", "data": {"bookingId": 254, "status": 0, "duplicated": false}}
+[demo] GET /api/bookings?page=1&size=2 -> 200 4ms {"code": 0, "msg": "ok", "data": {"list": [{"id": 254, "packageId": 1, "packageTitle": "城市轻写真", "bookDate": "2026-11-28", "slot": "晚间", "contactMasked": "139****3851", "status": 0, "statusText": "待确认", "createdAt": "2026-11-21 03:37:03"}, {"id": 253, "packageId": 1, "packageTitle": "城市轻写真", "bookDat
+[demo] GET /api/bookings?page=2&size=2 -> 200 17ms {"code": 0, "msg": "ok", "data": {"list": [{"id": 252, "packageId": 1, "packageTitle": "城市轻写真", "bookDate": "2026-11-28", "slot": "上午", "contactMasked": "139****3849", "status": 0, "statusText": "待确认", "createdAt": "2026-11-21 03:37:03"}], "total": 3, "page": 2, "size": 2}}

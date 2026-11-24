@@ -1,0 +1,168 @@
+step: "4"
+project: ecom-scrape-rpa-dashboard
+updated_at: 2026-11-23 17:25
+sources:
+  - 02_架构设计/第二轮技术架构设计文档.md
+  - 03_评审报告/第二轮架构复审报告.md
+  - 01_项目基线说明书.md
+arch_ref: 02_架构设计/第二轮技术架构设计文档.md#13
+d_list_range: D-01..D-93
+tasks:
+  - task_id: T01
+    desc: 配置装载与强校验（targets/sites/env + config_hash）
+    risk: 关键
+    criterion_ref: C01
+  - task_id: T02
+    desc: task/task_run 任务表与 CLI 骨架（initdb/collect/backfill）
+    risk: 高
+    criterion_ref: C04
+  - task_id: T03
+    desc: 反爬五件套（令牌桶/UA/Cookie/代理/退避）
+    risk: 关键
+    criterion_ref: C02,C03
+  - task_id: T04
+    desc: antibot_metrics 观测与风控页识别
+    risk: 高
+    criterion_ref: C02
+  - task_id: T05
+    desc: 适配器基类与 platform registry
+    risk: 高
+    criterion_ref: C01
+  - task_id: T06
+    desc: 四站点适配器 jd/tmall/pdd/douyin
+    risk: 高
+    criterion_ref: C01
+  - task_id: T07
+    desc: raw_page 原始快照落盘与指针
+    risk: 中
+    criterion_ref: C01
+  - task_id: T08
+    desc: 页级事务（stg+item+cursor）与逐 SKU 状态
+    risk: 关键
+    criterion_ref: C04
+  - task_id: T09
+    desc: 断点续采 resume 与唯一键兜底
+    risk: 关键
+    criterion_ref: C04,C05
+  - task_id: T10
+    desc: stg_price_item 暂存表与幂等写入
+    risk: 关键
+    criterion_ref: C06
+  - task_id: T11
+    desc: RPA DSL loader 校验与版本入库
+    risk: 高
+    criterion_ref: C08
+  - task_id: T12
+    desc: RPA 9 动作 + engine 超时重试 + 显式等待
+    risk: 高
+    criterion_ref: C08
+  - task_id: T13
+    desc: jd_price_scan 示例流程 + 截图 + rpa_run
+    risk: 高
+    criterion_ref: C08
+  - task_id: T14
+    desc: 故障演练 inject-fault 与商业 RPA 对照文档
+    risk: 中
+    criterion_ref: C08
+  - task_id: T15
+    desc: 清洗归一化（价格/销量/标题）
+    risk: 中
+    criterion_ref: C06
+  - task_id: T16
+    desc: 四类校验规则 + 缺价沿用 imputed
+    risk: 高
+    criterion_ref: C06
+  - task_id: T17
+    desc: 突变检测 anomaly_flag + 同款聚合 same_group_id
+    risk: 高
+    criterion_ref: C07
+  - task_id: T18
+    desc: price_snapshot 唯一写入口 + clean_report/clean_issue
+    risk: 关键
+    criterion_ref: C05,C06
+  - task_id: T19
+    desc: 14 表 DDL + 按日分区 + 唯一键
+    risk: 关键
+    criterion_ref: C01,C05
+  - task_id: T20
+    desc: rw/ro 双连接池 + 分区补齐 + 批量 upsert + wait-db
+    risk: 关键
+    criterion_ref: C01,C05
+  - task_id: T21
+    desc: 窗口函数查询组 + agg_daily_platform + 孤儿检查
+    risk: 高
+    criterion_ref: C10
+  - task_id: T22
+    desc: 五 sheet Excel 日报 + 公式/格式/图表 + report_file
+    risk: 高
+    criterion_ref: C09
+  - task_id: T23
+    desc: LibreOffice 重算对账与三方对账脚本
+    risk: 高
+    criterion_ref: C09
+  - task_id: T24
+    desc: 五个只读接口 + 统一响应/错误码/trace_id + 缓存
+    risk: 高
+    criterion_ref: C10
+  - task_id: T25
+    desc: 前端四视图 + 三态 + 503 顶部条
+    risk: 中
+    criterion_ref: C10
+  - task_id: T26
+    desc: FineBI 口径迁移文档
+    risk: 低
+    criterion_ref: —
+  - task_id: T27
+    desc: APScheduler 双定时 + 重试 + alerts.jsonl
+    risk: 高
+    criterion_ref: C09
+  - task_id: T28
+    desc: docker-compose 三服务与启动脚本
+    risk: 关键
+    criterion_ref: C10
+  - task_id: T29
+    desc: 结构化日志 + ops.md + 采集单入口约束
+    risk: 中
+    criterion_ref: C10
+  - task_id: T30
+    desc: 首屏性能探针 perf_probe + prune 数据保留
+    risk: 中
+    criterion_ref: C10
+  - task_id: T31
+    desc: mock 站点与 429/验证码/脏数据注入开关
+    risk: 中
+    criterion_ref: C01,C06
+  - task_id: T32
+    desc: mock 环境标识（前端黄条 + API env + 报表标注）
+    risk: 低
+    criterion_ref: C01
+  - task_id: T33
+    desc: pytest 6 文件 ≥25 用例 + HTML 快照
+    risk: 高
+    criterion_ref: C11
+  - task_id: T34
+    desc: 脏样本/突变样本脚本 + README/docs/证据集
+    risk: 中
+    criterion_ref: C06,C07
+scope:
+  files_in_scope:
+    - "05_代码/backend/**"
+    - "05_代码/docs/**"
+    - "05_代码/ops.md"
+    - "05_代码/README.md"
+    - "05_代码/docker-compose.yml"
+    - "04_任务拆解与开发规范.md"
+    - "_设计实施映射表.md"
+  out_of_scope:
+    - "05_代码/frontend/**"
+    - "02_架构设计/**"
+    - "03_评审报告/**"
+    - "prompts/**"
+    - "scripts/**"
+    - "WORKFLOW_*.md"
+limits:
+  max_files: 95
+  max_attempts: 3
+  timeout_min: 600
+mapping_table: _设计实施映射表.md
+d_item_count: 93

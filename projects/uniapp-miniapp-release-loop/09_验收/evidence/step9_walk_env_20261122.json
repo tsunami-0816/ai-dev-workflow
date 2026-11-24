@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-11-22T21:58:59+08:00",
+  "purpose": "第 9 步两段式人工走查前环境重启与只读核对（未造新单）",
+  "services": {
+    "backend_8092": {
+      "pid": 24552,
+      "start_cmd": "java -Dfile.encoding=UTF-8 -Xmx512m -jar booking-service.jar",
+      "env": { "MYSQL_PORT": "3307" },
+      "api_packages_http": 200,
+      "log": "05_代码/backend/evidence/app_run_20261122.log"
+    },
+    "h5_5186": {
+      "pid": 34384,
+      "start_cmd": "npm run dev:h5 (uni)",
+      "http_home": 200,
+      "log": "05_代码/frontend/h5_dev_20261122.log"
+    },
+    "cloud_function_8093": {
+      "pid": 32744,
+      "start_cmd": "node --max-old-space-size=256 apiProxy/localServer.js",
+      "healthz_probe_code": 0,
+      "env": { "CF_BACKEND_BASE": "http://127.0.0.1:8092", "CF_PORT": "8093" },
+      "log": "05_代码/cloud-functions/evidence/cf_8093_20261122.log"
+    },
+    "mysql_3307": { "listening": true, "pid": 7896 },
+    "redis_6379": { "listening": true, "pid": 6184 },
+    "rabbitmq_5672": { "listening": false }
+  },
+  "actuator_health": {
+    "overall": "DOWN",
+    "components": { "db": "UP", "diskSpace": "UP", "livenessState": "UP", "ping": "UP", "rabbit": "DOWN", "readinessState": "UP", "redis": "UP" },
+    "note": "overall DOWN 仅因 rabbit 未起（已知边界），db/redis/diskSpace 均 UP"
+  },
+  "db_counts": {
+    "user": 2,
+    "package": 4,
+    "booking": 1,
+    "notify_log": 0,
+    "max_booking_id": 1
+  },
+  "baseline_match": "与验收现场基线 2/4/1/0 一致（booking id=1 为用户 2026-11-21 17:14 提交的 138****0001 验收数据，保留）",
+  "notes": [
+    "仅只读核对，未调用写接口、未造新单",
+    "MQ 未起：预约可成单但无通知落库，属手册已载明的已知边界",
+    "AI 侧预走 17/17 已于 2026-11-21 完成，本轮不重跑，避免 CPU 打满导致前端 3s 超时误报"
+  ]
+}

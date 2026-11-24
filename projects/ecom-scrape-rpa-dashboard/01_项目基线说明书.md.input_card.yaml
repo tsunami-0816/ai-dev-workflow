@@ -1,0 +1,9 @@
+# step1 项目基线定义输入卡
+step: 1
+project: ecom-scrape-rpa-dashboard
+updated_at: 2026-11-23
+sources:
+  - 00_原始项目描述.md
+  - 00_JD对账表.md
+baseline_ref: 01_项目基线说明书.md
+scope_ref: 01_项目基线说明书.md#3-项目范围界定

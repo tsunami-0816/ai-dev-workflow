@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 400 18ms {"code": 40001, "msg": "bookDate 预约日期不能为空", "data": null}

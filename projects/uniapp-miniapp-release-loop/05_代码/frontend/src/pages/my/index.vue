@@ -32,7 +32,8 @@
       </view>
 
       <view v-else-if="list.length" class="list">
-        <view v-for="b in list" :key="b.id" class="booking">
+        <text class="ub-small list-note">待确认＝已提交，店家确认后会另行联系；demo 没有店家端，状态不会自动变。点任意一条回看该套餐。</text>
+        <view v-for="b in list" :key="b.id" class="booking" hover-class="booking-hover" @tap="openPackage(b.packageId)">
           <view class="b-top">
             <text class="ub-num b-no">No.{{ b.id }}</text>
             <text class="b-status" :class="statusClass(b.status)">{{ b.statusText }}</text>
@@ -162,6 +163,11 @@ function goHome(): void {
   uni.switchTab({ url: '/pages/index/index' })
 }
 
+function openPackage(packageId: number): void {
+  if (!packageId) return
+  uni.navigateTo({ url: `/pages/package/detail?id=${packageId}` })
+}
+
 function openPrivacy(): void {
   uni.navigateTo({ url: '/pages/privacy/index' })
 }
@@ -234,9 +240,21 @@ function statusClass(status: number): string {
   padding-top: var(--sp-1);
 }
 
+.list-note {
+  display: block;
+  padding: var(--sp-1) 0 var(--sp-2);
+  color: var(--ub-silver);
+  opacity: 0.72;
+  line-height: 1.6;
+}
+
 .booking {
   padding: var(--sp-3) 0;
   border-bottom: 1px solid var(--ub-line);
+}
+
+.booking-hover {
+  background: rgba(242, 237, 228, 0.04);
 }
 
 .b-top {
@@ -333,4 +351,20 @@ function statusClass(status: number): string {
   align-items: center;
   justify-content: center;
 }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：档期双栏排布，字号抬一档，手机版式不动 ---- */
+@media (min-width: 900px) {
+  .ub-page { padding-bottom: 104px; }
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+  }
+  .list-note { grid-column: 1 / -1; }
+  .booking { padding: var(--sp-3) 0; cursor: pointer; }
+  .b-title { font-size: 20px; }
+  .me-name { font-size: 26px; }
+}
+/* #endif */
 </style>

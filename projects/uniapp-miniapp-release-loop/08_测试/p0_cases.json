@@ -1,0 +1,105 @@
+{
+  "auth": {
+    "url": "http://127.0.0.1:8092/api/auth/login",
+    "method": "POST",
+    "headers": {"Content-Type": "application/json"},
+    "body": {"account": "demo", "password": "welcome1"},
+    "token_path": "data.token"
+  },
+  "cases": [
+    {
+      "id": "P0-001",
+      "name": "后端健康检查 UP（db/redis/rabbit）",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/actuator/health",
+      "expect_status": 200,
+      "expect_json_contains": ["\"status\":\"UP\"", "db", "redis", "rabbit"]
+    },
+    {
+      "id": "P0-002",
+      "name": "套餐列表 4 条且中文标题正确",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/api/packages?page=1&size=10",
+      "expect_status": 200,
+      "expect_json_contains": ["\"total\":4", "城市轻写真", "复古胶片"]
+    },
+    {
+      "id": "P0-003",
+      "name": "套餐详情 id=2 字段正确",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/api/packages/2",
+      "expect_status": 200,
+      "expect_json_contains": ["\"id\":2", "复古胶片", "499"]
+    },
+    {
+      "id": "P0-004",
+      "name": "登录返回 token/nickname",
+      "method": "POST",
+      "url": "http://127.0.0.1:8092/api/auth/login",
+      "headers": {"Content-Type": "application/json"},
+      "body": {"account": "demo", "password": "welcome1"},
+      "expect_status": 200,
+      "expect_json_contains": ["\"token\"", "演示用户A", "\"expiresIn\":7200"]
+    },
+    {
+      "id": "P0-005",
+      "name": "我的预约列表（带 token）",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/api/bookings?page=1&size=20",
+      "expect_status": 200,
+      "expect_json_contains": ["\"code\":0", "\"list\"", "\"total\""]
+    },
+    {
+      "id": "P0-006",
+      "name": "套餐不存在 404/40401",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/api/packages/999",
+      "expect_status": 404,
+      "expect_json_contains": ["40401"]
+    },
+    {
+      "id": "P0-007",
+      "name": "未知路径 404/40400",
+      "method": "GET",
+      "url": "http://127.0.0.1:8092/api/no-such-path",
+      "expect_status": 404,
+      "expect_json_contains": ["40400"]
+    },
+    {
+      "id": "P0-008",
+      "name": "云函数健康检查 UP",
+      "method": "GET",
+      "url": "http://127.0.0.1:8093/healthz",
+      "expect_status": 200,
+      "expect_json_contains": ["\"status\":\"UP\"", "apiProxy"]
+    },
+    {
+      "id": "P0-009",
+      "name": "云函数转发套餐列表（签名链路）",
+      "method": "POST",
+      "url": "http://127.0.0.1:8093/",
+      "headers": {"Content-Type": "application/json"},
+      "body": {"action": "packages", "payload": {"page": 1, "size": 2}},
+      "expect_status": 200,
+      "expect_json_contains": ["\"code\":0", "\"total\":4"]
+    },
+    {
+      "id": "P0-010",
+      "name": "云函数转发套餐详情 id=2",
+      "method": "POST",
+      "url": "http://127.0.0.1:8093/",
+      "headers": {"Content-Type": "application/json"},
+      "body": {"action": "packageDetail", "payload": {"id": 2}},
+      "expect_status": 200,
+      "expect_json_contains": ["\"id\":2", "复古胶片"]
+    },
+    {
+      "id": "P0-011",
+      "name": "云函数健康探针（云函数→后端签名）",
+      "method": "GET",
+      "url": "http://127.0.0.1:8093/healthz?probe=1",
+      "expect_status": 200,
+      "expect_json_contains": ["\"code\":0"]
+    }
+  ]
+}

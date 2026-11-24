@@ -1,0 +1,1 @@
+[admin] POST /api/auth/login -> 401 23ms {"code": 40102, "msg": "openid 登录仅允许经小程序云函数发起", "data": null}

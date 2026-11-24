@@ -1,0 +1,73 @@
+{
+  "total": 11,
+  "passed": 11,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "P0-001",
+      "name": "后端健康检查 UP（db/redis/rabbit）",
+      "passed": true,
+      "elapsed_ms": 15
+    },
+    {
+      "id": "P0-002",
+      "name": "套餐列表 4 条且中文标题正确",
+      "passed": true,
+      "elapsed_ms": 4
+    },
+    {
+      "id": "P0-003",
+      "name": "套餐详情 id=2 字段正确",
+      "passed": true,
+      "elapsed_ms": 22
+    },
+    {
+      "id": "P0-004",
+      "name": "登录返回 token/nickname",
+      "passed": true,
+      "elapsed_ms": 32
+    },
+    {
+      "id": "P0-005",
+      "name": "我的预约列表（带 token）",
+      "passed": true,
+      "elapsed_ms": 17
+    },
+    {
+      "id": "P0-006",
+      "name": "套餐不存在 404/40401",
+      "passed": true,
+      "elapsed_ms": 14
+    },
+    {
+      "id": "P0-007",
+      "name": "未知路径 404/40400",
+      "passed": true,
+      "elapsed_ms": 18
+    },
+    {
+      "id": "P0-008",
+      "name": "云函数健康检查 UP",
+      "passed": true,
+      "elapsed_ms": 2
+    },
+    {
+      "id": "P0-009",
+      "name": "云函数转发套餐列表（签名链路）",
+      "passed": true,
+      "elapsed_ms": 34
+    },
+    {
+      "id": "P0-010",
+      "name": "云函数转发套餐详情 id=2",
+      "passed": true,
+      "elapsed_ms": 5
+    },
+    {
+      "id": "P0-011",
+      "name": "云函数健康探针（云函数→后端签名）",
+      "passed": true,
+      "elapsed_ms": 5
+    }
+  ]
+}

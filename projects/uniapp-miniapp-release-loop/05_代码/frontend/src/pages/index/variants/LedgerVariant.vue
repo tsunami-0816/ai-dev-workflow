@@ -4,7 +4,12 @@
       <view class="ub-rule" />
       <view class="mast-row">
         <text class="ub-num mast-no">No.01</text>
+        <!-- #ifdef H5 -->
+        <h1 class="mast-words" style="margin: 0; font-weight: inherit">约拍档期</h1>
+        <!-- #endif -->
+        <!-- #ifndef H5 -->
         <text class="mast-words">约拍档期</text>
+        <!-- #endif -->
       </view>
     </view>
 
@@ -244,4 +249,26 @@ function pad(n: number): string {
 }
 .foot-rule { margin-top: var(--sp-5); }
 .foot-note { display: block; margin-top: var(--sp-2); }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：首项摊成 文本 | 大图位 两栏，清单行加高放大，手机版式不动 ---- */
+@media (min-width: 900px) {
+  .lb-page { padding: 0 var(--gutter) 132px; }
+  .hero { align-items: stretch; padding: var(--sp-3) 0 var(--sp-4); }
+  .hero-copy { padding-right: var(--sp-4); }
+  .hero-price { margin-top: var(--sp-2); }
+  .hero-note { margin-top: var(--sp-2); }
+  .hero-photo {
+    width: 380px;
+    height: 320px;
+    margin-right: 0;
+    border: 1px solid var(--ub-line);
+  }
+  .row { min-height: 88px; }
+  .row-title { font-size: 22px; }
+  .row-price { width: 104px; }
+  .row-no { left: -32px; width: 24px; font-size: 14px; }
+  .sk-row { height: var(--row-h); }
+}
+/* #endif */
 </style>

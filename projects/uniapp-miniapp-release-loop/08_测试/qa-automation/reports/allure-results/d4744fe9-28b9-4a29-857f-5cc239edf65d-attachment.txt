@@ -1,0 +1,3 @@
+[tmp] POST /api/auth/login -> 200 55ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIwYzNkNmRlNi04MzgwLTQ4M2ItYWY3Ny0yNDBiNjk1NDM3ZmMiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MjAzNDI2LCJleHAiOjE3OTUyMTA2MjZ9.PHIliMM8yBjqMXsaCwTDBINrBx963D8Ac-y6pj5hy-s", "expiresIn": 7200, "userId": 1, "nickname": "演示用户A"}}
+[logout] POST /api/auth/logout -> 200 14ms {"code": 0, "msg": "ok", "data": null}
+[logout] GET /api/bookings -> 401 2ms {"code": 40103, "msg": "登录已过期，请重新登录", "data": null}

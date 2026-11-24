@@ -1,0 +1,2 @@
+[demo] POST /api/bookings -> 200 34ms {"code": 0, "msg": "ok", "data": {"bookingId": 255, "status": 0, "duplicated": false}}
+[demo2] GET /api/bookings?page=1&size=20&userId=1 -> 200 22ms {"code": 0, "msg": "ok", "data": {"list": [], "total": 0, "page": 1, "size": 20}}

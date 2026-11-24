@@ -1,0 +1,2 @@
+[demo] GET /api/bookings?page=1&size=50 -> 200 5ms {"code": 0, "msg": "ok", "data": {"list": [], "total": 0, "page": 1, "size": 50}}
+[demo2] GET /api/bookings?page=1&size=50 -> 200 23ms {"code": 0, "msg": "ok", "data": {"list": [], "total": 0, "page": 1, "size": 50}}

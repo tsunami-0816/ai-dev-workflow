@@ -38,7 +38,7 @@
               :key="s"
               class="slot"
               :class="{ active: slot === s }"
-              @tap="slot = s"
+              @tap="pickSlot(s)"
             >
               <text>{{ s }}</text>
             </view>
@@ -55,6 +55,7 @@
             v-model="contact"
             placeholder="11 位手机号"
             placeholder-class="placeholder"
+            @input="onContactInput"
           />
           <text v-if="errors.contact" class="err">{{ errors.contact }}</text>
         </view>
@@ -130,13 +131,25 @@ function onDate(e: unknown): void {
   errors.date = ''
 }
 
+function pickSlot(s: string): void {
+  slot.value = s
+  errors.slot = ''
+}
+
+// 用户边改边看：输入变化即撤掉上一次的红字，避免「已经改了还在报错」的错觉
+function onContactInput(): void {
+  if (errors.contact) errors.contact = ''
+}
+
 function validate(): boolean {
   errors.date = ''
   errors.slot = ''
   errors.contact = ''
   if (!bookDate.value) errors.date = '请选择日期'
   if (!slot.value) errors.slot = '请选择时段'
-  if (!/^1[3-9]\d{9}$/.test(contact.value)) errors.contact = '请输入 11 位手机号'
+  const phone = contact.value.trim()
+  if (phone.length !== 11) errors.contact = '请输入 11 位手机号'
+  else if (!/^1[3-9]\d{9}$/.test(phone)) errors.contact = '手机号格式不对，请检查'
   return !errors.date && !errors.slot && !errors.contact
 }
 
@@ -377,4 +390,13 @@ function backHome(): void {
   align-items: center;
   justify-content: center;
 }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：表单收窄成阅读宽度，按钮不再横贯整屏 ---- */
+@media (min-width: 900px) {
+  .ub-page { max-width: 680px; }
+  .submit { width: 320px; }
+  .tip { text-align: left; }
+}
+/* #endif */
 </style>

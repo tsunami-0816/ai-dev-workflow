@@ -1,0 +1,2 @@
+# 代理池（D-12）：一行一个 http://user:pass@host:port；空文件 = 直连（via_proxy=0）
+# 凭据只放本文件（已进 .gitignore），不进代码/日志

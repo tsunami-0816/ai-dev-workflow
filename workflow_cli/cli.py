@@ -178,7 +178,16 @@ def _read_board(pdir: Path) -> dict:
     text = board.read_text(encoding="utf-8", errors="ignore")
     m = re.search(r"当前阶段：\*\*(.+?)\*\*", text)
     info["stage"] = m.group(1) if m else ""
-    info["shelved"] = "搁置" in text
+    # 搁置判定只看「总体状态」与「当前阶段」两行，不做全文子串匹配：
+    # 全文匹配会把「开工前已补做上个搁置项目的体检」这类正常叙述误判为搁置（2026-11-18 实证，
+    # 本项目首次 --sync 即被误推成「已搁置」）。与 #103 BOARD_STALE 行级解析同口径。
+    status_line = ""
+    for line in text.splitlines():
+        ms = re.match(r"\s*-?\s*\**总体状态\**：\s*(.+)", line)
+        if ms:
+            status_line = ms.group(1)
+            break
+    info["shelved"] = ("搁置" in status_line) or ("搁置" in info["stage"])
 
     for line in text.splitlines():
         if not line.strip().startswith("|"):
@@ -202,7 +211,17 @@ def _read_board(pdir: Path) -> dict:
             if l.strip() and not l.strip().startswith(">")
         )
         info["checkpoint"] = "" if (not body or "无卡点" in body or body == "无") else body[:60].replace("|", "／")
-    info["closed"] = any(w in text for w in ("项目已交付", "已闭环", "门禁全绿", "项目完成", "MVP 验收通过"))
+    # 2026-11-22 修：原用全文子串判 closed，看板备注里一句「门禁全绿」就把在产项目判成已完成。
+    # 改为行级：只认「总体状态」行或「当前阶段」行里明确写交付/闭环。
+    info["closed"] = False
+    m_overall = re.search(r"- 总体状态：(.+)", text)
+    if m_overall:
+        val = m_overall.group(1).strip()
+        # 模板占位行形如「未开始 / 进行中 / 卡在人工 / 已交付」，含斜杠说明还没填，不能当已交付
+        if "/" not in val and any(w in val for w in ("已交付", "已闭环")):
+            info["closed"] = True
+    if info["stage"] and any(w in info["stage"] for w in ("项目已交付", "已闭环")):
+        info["closed"] = True
     return info
 
 

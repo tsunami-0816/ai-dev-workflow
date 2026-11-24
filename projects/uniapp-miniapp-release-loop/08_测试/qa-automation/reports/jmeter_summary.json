@@ -1,0 +1,24 @@
+[
+  {
+    "file": "result_10.jtl",
+    "samples": 205221,
+    "wall_s": 29.92,
+    "tps": 6859.7,
+    "avg_ms": 1.39,
+    "p95_ms": 2,
+    "p99_ms": 4,
+    "max_ms": 32,
+    "error_rate": 0.0
+  },
+  {
+    "file": "result_50.jtl",
+    "samples": 302850,
+    "wall_s": 29.91,
+    "tps": 10124.4,
+    "avg_ms": 4.82,
+    "p95_ms": 9,
+    "p99_ms": 14,
+    "max_ms": 124,
+    "error_rate": 0.0
+  }
+]

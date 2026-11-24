@@ -18,17 +18,26 @@
         </view>
       </view>
 
-      <text class="ub-title title">{{ item.title }}</text>
-      <text class="ub-num price">¥{{ Number(item.price).toFixed(0) }}</text>
+      <view class="d-main">
+        <!-- #ifdef H5 -->
+        <h1 class="ub-title title" style="margin: 0; margin-top: var(--sp-3); font-weight: inherit">
+          {{ item.title }}
+        </h1>
+        <!-- #endif -->
+        <!-- #ifndef H5 -->
+        <text class="ub-title title">{{ item.title }}</text>
+        <!-- #endif -->
+        <text class="ub-num price">¥{{ Number(item.price).toFixed(0) }}</text>
 
-      <view class="tags">
-        <text v-for="t in item.tags" :key="t" class="tag">{{ t }}</text>
-      </view>
+        <view class="tags">
+          <text v-for="t in item.tags" :key="t" class="tag">{{ t }}</text>
+        </view>
 
-      <view class="section">
-        <text class="section-label ub-small">说明</text>
-        <text class="summary" :class="{ clamp: !expanded }">{{ item.summary || '暂无更多说明' }}</text>
-        <text v-if="needFold" class="fold" @tap="expanded = !expanded">{{ expanded ? '收起' : '展开' }}</text>
+        <view class="section">
+          <text class="section-label ub-small">说明</text>
+          <text class="summary" :class="{ clamp: !expanded }">{{ item.summary || '暂无更多说明' }}</text>
+          <text v-if="needFold" class="fold" @tap="expanded = !expanded">{{ expanded ? '收起' : '展开' }}</text>
+        </view>
       </view>
 
       <view class="ub-rule" />
@@ -232,4 +241,47 @@ function pad(n: number): string {
   align-items: center;
   justify-content: center;
 }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：左文右图两栏，预约栏落到右下，手机版式不动 ---- */
+@media (min-width: 900px) {
+  .ub-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-areas:
+      "mast mast"
+      "main photo"
+      "bar  bar";
+    column-gap: 56px;
+    align-items: start;
+    align-content: start;
+    padding-bottom: 72px;
+  }
+  .ub-page > .ub-rule { display: none; }
+  .mast { grid-area: mast; }
+  .d-main { grid-area: main; min-width: 0; }
+  .title { margin-top: var(--sp-3); font-size: 40px; }
+  .price { margin-top: var(--sp-1); font-size: 34px; }
+  .tags { margin-top: var(--sp-2); align-items: flex-start; }
+  .section { border-top: 1px solid var(--ub-line); margin-top: var(--sp-3); }
+  .photo {
+    grid-area: photo;
+    align-self: start;
+    width: 100%;
+    height: 0;
+    padding-bottom: 125%;
+    margin: 0;
+  }
+  .bar {
+    grid-area: bar;
+    position: static;
+    justify-self: end;
+    width: 360px;
+    margin-top: var(--sp-4);
+    padding: 0;
+    border-top: none;
+  }
+  .state { grid-column: 1 / -1; }
+}
+/* #endif */
 </style>

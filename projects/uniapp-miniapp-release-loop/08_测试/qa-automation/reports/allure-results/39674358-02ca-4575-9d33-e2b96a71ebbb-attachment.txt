@@ -1,0 +1,1 @@
+[demo] GET /api/packages/2 -> 200 14ms {"code": 0, "msg": "ok", "data": {"id": 2, "title": "复古胶片", "price": 499.0, "coverUrl": "/static/covers/cover-2.jpg", "tags": ["外景", "胶片质感", "精修12张"], "summary": "外景街拍 + 胶片色调整，适合换季纪念与情侣合拍。", "status": 1}}

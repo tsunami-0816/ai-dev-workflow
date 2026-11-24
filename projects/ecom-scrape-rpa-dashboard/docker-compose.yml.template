@@ -1,0 +1,47 @@
+# docker-compose.yml 模板
+# ============================================
+# 使用说明：
+# 1. 从 WORKFLOW_端口分配表.md 取本项目的端口前缀（如 8090）
+# 2. 把下面所有端口的"宿主端口"改成前缀 + 默认端口
+#    例：默认 3306 → 改成 8906（前缀 8090 + 3306 尾数）
+#    例：默认 6379 → 改成 8979
+# 3. 启动：docker compose up -d
+# ============================================
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ${PROJECT_NAME:-app}-mysql
+    ports:
+      - "3306:3306"  # 改：项目端口前缀 + 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${PROJECT_NAME:-app}-redis
+    ports:
+      - "6379:6379"  # 改：项目端口前缀 + 6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+  redis_data:

@@ -1,0 +1,1 @@
+[admin] GET /actuator/health -> 200 34ms {"status": "UP", "components": {"db": {"status": "UP", "details": {"database": "MySQL", "validationQuery": "isValid()"}}, "diskSpace": {"status": "UP", "details": {"total": 294972813312, "free": 55389437952, "threshold": 10485760, "path": "D:\\lg\\project\\工作流测试\\.", "exists": true}}, "livenessState

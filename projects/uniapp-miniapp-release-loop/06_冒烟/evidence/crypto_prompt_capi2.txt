@@ -1,0 +1,4 @@
+﻿--- CAPI2 logs ---
+
+--- last CAPI2 events ---
+capi2_read_error: 找不到任何与指定的选择条件匹配的事件。

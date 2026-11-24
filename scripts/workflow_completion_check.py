@@ -94,10 +94,13 @@ def load_steps() -> list:
 
 def _gate_item(art: dict, step: dict, is_refurbish: bool) -> dict:
     """把 steps.yaml 的一条 artifact 展开成门禁检查项（含内容闸门扩展键，缺省不启用）。"""
+    step_id = str(step["id"])
     return {
         "path": art["path"],
         "alt": art.get("alt") or [],
         "label": art.get("label", art["path"]),
+        "step": step_id,
+        "step_num": _step_num(step_id),
         "keywords": art.get("keywords") or [],
         "launch_date": art.get("launch_date") or step.get("launch_date") or "",
         "fallback_steps": step.get("fallback") or [step["id"]],
@@ -110,6 +113,12 @@ def _gate_item(art: dict, step: dict, is_refurbish: bool) -> dict:
         "requires_http_api": bool(art.get("requires_http_api")),
         "requires_skill": art.get("requires_skill") or "",
     }
+
+
+def _step_num(step_id: str) -> float:
+    """把 step id（如 '5A'、'10.5'、'F0'）抽成数字，便于按 stage 过滤。抽不出来返回 999。"""
+    m = re.match(r"(\d+(?:\.\d+)?)", step_id or "")
+    return float(m.group(1)) if m else 999.0
 
 
 def load_gate_items() -> list:
@@ -433,11 +442,11 @@ def check_one(project_root: Path, item: dict) -> dict:
     return result
 
 
-def check_board_consistency(root: Path) -> dict:
+def check_board_consistency(root: Path, stage_num: float | None = None) -> dict:
     """
-    看板一致性检查（2026-10-28 新增，来源：10-27 晚看板未同步事故）。
-    门禁全绿只代表产物文件都在；如果看板 _项目状态.md 还写着"进行中/未开始/当前卡点"，
-    说明跑完没回写看板，必须先回写再改队列状态。
+    看板一致性检查。默认全量门禁要求看板彻底闭环；
+    --stage 模式下只要求 step ≤ stage_num 的行已回写，且总体状态/当前阶段/当前卡点等"全闭环"信号都降级为警告，
+    因为 stage 模式下 10.5/10.6/11 还没跑、看板不闭环是正常的（改进建议 N4）。
     """
     board = root / "_项目状态.md"
     info = {
@@ -489,6 +498,12 @@ def check_board_consistency(root: Path) -> dict:
             # 表格行：只解析状态列（第 3 列），产物路径/备注列里的词不算滞后
             cells = [c.strip() for c in stripped.split("|")[1:-1]]
             if len(cells) >= 3:
+                # --stage 模式下跳过 step id > stage_num 的行（步骤 10.5/10.6/11 等）
+                step_id_text = cells[0]
+                if stage_num is not None:
+                    sid = _step_num(step_id_text)
+                    if sid > stage_num:
+                        continue
                 state_col = cells[2]
                 for marker, desc in danger_markers:
                     if marker == "当前阶段：**":
@@ -516,6 +531,10 @@ def check_board_consistency(root: Path) -> dict:
         if created and created < BOARD_STRICT_DATE:
             info["status"] = "BOARD_FRESH_WARNING"
             info["details"] = "旧项目看板回写不严格，降级警告：" + "；".join(found_danger)
+        elif stage_num is not None:
+            # --stage 模式下看板整体不闭环是正常的（后面步骤还没跑），降级警告
+            info["status"] = "BOARD_FRESH_WARNING"
+            info["details"] = f"--stage {stage_num} 模式，stage 后步骤仍未闭环；只警告不阻塞：" + "；".join(found_danger)
         else:
             info["status"] = "BOARD_STALE"
             info["details"] = "；".join(found_danger)
@@ -582,11 +601,11 @@ def check_ledger(root: Path, created_date: str | None = None) -> dict:
     return info
 
 
-def check_log_gap(root: Path) -> dict:
+def check_log_gap(root: Path, hard_gap: bool = False) -> dict:
     """
-    失败日志缺口警告（改进建议 #56，仅警告不阻塞）：
-    台账里 P1 且状态 verified 的条数，应不大于 _失败日志.md 的记录条数；
-    缺口 >0 说明「P1 修完没记失败日志」，R10 空转，step10 复盘会缺数据。
+    失败日志缺口（改进建议 #56 + N5）：台账里 P1 且 verified 的条数，应 ≤ _失败日志.md 的记录条数。
+    - hard_gap=False 或 --stage 模式：保持原 LOG_GAP_WARNING（警告不阻塞）。
+    - hard_gap=True（默认全量门禁 + 新项目 >= GATE_LAUNCH_DATE）：gap > 0 升为硬失败，禁止把队列改已完成。
     """
     info = {
         "path": "_失败日志.md",
@@ -619,8 +638,10 @@ def check_log_gap(root: Path) -> dict:
 
     gap = p1_verified - log_rows
     if gap > 0:
-        info["status"] = "LOG_GAP_WARNING"
-        info["details"] = f"台账 P1 verified {p1_verified} 条，失败日志仅 {log_rows} 条，缺口 {gap} 条"
+        gap_label = "LOG_GAP" if hard_gap else "LOG_GAP_WARNING"
+        info["status"] = gap_label
+        info["details"] = (f"台账 P1 verified {p1_verified} 条，失败日志仅 {log_rows} 条，缺口 {gap} 条"
+                           + ("（硬闸：禁止改队列为已完成）" if hard_gap else "（警告不阻塞）"))
     else:
         info["details"] = f"台账 P1 verified {p1_verified} 条 ≤ 失败日志 {log_rows} 条"
     return info
@@ -794,6 +815,9 @@ def main():
     ap = argparse.ArgumentParser(description="工作流完成门禁检查")
     ap.add_argument("project_dir", help="项目目录，如 projects/xxx")
     ap.add_argument("--json", action="store_true", help="输出 JSON（供 CI/脚本消费）")
+    ap.add_argument("--stage", default="full",
+                    help="分阶段门禁（改进建议 N4）。例：--stage 10 只验 step10 及以前，跳过 10.5/10.6/11；"
+                         "看板一致性只校验 step≤10 行；LOG_GAP 保持警告（不升硬闸）。默认 full")
     args = ap.parse_args()
 
     root = Path(args.project_dir).resolve()
@@ -833,11 +857,21 @@ def main():
     if route == "迭代":
         gate_items.extend(load_incremental_gate_items())
 
+    # --stage 过滤：只验 step id 数字部分 <= stage 的产物（改进建议 N4）
+    stage_num: float | None = None
+    if args.stage and args.stage != "full":
+        try:
+            stage_num = float(args.stage)
+        except ValueError:
+            print(f"❌ --stage {args.stage} 不是数字或 'full'", file=sys.stderr)
+            sys.exit(2)
+        gate_items = [it for it in gate_items if it.get("step_num", 999) <= stage_num]
+
     results = [check_one(root, item) for item in gate_items]
     # 追加问题台账收敛检查（按创建日期判断可选/必查）+ 看板一致性检查
     ledger_result = check_ledger(root, created_date)
-    board_result = check_board_consistency(root)
-    log_gap_result = check_log_gap(root)
+    board_result = check_board_consistency(root, stage_num=stage_num)
+    log_gap_result = check_log_gap(root, hard_gap=(stage_num is None and created_date and created_date >= GATE_LAUNCH_DATE))
     mapping_result = check_mapping(root, created_date)
     job_handoff_result = check_job_handoff(project_name)
     regression_result = check_incremental_regression(root)
@@ -847,8 +881,11 @@ def main():
     results.append(mapping_result)
     results.append(job_handoff_result)
     results.append(regression_result)
+    # --stage 模式下，跳过 step > stage 的附加检查（台账/看板/log_gap 不跳过）
+    _STAGE_EXTRA = False  # 留开关，暂不启用
     failed = [r for r in results
-              if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING", "JOB_HANDOFF")]
+              if r["status"] not in ("OK", "BOARD_FRESH_WARNING", "LOG_GAP_WARNING", "JOB_HANDOFF")
+              and not (stage_num is not None and _STAGE_EXTRA and r.get("stage_skip"))]
 
     # 建议回退到的步骤：第一个失败项按 path 反查 gate_items（含翻新 items）
     suggested_fallback = None
@@ -881,6 +918,7 @@ def main():
                 "BOARD_STALE": "🔴",
                 "BOARD_FRESH_WARNING": "🟡",
                 "LOG_GAP_WARNING": "🟡",
+                "LOG_GAP": "🔴",
                 "JOB_HANDOFF": "📮",
                 "LEDGER_OPEN": "🔴",
                 "MAPPING_MISSING": "🔴",
@@ -912,7 +950,9 @@ def main():
             elif r["status"] == "BOARD_FRESH_WARNING":
                 line += f"  [看板可能未回写：{r.get('details','')}]"
             elif r["status"] == "LOG_GAP_WARNING":
-                line += f"  [失败日志缺口（不阻塞）：{r.get('details','')}]"
+                line += f"  [失败日志缺口（警告不阻塞）：{r.get('details','')}]"
+            elif r["status"] == "LOG_GAP":
+                line += f"  [失败日志缺口（硬闸）：{r.get('details','')}]"
             elif r["status"] == "JOB_HANDOFF":
                 line += f"  [求职侧联动：{r.get('details','')}]"
             elif r["status"] in ("REGRESSION_MISSING", "REGRESSION_NEGATIVE", "REGRESSION_NO_KEYWORD"):

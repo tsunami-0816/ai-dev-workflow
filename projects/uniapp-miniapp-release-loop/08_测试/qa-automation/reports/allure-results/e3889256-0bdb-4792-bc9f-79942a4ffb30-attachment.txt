@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 200 13ms {"code": 0, "msg": "ok", "data": {"bookingId": 258, "status": 0, "duplicated": false}}

@@ -122,4 +122,15 @@ function back(): void {
   justify-content: center;
 }
 .btn-primary::after, .btn-ghost::after { border: none; }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：协议收窄到 720 阅读宽度，正文行宽可控 ---- */
+@media (min-width: 900px) {
+  .ub-page { max-width: 720px; }
+  .title { font-size: 40px; }
+  .section-title { font-size: 20px; }
+  .body { font-size: 16px; }
+  .btn-primary, .btn-ghost { width: 280px; }
+}
+/* #endif */
 </style>

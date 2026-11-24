@@ -1,0 +1,1 @@
+[admin] POST /api/auth/login -> 200 52ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIyMDVkMmFiMC01NTEzLTQ1OGQtYmIwMC04OWVhYWJiYWI3ODIiLCJzdWIiOiI0IiwiaWF0IjoxNzk1MjAzNDI1LCJleHAiOjE3OTUyMTA2MjV9.srpLtwt-o5U3bKXq62r6540pG-Uup7oABYJcZIgdvKs", "expiresIn": 7200, "userId": 4, "nickname": "QA 自动补种"}}

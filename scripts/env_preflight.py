@@ -428,6 +428,52 @@ def verify_config(project_dir: str) -> tuple[list[str], list[str]]:
         print(f"  ❌ {r}")
     problems.extend(required)
 
+    # compose 端口回环检查（改进建议 N2：扫 docker-compose 文件，DB/中间件端口出现 0.0.0.0 或裸端口即告警）
+    compose_problems, compose_warns = check_compose_ports(root)
+    problems.extend(compose_problems)
+    warns.extend(compose_warns)
+
+    return problems, warns
+
+
+def check_compose_ports(root: Path) -> tuple[list[str], list[str]]:
+    """扫描 docker-compose*.yml / .yaml 的 ports: 节，0.0.0.0 或裸端口视为警告。
+    纯 warn，不升级为 problem——改 binding 通常是用户刻意选择（如前端开发需局域网访问）。
+    """
+    import re
+    problems, warns = [], []
+    compose_files = list(root.glob("docker-compose*.yml")) + list(root.glob("docker-compose*.yaml"))
+    if not compose_files:
+        return problems, warns
+    print(f"\n--- compose 端口回环检查（{len(compose_files)} 个文件）---")
+    port_binding_re = re.compile(r"^\s*(-\s+)?['\"]?(\d+:\d+)['\"]?\s*$")
+    for cf in compose_files:
+        try:
+            lines = cf.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except OSError:
+            continue
+        in_ports = False
+        for line in lines:
+            stripped = line.strip()
+            if stripped.lower().startswith("ports:"):
+                in_ports = True
+                continue
+            if in_ports:
+                if stripped.startswith(("- ", "-\t", "-")) or stripped.startswith("- "):
+                    val = stripped.lstrip("- ").strip().strip("'\"")
+                    if "0.0.0.0:" in val:
+                        msg = f"⚠️  {cf.name} ports 暴露公网：{val}"
+                        warns.append(msg); print(f"  {msg}")
+                    else:
+                        # 裸端口或 IP 绑定：只有含冒号才是端口映射，无前缀 host 视为裸绑定
+                        m = port_binding_re.match(val)
+                        if m:
+                            msg = f"⚠️  {cf.name} ports 未绑定回环：{val}（建议 127.0.0.1:{val}）"
+                            warns.append(msg); print(f"  {msg}")
+                elif stripped and not stripped.startswith("#"):
+                    in_ports = False
+    if not warns and not problems:
+        print("  ✅ 所有 compose ports 均绑定回环或未发现 docker-compose 文件")
     return problems, warns
 
 

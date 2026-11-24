@@ -1,0 +1,131 @@
+/* 单 CSS 变量定色板（架构 §1.2：不引组件库、不做设计系统）。
+   flat 风格：无渐变、无玻璃拟态、无阴影堆叠；app-screen 密度优先（taste-skill app 规则）。 */
+:root {
+  --bg: #f4f5f3;
+  --surface: #ffffff;
+  --ink: #21262b;
+  --muted: #667079;
+  --border: #dfe3e0;
+  --accent: #0f766e;
+  --up: #d93025; /* 涨=红（A 股口径） */
+  --down: #1a7f37; /* 跌=绿（A 股口径） */
+  --mock-bg: #fff7d1;
+  --mock-ink: #5c4d00;
+  --err-bg: #fbe9e7;
+  --err-ink: #8c1d18;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ---- 顶部条 ---- */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px;
+  font-size: 13px;
+}
+.banner-503 { background: var(--err-bg); color: var(--err-ink); }
+.banner-mock { background: var(--mock-bg); color: var(--mock-ink); border-bottom: 1px solid #e6d98a; }
+
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); }
+.topbar-inner {
+  max-width: 1180px; margin: 0 auto; padding: 0 20px;
+  display: flex; align-items: baseline; gap: 32px; height: 52px;
+}
+.brand { font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
+.tabs { display: flex; gap: 4px; height: 100%; }
+.tabs a {
+  display: inline-flex; align-items: center; padding: 0 14px;
+  color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent;
+}
+.tabs a:hover { color: var(--ink); }
+.tabs a.router-link-active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+.content { flex: 1; max-width: 1180px; margin: 0 auto; padding: 20px 20px 40px; width: 100%; }
+
+.footer {
+  border-top: 1px solid var(--border); padding: 10px 20px;
+  color: var(--muted); font-size: 12px; background: var(--surface);
+}
+
+/* ---- 视图通用 ---- */
+.view { display: flex; flex-direction: column; gap: 16px; }
+
+.filters {
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+  background: var(--surface); border: 1px solid var(--border); padding: 10px 14px;
+}
+.filters label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.filters select, .filters input {
+  font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--border); padding: 4px 8px; border-radius: 2px;
+}
+.filter-note { color: var(--muted); font-size: 12px; }
+
+.seg { display: inline-flex; }
+.seg button {
+  font: inherit; padding: 4px 14px; background: var(--surface);
+  border: 1px solid var(--border); cursor: pointer; color: var(--muted);
+}
+.seg button + button { border-left: none; }
+.seg button.active { background: var(--bg); color: var(--ink); font-weight: 600; }
+
+.btn {
+  font: inherit; padding: 3px 12px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border); color: var(--ink);
+  border-radius: 2px;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---- 卡片 ---- */
+.card { background: var(--surface); border: 1px solid var(--border); }
+.card-head {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+}
+.card-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.card-note { color: var(--muted); font-size: 12px; margin-right: auto; }
+.card-head .btn { margin-left: 0; }
+.card-body { padding: 14px; }
+
+/* ---- 指标行（不等宽：主指标放大，其余两级） ---- */
+.stat-row { display: flex; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.stat-tile { background: var(--surface); padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.stat-tile.primary { flex: 1.4; }
+.stat-tile:not(.primary) { flex: 1; }
+.stat-label { color: var(--muted); font-size: 12px; }
+.stat-value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-tile.primary .stat-value { font-size: 28px; }
+.stat-tile.up .stat-value { color: var(--up); }
+.stat-tile.down .stat-value { color: var(--down); }
+.stat-note { color: var(--muted); font-size: 11px; }
+
+/* ---- 表格 ---- */
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.data-table th {
+  text-align: left; font-weight: 600; color: var(--muted); font-size: 12px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.data-table td { padding: 7px 10px; border-bottom: 1px solid var(--bg); white-space: nowrap; }
+.data-table tbody tr:hover { background: var(--bg); }
+
+/* ---- 三态 ---- */
+.state { padding: 40px 0; text-align: center; color: var(--muted); }
+.state-error { color: var(--err-ink); display: flex; align-items: center; justify-content: center; gap: 12px; }
+.state-error .btn { border-color: var(--err-ink); color: var(--err-ink); }
+
+.changes-legend { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
+.chart { width: 100%; }

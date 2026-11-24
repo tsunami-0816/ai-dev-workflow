@@ -258,4 +258,13 @@ function loginWeixin(): void {
   display: block;
   margin-top: var(--sp-2);
 }
+
+/* #ifdef H5 */
+/* ---- 桌面版（≥900px）：登录收窄成 640，按钮不横贯整屏 ---- */
+@media (min-width: 900px) {
+  .ub-page { max-width: 640px; }
+  .title { font-size: 40px; }
+  .btn-primary { width: 320px; }
+}
+/* #endif */
 </style>

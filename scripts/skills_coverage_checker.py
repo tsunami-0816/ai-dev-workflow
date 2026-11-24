@@ -198,7 +198,12 @@ def main():
     skills_data = json.loads(Path(args.skills_json).read_text(encoding="utf-8"))
     hard = skills_data.get("hard_stack", [])
     arch = skills_data.get("architecture_skills", [])
-    must = skills_data.get("must_have") or hard
+    # 兼容 architecture_skills 为字符串（旧写法）的情况，否则会被逐字符迭代
+    if isinstance(arch, str):
+        arch = [p.strip() for p in re.split(r"、|,|，|;|；", arch) if p.strip()]
+    raw_must = skills_data.get("must_have") or hard
+    # 兼容两种 must_have 格式：字符串列表（旧）/ 对象列表 [{"skill": "...", ...}]（新）
+    must = [m.get("skill", "") if isinstance(m, dict) else m for m in raw_must]
 
     # ===== 对账模式：JD vs 已有作品集 =====
     if args.portfolio_mode:
@@ -320,7 +325,8 @@ def main():
     # 撞车检测
     if args.portfolio_json and Path(args.portfolio_json).exists():
         port = json.loads(Path(args.portfolio_json).read_text(encoding="utf-8"))
-        new_stack = set(s.lower() for s, _, _ in covered + shallow)
+        new_stack = set(s.lower() for s, _, _ in covered)
+        new_stack |= set(s.lower() for s, _, _, _ in shallow)
         print(f"\n--- 撞车检测 ---")
         for proj in port if isinstance(port, list) else port.get("projects", []):
             name = proj.get("project_name", "?")

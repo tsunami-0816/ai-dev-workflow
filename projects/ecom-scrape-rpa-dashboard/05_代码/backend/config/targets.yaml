@@ -1,0 +1,25 @@
+# 采集目标配置（L1 / D-01）——改 YAML 即可换采集目标，不用改代码
+# expect_sku 是每平台日采集目标（<100 只 WARN 不退出，C01 断言兜底）
+freq_cron: "0 2 * * *"
+
+platforms:
+  - platform: jd
+    category: 个护健康
+    keywords: ["避孕套 超薄", "避孕套 组合装"]
+    expect_sku: 120
+  - platform: tmall
+    category: 个护健康
+    keywords: ["避孕套 超薄", "避孕套 玻尿酸"]
+    expect_sku: 120
+  - platform: pdd
+    category: 个护健康
+    keywords: ["避孕套 家庭装", "避孕套 拼团"]
+    expect_sku: 120
+  - platform: douyin
+    category: 个护健康
+    keywords: ["避孕套 直播同款", "避孕套 达人推荐"]
+    expect_sku: 120
+  - platform: mock
+    category: 个护健康
+    keywords: ["样例关键词"]
+    expect_sku: 120

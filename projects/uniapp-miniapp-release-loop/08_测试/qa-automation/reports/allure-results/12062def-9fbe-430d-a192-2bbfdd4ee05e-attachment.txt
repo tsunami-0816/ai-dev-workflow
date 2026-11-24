@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 400 22ms {"code": 40001, "msg": "remark 备注最多 255 字", "data": null}

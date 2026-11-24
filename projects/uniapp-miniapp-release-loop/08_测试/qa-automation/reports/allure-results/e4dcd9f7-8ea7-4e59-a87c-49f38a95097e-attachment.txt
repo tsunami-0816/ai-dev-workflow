@@ -1,0 +1,2 @@
+[cf] GET /healthz -> 200 0ms {"status": "UP", "service": "apiProxy", "mode": "http", "port": 8093, "backend": "http://127.0.0.1:8092", "secretConfigured": false, "timeoutMs": 3000, "retry": 1, "uptimeSec": 3050}
+[cf] GET /healthz?probe=1 -> 200 6ms {"status": "UP", "service": "apiProxy", "mode": "http", "port": 8093, "backend": "http://127.0.0.1:8092", "secretConfigured": false, "timeoutMs": 3000, "retry": 1, "uptimeSec": 3050, "backendProbe": {"code": 0, "msg": "ok", "elapsedMs": 4, "traceId": "cf-0ed96f95"}}

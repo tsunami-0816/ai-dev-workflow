@@ -1,0 +1,1 @@
+[admin] POST /api/auth/login -> 200 46ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4NzA5MjkyOC04NWZmLTRiOTMtYWFmMy01YTdhMTlmOWEyYzMiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MjAzNDI1LCJleHAiOjE3OTUyMTA2MjV9.NUV0IJh3XakdLhtj25k-Ef0rfcD2TS_-6n5WL3PZevM", "expiresIn": 7200, "userId": 1, "nickname": "演示用户A"}}

@@ -12,6 +12,12 @@
 | Kafka | **9092** | saas-kafka | 需要时共用 |
 | ClickHouse | 3310 容器内 | 05_-clickhouse-1 | 未映射宿主机端口，需要时单独映射 |
 
+## 项目专属中间件（不与共享基础设施混用）
+
+| 项目 | 服务 | 宿主机端口 | 容器名 | 状态 | 说明 |
+|---|---|---|---|---|---|
+| dw-etl-pipeline | MySQL 8.0.36 | **53306**（仅 127.0.0.1） | dw-etl-mysql | ✅ 已交付（2026-11-24 收尾停止） | 独立数据卷 `dw-etl-pipeline_dw_mysql_data`；绑定已从 0.0.0.0 收紧为回环（Q-007） |
+
 ## 后端端口分配池（8081 起递增）
 
 | 项目 | 后端端口 | 状态 | 说明 |
@@ -27,6 +33,9 @@
 | nestjs-agent-workbench | **8089** | 🔨 进行中 | NestJS 主服务（2026-11-08 启动分配） |
 | dev-metrics-dashboard | **8091** | 🔨 进行中 | FastAPI 主服务（2026-11-11 启动分配，设计书预分配核实） |
 | react-taro-microfrontend | 复用 8083 | 🔨 进行中 | 不新写后端，复用 #7 saas-workflow-agent Spring Boot 接口（2026-11-11 并行启动） |
+| uniapp-miniapp-release-loop | **8092** | 🔨 进行中 | Spring Boot 3 写真预约服务（复用 #7 骨架自建模块，独立 database `uniapp_booking`；2026-11-18 启动分配） |
+| uniapp-miniapp-release-loop | **8093** | 🔨 进行中 | 云函数 `apiProxy` 本机模拟 Node 服务（真实云开发不可得时的降级模式；2026-11-18 启动分配） |
+| ecom-scrape-rpa-dashboard | **8094** | 🔨 进行中 | FastAPI 只读看板服务（2026-11-23 step2 架构分配；MySQL 复用共用容器 3310，database=ecom_scrape） |
 | 预留 | 8090 | | |
 
 ## 前端端口分配池（5173 起递增）
@@ -43,6 +52,8 @@
 | nestjs-agent-workbench | **5183** | 🔨 进行中 | Vite dev（2026-11-08 启动分配） |
 | dev-metrics-dashboard | **5184** | 🔨 进行中 | Vite dev（2026-11-11 启动分配，设计书预分配核实） |
 | react-taro-microfrontend | **5185** | 🔨 进行中 | Taro4/Vite dev H5 端（2026-11-11 并行启动分配；后端复用 #7 saas-workflow-agent 8083，不新分配后端端口） |
+| uniapp-miniapp-release-loop | **5186** | 🔨 进行中 | uni-app H5 dev / 微信开发者工具预览（2026-11-18 启动分配） |
+| ecom-scrape-rpa-dashboard | **5187** | 🔨 进行中 | Vite dev + nginx 静态托管（2026-11-23 step2 架构分配） |
 
 ## 开工时自动分配规则（env_preflight.py）
 

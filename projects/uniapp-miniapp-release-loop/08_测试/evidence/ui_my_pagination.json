@@ -1,0 +1,11 @@
+{
+  "expectMin": 25,
+  "firstCount": 20,
+  "afterCount": 25,
+  "pages": [
+    "1",
+    "2"
+  ],
+  "requests": 8,
+  "pass": true
+}

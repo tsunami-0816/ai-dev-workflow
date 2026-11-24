@@ -1,0 +1,4 @@
+
+JUnit 汇总:
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.557 s -- in com.uniapp.booking.common.PasswordHasherTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.434 s -- in com.uniapp.booking.infra.JwtServiceTest

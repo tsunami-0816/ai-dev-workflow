@@ -1,0 +1,1 @@
+[admin] POST /api/auth/login -> 400 3ms {"code": 40001, "msg": "account 或 openid 至少填一个", "data": null}

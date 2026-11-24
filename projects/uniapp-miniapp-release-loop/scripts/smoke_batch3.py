@@ -8,6 +8,7 @@
 """
 import base64
 import json
+import os
 import subprocess
 import sys
 import time
@@ -19,7 +20,8 @@ from pathlib import Path
 BASE = "http://127.0.0.1:8092"
 MGMT = "http://127.0.0.1:15672/api"
 MQ_AUTH = "Basic " + base64.b64encode(b"admin:admin").decode()
-MYSQL = ["mysql.exe", "--host=127.0.0.1", "--port=3308", "--user=root",
+MYSQL_PORT = os.environ.get("SMOKE_MYSQL_PORT") or os.environ.get("MYSQL_PORT") or "3308"
+MYSQL = ["mysql.exe", "--host=127.0.0.1", "--port=" + MYSQL_PORT, "--user=root",
          "--password=123456", "--default-character-set=utf8mb4", "-N", "-B", "-D", "uniapp_booking"]
 EVID = str(Path(__file__).resolve().parent.parent / "05_代码" / "backend" / "evidence" / "smoke_batch3.txt")
 LINES = []
@@ -105,7 +107,7 @@ def main():
     d2 = (today + timedelta(days=2)).isoformat()
     d3 = (today + timedelta(days=3)).isoformat()
     log(f"=== 批次 3 冒烟 {time.strftime('%Y-%m-%d %H:%M:%S')} ===")
-    log(f"base={BASE} today={today}")
+    log(f"base={BASE} today={today} mysql_port={MYSQL_PORT}")
 
     # 清理本次测试数据（幂等键残留由服务端自愈：键在行不在 → 清键重走）
     phones = [f"1390000{i:04d}" for i in range(1, 21)]

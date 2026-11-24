@@ -1,0 +1,2 @@
+[openid] POST / -> 200 27ms {"code": 0, "msg": "ok", "data": {"openid": "o_mock_wx_test_appid_goodcode", "unionid": null, "isNewSession": true}, "traceId": "cf-e66f0d32", "elapsedMs": 8}
+[openid] POST / -> 400 4ms {"code": 40001, "msg": "登录凭证无效或已使用，请重新登录", "data": null, "traceId": "cf-b36d3dfb", "elapsedMs": 2}

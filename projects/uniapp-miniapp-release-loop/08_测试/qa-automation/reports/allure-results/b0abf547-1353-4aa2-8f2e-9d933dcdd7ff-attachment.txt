@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 404 25ms {"code": 40401, "msg": "套餐不存在", "data": null}

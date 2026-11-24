@@ -1,0 +1,2 @@
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 251, "status": 0, "duplicated": false}}
+[demo] GET /api/bookings?page=1&size=20 -> 200 5ms {"code": 0, "msg": "ok", "data": {"list": [{"id": 251, "packageId": 3, "packageTitle": "情侣纪实", "bookDate": "2026-11-27", "slot": "上午", "contactMasked": "139****3848", "status": 0, "statusText": "待确认", "createdAt": "2026-11-21 03:37:03"}], "total": 1, "page": 1, "size": 20}}

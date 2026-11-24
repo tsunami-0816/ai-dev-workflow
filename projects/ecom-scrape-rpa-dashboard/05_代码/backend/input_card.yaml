@@ -1,0 +1,162 @@
+step: "5A"
+project: ecom-scrape-rpa-dashboard
+updated_at: 2026-11-23 17:26
+sources:
+  - 02_架构设计/第二轮技术架构设计文档.md
+  - 04_任务拆解与开发规范.md
+  - _设计实施映射表.md
+arch_ref: 02_架构设计/第二轮技术架构设计文档.md#2.4
+python_runtime: "py -3.11（3.11.9，禁止用默认 3.13 建 venv）"
+mock_policy: >
+  外部站点（jd/tmall/pdd/douyin）一律不依赖真实账号：默认走 mock_site（127.0.0.1:5190）
+  与 tests/fixtures/*.html 快照；真实站点适配器只允许在 MOCK_MODE=0 且显式 --platform 时启用，
+  失败必须降级而非崩溃；所有 mock 数据在接口/报表标注「mock 环境」。禁止硬编码 Cookie/口令。
+tasks:
+  - task_id: T01
+    desc: 配置装载与强校验（targets.yaml/sites.yaml/.env + config_hash 版本化）
+    risk: 关键
+    criterion_ref: C01
+  - task_id: T02
+    desc: task/task_run 与 CLI 骨架（initdb/collect/backfill/resume/rpa/report/prune）
+    risk: 高
+    criterion_ref: C04
+  - task_id: T03
+    desc: 反爬五件套 rate_limiter/ua_pool/cookie_pool/proxy_pool/backoff
+    risk: 关键
+    criterion_ref: C02,C03
+  - task_id: T04
+    desc: observability 写 antibot_metrics + 风控页启发式识别
+    risk: 高
+    criterion_ref: C02
+  - task_id: T05
+    desc: adapters/base.py 统一接口 + registry + url_hash 去重
+    risk: 高
+    criterion_ref: C01
+  - task_id: T06
+    desc: adapters/jd,tmall,pdd,douyin,mock 五适配器
+    risk: 高
+    criterion_ref: C01
+  - task_id: T07
+    desc: raw_page 快照落盘与表指针（提供离线重放）
+    risk: 中
+    criterion_ref: C01
+  - task_id: T08
+    desc: 页级事务 stg_price_item + task_run_item + cursor 同提交
+    risk: 关键
+    criterion_ref: C04
+  - task_id: T09
+    desc: 断点续采 resume + uk_platform_sku_date 兜底
+    risk: 关键
+    criterion_ref: C04,C05
+  - task_id: T10
+    desc: stg_price_item 暂存表与幂等 upsert（采集侧唯一落点）
+    risk: 关键
+    criterion_ref: C06
+  - task_id: T11
+    desc: rpa/loader.py DSL 校验（9 动作/assert.expect/select.by/scroll 上限）
+    risk: 高
+    criterion_ref: C08
+  - task_id: T12
+    desc: rpa/actions.py 9 动作 + engine 超时 15s/重试 2 次/显式等待
+    risk: 高
+    criterion_ref: C08
+  - task_id: T13
+    desc: flows/jd_price_scan.yaml 5 步 + 失败截图 + rpa_run 记录
+    risk: 高
+    criterion_ref: C08
+  - task_id: T14
+    desc: cli rpa --inject-fault selector 故障演练 + docs/rpa_flow.md
+    risk: 中
+    criterion_ref: C08
+  - task_id: T15
+    desc: clean/normalize.py 价格/销量/标题归一
+    risk: 中
+    criterion_ref: C06
+  - task_id: T16
+    desc: clean/rules.py 必填/范围/枚举/批内唯一 + 缺价沿用 imputed
+    risk: 高
+    criterion_ref: C06
+  - task_id: T17
+    desc: clean/anomaly.py 突变 >30% 标记 + difflib 同款聚合
+    risk: 高
+    criterion_ref: C07
+  - task_id: T18
+    desc: clean/pipeline.py 唯一写入口写 price_snapshot + clean_report/clean_issue
+    risk: 关键
+    criterion_ref: C05,C06
+  - task_id: T19
+    desc: sql/init/01_schema.sql 14 表 + 按日分区 + 唯一键 + rw/ro 账号
+    risk: 关键
+    criterion_ref: C01,C05
+  - task_id: T20
+    desc: app/db.py 双账号池 + 分区自动补齐 + 500 行/批 upsert + wait-db
+    risk: 关键
+    criterion_ref: C01,C05
+  - task_id: T21
+    desc: sql/queries/*.sql 窗口函数组 + agg_daily_platform + 孤儿检查
+    risk: 高
+    criterion_ref: C10
+  - task_id: T22
+    desc: report/excel.py 5 sheet + 公式 + 条件格式 + 图表 + report_file
+    risk: 高
+    criterion_ref: C09
+  - task_id: T23
+    desc: scripts/recalc_check.py + reconcile_check.py 三方对账
+    risk: 高
+    criterion_ref: C09
+  - task_id: T24
+    desc: api/main.py 统一响应/错误码/trace_id + 5 routers + 60s 缓存 + /openapi.json
+    risk: 高
+    criterion_ref: C10
+  - task_id: T27
+    desc: jobs/scheduler.py 02:00/08:00 + coalesce/max_instances + alerts.jsonl
+    risk: 高
+    criterion_ref: C09
+  - task_id: T28
+    desc: docker-compose.yml 三服务 + Dockerfile + nginx.conf
+    risk: 关键
+    criterion_ref: C10
+  - task_id: T29
+    desc: logs/*.jsonl 结构化日志 + ops.md 8 类 + 采集单入口文件锁
+    risk: 中
+    criterion_ref: C10
+  - task_id: T30
+    desc: scripts/perf_probe.py + cli prune（默认 dry-run）
+    risk: 中
+    criterion_ref: C10
+  - task_id: T31
+    desc: mock_site/app.py 3 平台页 + 429/验证码/脏数据注入
+    risk: 中
+    criterion_ref: C01,C06
+  - task_id: T33
+    desc: tests/ 6 文件 ≥25 用例 + fixtures HTML 快照
+    risk: 高
+    criterion_ref: C11
+  - task_id: T34
+    desc: scripts/gen_dirty.py + seed_anomaly.py + README.md + docs 三件
+    risk: 中
+    criterion_ref: C06,C07
+ports:
+  api: 8094
+  frontend_dev: 5187
+  mysql: 3310
+  mock_site: 5190
+scope:
+  files_in_scope:
+    - "05_代码/backend/**"
+    - "05_代码/docs/**"
+    - "05_代码/ops.md"
+    - "05_代码/README.md"
+    - "05_代码/docker-compose.yml"
+  out_of_scope:
+    - "05_代码/frontend/**"
+    - "02_架构设计/**"
+    - "03_评审报告/**"
+    - "04_任务拆解与开发规范.md"
+    - "prompts/**"
+    - "scripts/**"
+    - "WORKFLOW_*.md"
+limits:
+  max_files: 70
+  max_attempts: 3
+  timeout_min: 600

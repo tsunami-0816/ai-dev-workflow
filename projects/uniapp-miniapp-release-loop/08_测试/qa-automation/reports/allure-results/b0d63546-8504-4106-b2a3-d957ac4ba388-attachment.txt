@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 400 3ms {"code": 40001, "msg": "contact 手机号格式不正确", "data": null}

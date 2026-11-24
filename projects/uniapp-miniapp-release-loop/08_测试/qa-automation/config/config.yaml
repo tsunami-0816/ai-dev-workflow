@@ -1,0 +1,50 @@
+# 第 8 步测试环境配置（端口口径以 7.5 重置后的现场为准）
+base_url: "http://127.0.0.1:8092"
+cf_url: "http://127.0.0.1:8093"
+h5_url: "http://127.0.0.1:5186"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3307            # 本项目验收库；容器 3308 同名库不得用于验收（Q-024）
+  user: "root"
+  password: "123456"
+  database: "uniapp_booking"
+  client: "mysql.exe"
+
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  password: ""
+
+mq:
+  mgmt_url: "http://127.0.0.1:15672/api"
+  user: "admin"
+  password: "admin"
+  exchange: "booking.exchange"
+  queue: "booking.notify.queue"
+  dlq: "booking.notify.dlq"
+  routing_key: "booking.created"
+
+accounts:
+  demo:
+    account: "demo"
+    password: "welcome1"
+  demo2:
+    account: "demo2"
+    password: "welcome1"
+
+timeouts:
+  http: 20
+  mq_wait: 15
+  cf_wait: 12
+
+thresholds:
+  c03_p95_ms: 800          # C03 预约端到端 P95（含云函数一跳）
+  c04_cache_hit_ratio: 0.80 # C04 套餐缓存命中率
+  c13_min_cases: 15         # C13 L1+L2 最少用例数
+  booking_window_days: 30
+
+paths:
+  root: "./"
+  reports: "./reports"
+  allure_results: "./reports/allure-results"

@@ -1,0 +1,56 @@
+﻿=== 批次 3 冒烟 2026-11-20 16:13:28 ===
+base=http://127.0.0.1:8092 today=2026-11-20 mysql_port=3307
+loginA userId=1 loginB userId=2
+基线 booking 数 A=7 B=0
+
+--- T-403 拓扑 ---
+PASS 队列存在 booking.notify.queue
+PASS 队列存在 booking.notify.dlq
+PASS 交换机存在 booking.exchange
+PASS 交换机存在 booking.dlx
+
+--- T-402 幂等（同人同日同时段 3 次） ---
+req1 HTTP=200 {"code": 0, "msg": "ok", "data": {"bookingId": 20, "status": 0, "duplicated": false}}
+PASS req1 code=0
+req2 HTTP=200 {"code": 0, "msg": "ok", "data": {"bookingId": 20, "status": 0, "duplicated": true}}
+PASS req2 code=0
+req3 HTTP=200 {"code": 0, "msg": "ok", "data": {"bookingId": 20, "status": 0, "duplicated": true}}
+PASS req3 code=0
+PASS 3 次同一 bookingId | [20, 20, 20]
+PASS 首单 duplicated=false | [False, True, True]
+PASS 第 2/3 次 duplicated=true | [False, True, True]
+PASS DB 计数=1 | count=1
+notify.queue 累计发布 before=17 after=18（深度=0）
+PASS 提交 1 单消息数 +1（重复提交不再发消息） | delta=1
+PASS T-404 首单 notify_log=1 | count=1
+
+--- 参数校验 ---
+PASS 过去日期 40002 | 400 {'code': 40002, 'msg': '可预约范围为 2026-11-20 ~ 2026-12-20', 'data': None}
+PASS 超 30 天 40002 | 400 {'code': 40002, 'msg': '可预约范围为 2026-11-20 ~ 2026-12-20', 'data': None}
+PASS 套餐不存在 40401 | 404 {'code': 40401, 'msg': '套餐不存在', 'data': None}
+PASS 非法时段 40001 | 400 {'code': 40001, 'msg': 'slot 只能是 上午/下午/晚间', 'data': None}
+PASS 手机号非法 40001 | 400 {'code': 40001, 'msg': 'contact 手机号格式不正确', 'data': None}
+PASS 无 token 40101 | 401 {'code': 40101, 'msg': '未登录或登录态无效', 'data': None}
+PASS 未知路径 404 + 40400 | 404 {'code': 40400, 'msg': '接口不存在', 'data': None}
+
+--- T-404 10 单 → notify_log=10 ---
+PASS 10 单全部创建成功 | created=10
+PASS notify_log=10 | count=10
+
+--- 重复投递幂等 ---
+PASS 重复投递不翻倍（仍为 1） | count=1
+
+--- T-501 我的预约 ---
+PASS A 列表 code=0 | 200
+PASS A total=基线+11 | total=18 base=7
+PASS B 用伪造 userId=A 仍只见自己的单 | B total=0 base=0
+PASS A 第 2 页 5 条 | len=5
+列表首条: {"id": 27, "packageId": 2, "packageTitle": "复古胶片", "bookDate": "2026-11-22", "slot": "下午", "contactMasked": "139****0007", "status": 0, "statusText": "待确认", "createdAt": "2026-11-20 16:13:36"}
+PASS 手机号已脱敏
+PASS 无 token 40101 | 401
+
+--- DLQ 验证（非法消息） ---
+dlq before=2 after=3
+PASS 非法消息入 DLQ | delta=1
+
+=== 结果：全部通过 ===

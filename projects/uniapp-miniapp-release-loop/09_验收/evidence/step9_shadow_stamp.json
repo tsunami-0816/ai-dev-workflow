@@ -1,0 +1,26 @@
+{
+  "shadow": [
+    {
+      "tag": "DIV",
+      "cls": "uni-page-refresh",
+      "shadow": "rgba(0, 0, 0, 0.118) 0px 1px 6px 0px, rgba(0, 0, 0, 0.118) 0px 1px 4px 0px"
+    }
+  ],
+  "stamp": [
+    {
+      "cls": "stamp",
+      "color": "rgb(242, 237, 228)",
+      "bg": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "cls": "stamp-bar",
+      "color": "rgb(242, 237, 228)",
+      "bg": "rgb(196, 69, 58)"
+    },
+    {
+      "cls": "stamp-text",
+      "color": "rgb(142, 154, 147)",
+      "bg": "rgba(0, 0, 0, 0)"
+    }
+  ]
+}

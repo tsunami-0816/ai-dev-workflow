@@ -1,0 +1,3 @@
+[login] POST /api/auth/login -> 200 35ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI2YjE3MDRiMi03YWY0LTQ2YTYtYmIyZC1kNjgxNTUyMjI1MzciLCJzdWIiOiIyIiwiaWF0IjoxNzk1MjAzNDIyLCJleHAiOjE3OTUyMTA2MjJ9.cNAPxMT0LMBoOKIs5DYj2srf-OTc_WkxeogB_BvlLq4", "expiresIn": 7200, "userId": 2, "nickname": "演示用户B"}}
+[demo] POST /api/bookings -> 200 13ms {"code": 0, "msg": "ok", "data": {"bookingId": 250, "status": 0, "duplicated": false}}
+[demo2] POST /api/bookings -> 400 24ms {"code": 40001, "msg": "该手机号当天该时段已有预约，请更换手机号或时段", "data": null}

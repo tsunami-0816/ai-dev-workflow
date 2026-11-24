@@ -1,0 +1,13 @@
+# step2 技术架构设计输入卡（step1 产出时生成，step2 开工前校验）
+step: "2"
+project: ecom-scrape-rpa-dashboard
+updated_at: "2026-11-23"
+sources:
+  - 01_项目基线说明书.md
+  - 00_原始项目描述.md
+baseline_ref: 01_项目基线说明书.md
+hardware_limit: 本机单实例（RTX 2050 4GB / 16GB 内存）；MySQL 8 用共用容器 05_-mysql-1（宿主机 3310）；不引入 Redis/Kafka/分布式集群；Playwright Chromium 单实例串行，浏览器并发 ≤1，HTTP 域内并发 京东4/天猫2/拼多多2/抖音1
+ports:
+  backend: 8094
+  frontend: 5187
+  mysql: 3310

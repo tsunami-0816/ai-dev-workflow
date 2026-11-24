@@ -1,0 +1,5 @@
+﻿alive1512=True
+--- CredentialUIBroker instances ---
+#1512 parent=1940 created=11/20/2026 22:40:44
+--- parent of each ---
+#1512 <- svchost.exe #1940 :: 

@@ -1,0 +1,205 @@
+{
+  "startedAt": "2026-11-21T09:13:42.819Z",
+  "cases": [
+    {
+      "name": "A-01 首页 375（hero+3 行=4 套餐 / h1 / 无横向溢出）",
+      "pass": true,
+      "rows": 3,
+      "titles": [
+        "复古胶片",
+        "情侣纪实",
+        "个人写真·夜场"
+      ],
+      "prices": [
+        "¥499",
+        "¥699",
+        "¥599"
+      ],
+      "h1": 1,
+      "h1Text": "约拍档期",
+      "scrollW": 375,
+      "clientW": 375,
+      "heroTitle": "城市轻写真",
+      "heroPrice": "¥399"
+    },
+    {
+      "name": "A-02 首页 414 无横向溢出",
+      "pass": true,
+      "scrollW": 414,
+      "clientW": 414
+    },
+    {
+      "name": "A-03 首页 1440 桌面（容器宽度/左右留白/h1）",
+      "pass": true,
+      "width": 1040,
+      "left": 200,
+      "right": 200,
+      "h1": 1,
+      "overflow": 0
+    },
+    {
+      "name": "A-04 分页（接口两页各 2 条不重复、首页 4 套餐）",
+      "pass": true,
+      "ids1": [
+        1,
+        2
+      ],
+      "ids2": [
+        3,
+        4
+      ],
+      "listed": 4,
+      "note": "种子仅 4 条，首页 pageSize=12 不会触发追加（已知边界）"
+    },
+    {
+      "name": "A-05 详情页（标题/价格/标签/预约栏/h1/不遮挡）",
+      "pass": true,
+      "title": "城市轻写真",
+      "price": "¥399",
+      "tags": [
+        "室内",
+        "2套服装",
+        "精修8张"
+      ],
+      "h1": 1,
+      "h1Text": "城市轻写真",
+      "cta": "立即预约",
+      "overlap": 0
+    },
+    {
+      "name": "A-06 空表单提交（3 条字段红字、不发请求）",
+      "pass": true,
+      "errs": [
+        "请选择日期",
+        "请选择时段",
+        "请输入 11 位手机号"
+      ],
+      "bookingPosts": 0
+    },
+    {
+      "name": "A-07 日期+时段已选、手机号 12345（仅 1 条长度提示）",
+      "pass": true,
+      "dateSet": {
+        "ok": true,
+        "mode": "dialog-confirm",
+        "value": "2026-11-21"
+      },
+      "errs": [
+        "请输入 11 位手机号"
+      ],
+      "bookingPosts": 0
+    },
+    {
+      "name": "A-08 前缀非法 → 格式提示；改号 → 红字立即消失",
+      "pass": true,
+      "errs": [
+        "手机号格式不对，请检查"
+      ],
+      "afterRetype": {
+        "errs": 0,
+        "value": "13800000001"
+      },
+      "bookingPosts": 0
+    },
+    {
+      "name": "A-09 连点 5 次提交（只落 1 单、POST 1 次、出单号）",
+      "pass": true,
+      "doneNo": "No.1",
+      "doneNote": "状态：待确认 · 我们会在 24 小时内联系你",
+      "bookingPostsDelta": 1,
+      "bookedDate": "2026-11-21",
+      "clicks": 5
+    },
+    {
+      "name": "A-11 未登录进「我的」（显示去登录、不自动跳转）",
+      "pass": true,
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "bookings": 0,
+      "loginBtn": "去登录",
+      "hasState": true
+    },
+    {
+      "name": "演示用户A",
+      "pass": true,
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "rows": 1,
+      "note": "待确认＝已提交，店家确认后会另行联系；demo 没有店家端，",
+      "firstMasked": "下午",
+      "cardJump": "http://127.0.0.1:5186/#/pages/package/detail?id=1",
+      "logoutOk": true,
+      "afterLogout": {
+        "rows": 0,
+        "hasState": true
+      }
+    },
+    {
+      "name": "A-13 隐私协议页可渲染",
+      "pass": true,
+      "len": 302
+    },
+    {
+      "name": "A-14 未登录调 /api/bookings → 40101",
+      "pass": true,
+      "status": 401,
+      "body": {
+        "code": 40101,
+        "msg": "未登录或登录态无效",
+        "data": null
+      }
+    },
+    {
+      "name": "A-15 未知路径 → HTTP 404 / code 40400",
+      "pass": true,
+      "status": 404,
+      "body": {
+        "code": 40400,
+        "msg": "接口不存在",
+        "data": null
+      }
+    },
+    {
+      "name": "A-16 同参数重复提交 → 返回首单 duplicated",
+      "pass": true,
+      "code": 0,
+      "bookingId": 1,
+      "duplicated": true,
+      "firstNo": "1"
+    },
+    {
+      "name": "A-17 跨账号同手机号同日同时段 → 40001 不写库",
+      "pass": true,
+      "loginB": 0,
+      "resp": {
+        "code": 40001,
+        "msg": "该手机号当天该时段已有预约，请更换手机号或时段",
+        "data": null
+      }
+    },
+    {
+      "name": "A-19 页面无 JS/console 报错",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "consoleErrors": [],
+  "bookDateUsed": "2026-11-21",
+  "bookingNo": "1",
+  "visualTokens": {
+    "pageBg": "rgb(14, 43, 38)",
+    "paper": "rgb(142, 154, 147)",
+    "mastFontSize": "13px",
+    "mastLetterSpacing": "1.04px",
+    "heroTitleSize": "34px",
+    "rowTitleSize": "18px",
+    "priceColor": "rgba(242, 237, 228, 0.82)",
+    "rowRadius": "0px",
+    "heroPaddingTop": "24px"
+  },
+  "allPass": true,
+  "finishedAt": "2026-11-21T09:14:33.470Z",
+  "sideEffects": {
+    "newBookings": [
+      "13800000001 2026-11-21 下午（1 条，预走后重置）"
+    ]
+  }
+}

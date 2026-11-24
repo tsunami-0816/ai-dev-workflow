@@ -1,0 +1,89 @@
+{
+  "cases": [
+    {
+      "name": "S4 详情页内容",
+      "pass": true,
+      "before": {
+        "title": "城市轻写真",
+        "price": "¥399",
+        "tags": [
+          "室内",
+          "2套服装",
+          "精修8张"
+        ],
+        "summaryLen": 26,
+        "foldText": "",
+        "hasFold": false,
+        "ctaText": "立即预约",
+        "ctaBottom": 828,
+        "viewportH": 844,
+        "overlapPx": 0
+      },
+      "foldBranchReachable": false,
+      "foldBranchNote": "说明仅 26 字（≤52），按设计不出现折叠按钮",
+      "afterFold": {
+        "foldText": "",
+        "bodyLen": 0
+      },
+      "judged": [
+        "标题=城市轻写真",
+        "价格含 399",
+        "标签=3",
+        "预约栏含「立即预约」",
+        "说明区与预约栏纵向重叠=0"
+      ]
+    },
+    {
+      "name": "S5-a 空表单提交",
+      "pass": true,
+      "errs": [
+        "请选择日期",
+        "请选择时段",
+        "请输入 11 位手机号"
+      ],
+      "url": "http://127.0.0.1:5186/#/pages/booking/form?packageId=1&title=%E5%9F%8E%E5%B8%82%E8%BD%BB%E5%86%99%E7%9C%9F&price=399",
+      "bookingPosts": 0
+    },
+    {
+      "name": "S5-b 非法手机号",
+      "pass": true,
+      "errs": [
+        "请输入 11 位手机号"
+      ],
+      "typedPhone": {
+        "value": "12345",
+        "dateValue": "2026-11-20",
+        "activeSlot": "下午"
+      },
+      "bookingPosts": 0
+    },
+    {
+      "name": "S8 未登录「我的」",
+      "pass": true,
+      "url": "http://127.0.0.1:5186/#/pages/my/index",
+      "hasState": true,
+      "loginBtn": "去登录",
+      "bookingRows": 0,
+      "bodyText": "No.02 我的 · 档期 还没有登录 登录后，你约过的档期会记在这里 去登录 隐私协议"
+    },
+    {
+      "name": "S10 隐私协议页",
+      "pass": true,
+      "url": "http://127.0.0.1:5186/#/pages/privacy/index",
+      "textLen": 302,
+      "head": "No.03 隐私协议 隐私协议 demo 占位文本，不构成正式法律文件。正式上线前须替换为运营方审核过的协议。 01 我"
+    },
+    {
+      "name": "S2 下拉刷新（代码级）",
+      "pass": true,
+      "pagesJsonEnablePullDownRefresh": true,
+      "indexHasHandler": true,
+      "myHasHandler": true,
+      "note": "H5 下拉手势由用户手感判定；本项只证代码挂接"
+    }
+  ],
+  "consoleErrors": [
+    "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "allPass": true
+}

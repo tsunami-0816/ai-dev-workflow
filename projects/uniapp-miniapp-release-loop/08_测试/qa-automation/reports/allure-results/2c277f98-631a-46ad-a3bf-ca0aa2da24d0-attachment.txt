@@ -1,0 +1,1 @@
+[demo] GET /api/packages?page=1&size=0 -> 200 25ms {"code": 0, "msg": "ok", "data": {"list": [{"id": 1, "title": "城市轻写真", "price": 399.0, "coverUrl": "/static/covers/cover-1.jpg", "tags": ["室内", "2套服装", "精修8张"], "summary": "室内自然光棚拍，适合日常通勤与社交头像；含妆造基础。", "status": 1}, {"id": 2, "title": "复古胶片", "price": 499.0, "coverUrl": "/static/covers/cover-2.jpg",

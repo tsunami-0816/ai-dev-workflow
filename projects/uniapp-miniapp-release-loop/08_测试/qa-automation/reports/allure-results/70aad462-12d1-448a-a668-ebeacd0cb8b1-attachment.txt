@@ -1,0 +1,26 @@
+[h5-ui] GET / -> 200 18ms {"_raw": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n  <head>\n    <script>if (typeof globalThis === 'undefined') {\n  window.globalThis = window\n}</script>\n\n    <script type=\"module\" src=\"/@vite/client\"></script>\n\n    <meta charset=\"UTF-8\" />\n    <meta\n      name=\"viewport\"\n      conte
+[demo] POST /api/bookings -> 200 14ms {"code": 0, "msg": "ok", "data": {"bookingId": 272, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 273, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 274, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 275, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 12ms {"code": 0, "msg": "ok", "data": {"bookingId": 276, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 13ms {"code": 0, "msg": "ok", "data": {"bookingId": 277, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 12ms {"code": 0, "msg": "ok", "data": {"bookingId": 278, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 11ms {"code": 0, "msg": "ok", "data": {"bookingId": 279, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 28ms {"code": 0, "msg": "ok", "data": {"bookingId": 280, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 29ms {"code": 0, "msg": "ok", "data": {"bookingId": 281, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 282, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 31ms {"code": 0, "msg": "ok", "data": {"bookingId": 283, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 29ms {"code": 0, "msg": "ok", "data": {"bookingId": 284, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 31ms {"code": 0, "msg": "ok", "data": {"bookingId": 285, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 30ms {"code": 0, "msg": "ok", "data": {"bookingId": 286, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 12ms {"code": 0, "msg": "ok", "data": {"bookingId": 287, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 34ms {"code": 0, "msg": "ok", "data": {"bookingId": 288, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 29ms {"code": 0, "msg": "ok", "data": {"bookingId": 289, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 29ms {"code": 0, "msg": "ok", "data": {"bookingId": 290, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 11ms {"code": 0, "msg": "ok", "data": {"bookingId": 291, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 12ms {"code": 0, "msg": "ok", "data": {"bookingId": 292, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 38ms {"code": 0, "msg": "ok", "data": {"bookingId": 293, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 10ms {"code": 0, "msg": "ok", "data": {"bookingId": 294, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 13ms {"code": 0, "msg": "ok", "data": {"bookingId": 295, "status": 0, "duplicated": false}}
+[demo] POST /api/bookings -> 200 12ms {"code": 0, "msg": "ok", "data": {"bookingId": 296, "status": 0, "duplicated": false}}

@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 400 20ms {"code": 40001, "msg": "packageId 套餐不能为空", "data": null}

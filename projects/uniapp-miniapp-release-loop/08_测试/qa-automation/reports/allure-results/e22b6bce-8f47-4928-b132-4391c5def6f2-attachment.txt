@@ -1,0 +1,2 @@
+[cf] POST / -> 200 37ms {"code": 0, "msg": "ok", "data": {"bookingId": 257, "status": 0, "duplicated": false}, "traceId": "cf-225c63c7", "elapsedMs": 13}
+[cf] POST / -> 200 6ms {"code": 0, "msg": "ok", "data": {"bookingId": 257, "status": 0, "duplicated": true}, "traceId": "cf-377cd929", "elapsedMs": 4}

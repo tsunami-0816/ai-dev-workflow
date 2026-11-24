@@ -1,0 +1,9 @@
+# 密钥/凭据/产物不入库
+.env
+config/cookies/
+data/
+logs/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

@@ -1,0 +1,2 @@
+[login] POST /api/auth/login -> 200 38ms {"code": 0, "msg": "ok", "data": {"token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3ZjQ3YjRkMy0xM2ZjLTQyOWItOGZiYi03YjQ2NDAxZGE3ZmMiLCJzdWIiOiIxIiwiaWF0IjoxNzk1MjAzNDE5LCJleHAiOjE3OTUyMTA2MTl9.EhoPBK89c1mO4DMp5ZwZVWZ_d8V_Kz5qCjUHA33TYws", "expiresIn": 7200, "userId": 1, "nickname": "演示用户A"}}
+[demo] POST /api/bookings -> 200 34ms {"code": 0, "msg": "ok", "data": {"bookingId": 248, "status": 0, "duplicated": false}}

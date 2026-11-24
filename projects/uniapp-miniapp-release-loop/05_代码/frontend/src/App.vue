@@ -58,5 +58,39 @@ onLaunch(() => {
   font-size: 12px !important;
   line-height: 1.4 !important;
 }
+
+/* ---- 桌面版（H5 ≥900px）：手机版式保持不变，宽屏换成居中的桌面编排 ---- */
+@media (min-width: 900px) {
+  :root,
+  page {
+    --gutter: 48px;
+    --fs-body: 16px;
+    --fs-small: 14px;
+    --fs-num: 22px;
+    --fs-display: 44px;
+    --row-h: 84px;
+    --sp-4: 56px;
+    --sp-5: 88px;
+  }
+  body {
+    background-color: var(--ub-ground);
+  }
+  /* 页面容器居中收窄，两侧露出底布，不再被 1440 拉满 */
+  .ub-page,
+  .lb-page {
+    max-width: 1040px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* 底部 tabBar 跟内容一起居中，收成 480 的停靠条，避免两个标签在 1040 里被拉散 */
+  .uni-tabbar {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    border-top: 1px solid var(--ub-line);
+  }
+}
 /* #endif */
 </style>

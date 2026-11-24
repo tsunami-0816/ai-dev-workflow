@@ -1,0 +1,1 @@
+[demo] POST /api/bookings -> 400 20ms {"code": 40001, "msg": "slot 只能是 上午/下午/晚间", "data": null}

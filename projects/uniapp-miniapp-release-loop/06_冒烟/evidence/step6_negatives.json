@@ -1,0 +1,33 @@
+{
+  "N1": {
+    "first": {
+      "http": 200,
+      "id": 35,
+      "duplicated": false
+    },
+    "second": {
+      "http": 200,
+      "id": 35,
+      "duplicated": true
+    },
+    "pass": true
+  },
+  "N2": {
+    "http": 400,
+    "code": 40001,
+    "msg": "该手机号当天该时段已有预约，请更换手机号或时段",
+    "hasData": false,
+    "pass": true
+  },
+  "N4": {
+    "http": 401,
+    "code": 40101,
+    "pass": true
+  },
+  "N5": {
+    "http": 404,
+    "code": 40400,
+    "pass": true
+  },
+  "allPass": true
+}
