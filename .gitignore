@@ -71,6 +71,7 @@ projects/dev-metrics-dashboard/
 
 # ===== 在跑项目与设计台目录（本地工作区，不入工作流仓库）=====
 projects/react-taro-microfrontend/
+projects/dw-etl-pipeline/
 projects/_队列/
 
 # ===== 本地能力库 / 一次性产物（不入库）=====
