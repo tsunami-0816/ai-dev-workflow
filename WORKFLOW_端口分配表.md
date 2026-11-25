@@ -35,7 +35,8 @@
 | react-taro-microfrontend | 复用 8083 | 🔨 进行中 | 不新写后端，复用 #7 saas-workflow-agent Spring Boot 接口（2026-11-11 并行启动） |
 | uniapp-miniapp-release-loop | **8092** | 🔨 进行中 | Spring Boot 3 写真预约服务（复用 #7 骨架自建模块，独立 database `uniapp_booking`；2026-11-18 启动分配） |
 | uniapp-miniapp-release-loop | **8093** | 🔨 进行中 | 云函数 `apiProxy` 本机模拟 Node 服务（真实云开发不可得时的降级模式；2026-11-18 启动分配） |
-| ecom-scrape-rpa-dashboard | **8094** | 🔨 进行中 | FastAPI 只读看板服务（2026-11-23 step2 架构分配；MySQL 复用共用容器 3310，database=ecom_scrape） |
+| ecom-scrape-rpa-dashboard | **8097** | 🔨 进行中 | FastAPI 只读看板服务（原 8094 让位给 rn-mobile-app-release，2026-11-25 改分配；MySQL 复用共用容器 3310，database=ecom_scrape） |
+| rn-mobile-app-release | **8094** | 🔨 进行中 | NestJS 12 后端（2026-11-25 第 6 步登记；APK 与 `release.json` 写死 `192.168.0.108:8094`，不可随意改） |
 | 预留 | 8090 | | |
 
 ## 前端端口分配池（5173 起递增）
@@ -54,6 +55,7 @@
 | react-taro-microfrontend | **5185** | 🔨 进行中 | Taro4/Vite dev H5 端（2026-11-11 并行启动分配；后端复用 #7 saas-workflow-agent 8083，不新分配后端端口） |
 | uniapp-miniapp-release-loop | **5186** | 🔨 进行中 | uni-app H5 dev / 微信开发者工具预览（2026-11-18 启动分配） |
 | ecom-scrape-rpa-dashboard | **5187** | 🔨 进行中 | Vite dev + nginx 静态托管（2026-11-23 step2 架构分配） |
+| rn-mobile-app-release | **8096** | 🔨 进行中 | Metro / Expo dev server（2026-11-25 第 6 步登记；非 5173 池，RN 打包端口固定 8096） |
 
 ## 开工时自动分配规则（env_preflight.py）
 

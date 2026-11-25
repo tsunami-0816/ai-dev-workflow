@@ -32,11 +32,23 @@ DEFAULT_MIN_BYTES = 32
 FORBID_CONTEXT_EXEMPT = [
     "deferred", "技术债", "已修复", "已改", "回归通过", "瑕疵", "根因", "历史瑕疵",
     "无 todo", "占位", "如实", "未验证", "边界", "降级", "砍除", "未做", "诚实", "标注",
+    # step11 N3：本项目 4 处误报的语境词（本身是「如实交代」而非结论性否定）
+    "误报", "已清零", "此前", "回填",
 ]
+# step11 N3：这些禁词只按「结论式」计（避免把「未达标 → 转下版本」这类归属句判红）
+CONCLUSION_ONLY_FORBIDS = {
+    "未达标": ["未达标：", "未达标:", "未达标（阻断", "未达标(阻断"],
+}
+# step11 N3：代码/模板里的占位写法（`TODO`、`// TODO`、`# TODO`、`<!--` 行）不算文档结论
+CODE_PLACEHOLDER_RE = re.compile(r"`TODO`|//\s*TODO|#\s*TODO|<!--\s*TODO")
 # 看板「创建日期」兼容两种写法：
 #   创建日期：2026-11-02
 #   创建日期：**2026-11-02**（翻新建档）      ← 粗体 + 后缀说明，必须照样抓到日期
 CREATE_DATE_RE = re.compile(r"创建日期[：:]\s*\**\s*(\d{4}-\d{2}-\d{2})")
+# 素材五处同步硬拦上线日（2026-11-25 · 方案 P2）：此日及之后创建的项目，
+# 若填了 10_交付/资产同步.json，则必须五处全命中才许改「已完成」；历史项目与未填 json 的跳过。
+ASSETS_GATE_DATE = "2026-11-25"
+ASSETS_SCRIPT = Path(r"D:\lg\resume\素材与脚本\scripts\sync_project_assets.py")
 
 
 def _parse_date(s: str) -> str:
@@ -73,6 +85,31 @@ def _is_exempt(root: Path, project_name: str) -> tuple[bool, str]:
             reason = cells[1] if len(cells) > 1 else ""
             return True, reason
     return False, ""
+
+
+def check_assets_sync(root: Path, created_date: str) -> dict:
+    """素材五处同步门禁（2026-11-25 · 方案 P2）。
+
+    只对「ASSETS_GATE_DATE 及以后创建 + 填了 10_交付/资产同步.json」的项目硬拦；
+    历史项目 / 未填 json → OK 跳过（不误伤存量）。
+    """
+    label, path = "素材五处同步", "PROJECT_INDEX/干净bullet库/项目场景标签/项目经历/缺口队列"
+    base = {"label": label, "path": path, "fallback_steps": ["10.6"]}
+    if created_date and created_date < ASSETS_GATE_DATE:
+        return dict(base, status="OK", skipped="历史项目（%s 前上线）" % ASSETS_GATE_DATE)
+    meta = root / "10_交付" / "资产同步.json"
+    if not meta.exists():
+        return dict(base, status="OK", skipped="未登记 资产同步.json")
+    if not ASSETS_SCRIPT.exists():
+        return dict(base, status="ASSETS_MISSING", details="找不到 sync_project_assets.py")
+    import subprocess
+    p = subprocess.run([sys.executable, str(ASSETS_SCRIPT), "--project", root.name],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if p.returncode == 0:
+        return dict(base, status="OK", details="五处全命中")
+    tail = [ln.strip() for ln in (p.stdout or "").splitlines() if ln.strip()][-2:]
+    return dict(base, status="ASSETS_MISSING",
+                details="；".join(tail)[:200] or "rc=%d" % p.returncode)
 
 
 def load_config() -> dict:
@@ -300,14 +337,26 @@ def _project_created_date(project_root: Path) -> str:
 
 
 def _scan_forbid(content: str, forbids: list[str]) -> list[str]:
-    """逐行扫 forbid 词（#97）：命中行若带豁免语境（技术债/已修复/如实标注/占位等），不计结论性否定。
+    """逐行扫 forbid 词（#97 / step11 N3）：命中行若带豁免语境（技术债/已修复/如实标注/占位等），
+    或属于代码占位 / 归属式「未达标 → 转下版本」，不计结论性否定。
 
     跨语境不豁免——只看命中词所在那一行；返回去重后的命中禁词列表。
     """
     hits = []
     for line in content.splitlines():
         low_line = line.lower()
-        matched = [f for f in forbids if f in line or f.lower() in low_line]
+        matched = []
+        for f in forbids:
+            if f not in line and f.lower() not in low_line:
+                continue
+            # 代码/模板里的 TODO 占位，不算文档结论
+            if f.upper() == "TODO" and CODE_PLACEHOLDER_RE.search(line):
+                continue
+            # 「未达标」只认结论式（未达标： / 未达标（阻断），归属句放行
+            if f in CONCLUSION_ONLY_FORBIDS:
+                if not any(p in line for p in CONCLUSION_ONLY_FORBIDS[f]):
+                    continue
+            matched.append(f)
         if not matched:
             continue
         if any(ctx in low_line for ctx in FORBID_CONTEXT_EXEMPT):
@@ -875,12 +924,14 @@ def main():
     mapping_result = check_mapping(root, created_date)
     job_handoff_result = check_job_handoff(project_name)
     regression_result = check_incremental_regression(root)
+    assets_result = check_assets_sync(root, created_date)
     results.append(ledger_result)
     results.append(board_result)
     results.append(log_gap_result)
     results.append(mapping_result)
     results.append(job_handoff_result)
     results.append(regression_result)
+    results.append(assets_result)
     # --stage 模式下，跳过 step > stage 的附加检查（台账/看板/log_gap 不跳过）
     _STAGE_EXTRA = False  # 留开关，暂不启用
     failed = [r for r in results
@@ -929,6 +980,7 @@ def main():
                 "REGRESSION_MISSING": "🔴",
                 "REGRESSION_NEGATIVE": "🔴",
                 "REGRESSION_NO_KEYWORD": "⚠️ ",
+                "ASSETS_MISSING": "🔴",
             }.get(r["status"], "💥")
             line = f"{icon} {r['label']:<28} {r['path']}"
             if r["status"] == "OK" and r.get("skipped"):

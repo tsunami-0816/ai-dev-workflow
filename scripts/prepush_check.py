@@ -60,6 +60,10 @@ PLACEHOLDER_TOKENS = {
     "secret_here", "key_here", "placeholder", "redacted", "masked", "none",
     "null", "password", "passwd", "****", "ollama",
     "dev-local", "dev_local", "not-used", "not_used", "unused", "n-a", "n/a",
+    # CI service 容器/本地联调固定口令（#121）：不是生产密钥
+    "postgres", "ci-only", "ci_only", "abc.def",
+    # 测试夹具/伪造令牌（#121）
+    "forged", "valid-token", "invoke-api",
 }
 
 # proto / 基础类型名（#101）：口令/令牌字段后标注的类型名不是字面量密钥
@@ -142,6 +146,16 @@ def _looks_code_reference(value: str) -> bool:
         return True
     if any(ch in value for ch in "()[]{}"):
         return True
+    if "?." in value:
+        return True  # 可选链取字段（userA.json?.data?.token），不是字面量
+    if re.fullmatch(r"[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+", value or ""):
+        return True  # 点号成员访问（login.data.token），不是字面量
+    if "<" in value or value.strip().endswith("!"):
+        return True  # 泛型/非空断言（useRef<string>、_token!）
+    if re.fullmatch(r"[A-Za-z_$][A-Za-z0-9_$]*", value) and (
+        "token" in low or low in {"forgedsig", "forged_sig"}
+    ):
+        return True  # 纯变量名（tokenA / userToken / forgedSig），不是字面量
     if re.fullmatch(r"[A-Z][A-Z0-9_]{2,}", value or ""):
         return True  # 全大写常量/环境变量名
     return False
