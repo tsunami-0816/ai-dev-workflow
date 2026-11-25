@@ -1,0 +1,63 @@
+{
+  "stamp": "20261125",
+  "startedAt": "2026-11-25T14:57:14.333Z",
+  "cases": [
+    {
+      "name": "R-01 首页渲染（375·4 套餐文案齐）",
+      "pass": true,
+      "title": "约拍档期",
+      "overflowX": false,
+      "text": "No.01 约拍档期 城市轻写真 室内 · 2套服装 ¥399 4 个套餐，30 天内可约 01 / 04 02 复古胶片 ¥499 外景 · 胶片质感 03 "
+    },
+    {
+      "name": "R-02 详情页渲染（id=1）",
+      "pass": true,
+      "title": "城市轻写真",
+      "price": "¥399",
+      "cta": "立即预约",
+      "h1": 1
+    },
+    {
+      "name": "R-03 我的页未登录态",
+      "pass": true,
+      "loginBtn": "去登录",
+      "bookings": 0
+    },
+    {
+      "name": "R-04 /api/packages",
+      "pass": true,
+      "code": 0,
+      "total": 4
+    },
+    {
+      "name": "R-05 云函数 8093 探针",
+      "pass": true,
+      "status": "UP",
+      "code": 0
+    },
+    {
+      "name": "R-06 console 报错 0",
+      "pass": true,
+      "count": 0
+    },
+    {
+      "name": "R-07 全程无写请求（只读）",
+      "pass": true,
+      "posts": [
+        "OPTIONS http://127.0.0.1:8092/api/packages?page=1&size=12",
+        "OPTIONS http://127.0.0.1:8092/api/packages/1"
+      ]
+    }
+  ],
+  "consoleErrors": [],
+  "posts": [
+    "OPTIONS http://127.0.0.1:8092/api/packages?page=1&size=12",
+    "OPTIONS http://127.0.0.1:8092/api/packages/1"
+  ],
+  "finishedAt": "2026-11-25T14:57:25.466Z",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  }
+}

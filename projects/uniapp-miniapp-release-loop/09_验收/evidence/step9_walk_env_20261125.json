@@ -1,0 +1,71 @@
+{
+  "checked_at": "2026-11-25T22:52:30+08:00",
+  "purpose": "第 9 步两段式人工走查前环境重启与只读核对（旧现场 11-22 22:00 起的三端已全部离线，本轮重起；未造新单）",
+  "services": {
+    "backend_8092": {
+      "pid": 13080,
+      "start_cmd": "java -Dfile.encoding=UTF-8 -Xmx512m -jar booking-service.jar",
+      "env": { "MYSQL_PORT": "3307", "MYSQL_HOST": "127.0.0.1", "REDIS_PORT": "6379" },
+      "api_packages_http": 200,
+      "api_packages_code": 0,
+      "api_packages_total": 4,
+      "log": "05_代码/backend/evidence/app_run_20261125.log"
+    },
+    "h5_5186": {
+      "pid": 26052,
+      "start_cmd": "npm run dev:h5 (uni)",
+      "http_home": 200,
+      "ready_ms": 65812,
+      "log": "05_代码/frontend/evidence_h5_20261125.log"
+    },
+    "cloud_function_8093": {
+      "pid": 29316,
+      "start_cmd": "node --max-old-space-size=256 apiProxy/localServer.js",
+      "healthz_status": "UP",
+      "healthz_probe_code": 0,
+      "env": { "CF_BACKEND_BASE": "http://127.0.0.1:8092", "CF_PORT": "8093" },
+      "log": "05_代码/cloud-functions/evidence/cf_8093_20261125.log"
+    },
+    "mysql_3307": { "listening": true, "pid": 7500 },
+    "redis_6379": { "listening": true, "pid": 6236 },
+    "rabbitmq_5672": { "listening": false }
+  },
+  "actuator_health": {
+    "overall": "DOWN",
+    "components": { "db": "UP", "diskSpace": "UP", "livenessState": "UP", "ping": "UP", "rabbit": "DOWN", "readinessState": "UP", "redis": "UP" },
+    "note": "overall DOWN 仅因 rabbit 未起（Docker 引擎未就绪，已知边界），db/redis/diskSpace 均 UP"
+  },
+  "db_counts": {
+    "user": 2,
+    "package": 4,
+    "booking": 1,
+    "notify_log": 0,
+    "max_booking_id": 1
+  },
+  "baseline_match": "与验收现场基线 2/4/1/0 一致（booking id=1 为用户 2026-11-21 17:14 提交的 138****0001 验收数据，保留）",
+  "render_probe": {
+    "script": "09_验收/scripts/render_probe_readonly.cjs",
+    "result": "7/7 PASS",
+    "json": "09_验收/evidence/step9_render_probe_20261125.json",
+    "screenshots": [
+      "09_验收/evidence/step9_render_probe_20261125_index_375.png",
+      "09_验收/evidence/step9_render_probe_20261125_detail_375.png",
+      "09_验收/evidence/step9_render_probe_20261125_my_375.png"
+    ],
+    "cases": [
+      "R-01 首页渲染 375（4 套餐文案齐、无横向溢出）",
+      "R-02 详情 id=1（城市轻写真 / ¥399 / 立即预约 / h1=1）",
+      "R-03 我的页未登录态（去登录、0 条预约）",
+      "R-04 GET /api/packages code=0 total=4",
+      "R-05 云函数 8093 healthz UP + backendProbe code=0",
+      "R-06 console 报错 0",
+      "R-07 全程仅 OPTIONS/GET，无写请求"
+    ]
+  },
+  "notes": [
+    "仅只读核对 + 只读渲染探针，未调用写接口、未造新单（库计数前后均为 2/4/1/0）",
+    "MQ 未起：预约可成单但无通知落库，属手册已载明的已知边界",
+    "AI 侧预走 17/17 已于 2026-11-21 完成，本轮不重跑（预走含下单，会动验收库），只跑只读探针证明现场可用",
+    "旧现场（2026-11-22 22:00）三端已全部掉线，本文件是重起后的现场证据"
+  ]
+}
