@@ -312,6 +312,75 @@ def _queue_rows(root: Path):
     return path, lines, rows
 
 
+BOARD_REL = Path("projects") / "_生产并行看板.md"
+SLOTS_REL = Path("scripts") / "slots.py"
+
+
+def _board_problems(root: Path, rows):
+    """校验 projects/_生产并行看板.md 是否还是旧快照。
+
+    看板由 scripts/slots.py 只读生成，只在有人主动跑脚本时刷新；
+    项目从第 8 步走到收口、队列改成「已完成」后若不重跑，看板会一直停在旧步骤。
+    """
+    p = root / BOARD_REL
+    if not p.exists():
+        return ["看板 projects/_生产并行看板.md 不存在（跑 py -3.11 scripts/slots.py）"]
+    t = p.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r"> 队列：进行中 (\d+) / 待开工 (\d+) / 已搁置 (\d+) / 已完成 (\d+)", t)
+    if not m:
+        return ["看板缺少「队列：进行中 X / 待开工 Y / 已搁置 Z / 已完成 W」计数行"]
+    want = {"进行中": 0, "待开工": 0, "已搁置": 0, "已完成": 0}
+    for _, cells in rows:
+        st = cells[4].strip()
+        if st.startswith("进行中"):
+            want["进行中"] += 1
+        elif st == "待开工":
+            want["待开工"] += 1
+        elif "搁置" in st:
+            want["已搁置"] += 1
+        elif st.startswith("已完成") or "豁免" in st:
+            want["已完成"] += 1
+    got = {"进行中": int(m.group(1)), "待开工": int(m.group(2)),
+           "已搁置": int(m.group(3)), "已完成": int(m.group(4))}
+    probs = []
+    if got != want:
+        probs.append("看板计数 进行中%d/待开工%d/已搁置%d/已完成%d ≠ 队列 %d/%d/%d/%d"
+                     % (got["进行中"], got["待开工"], got["已搁置"], got["已完成"],
+                        want["进行中"], want["待开工"], want["已搁置"], want["已完成"]))
+    for _, cells in rows:
+        name = cells[0].strip().strip("`")
+        st = cells[4].strip()
+        if not name:
+            continue
+        if st.startswith("进行中") and ("`%s`" % name) not in t and ("**%s**" % name) not in t:
+            probs.append("进行中项目 %s 不在看板上" % name)
+        if st.startswith("已完成") or "搁置" in st:
+            if ("`%s`" % name) in t:
+                probs.append("%s 队列已是「%s」，看板仍列在工位上（旧快照）" % (name, st))
+    return probs
+
+
+def _regenerate_board(root: Path):
+    """重建生产并行看板（调用 scripts/slots.py，不改任何项目状态）。"""
+    sp = root / SLOTS_REL
+    if not sp.exists():
+        return False
+    import contextlib
+    import io
+    import runpy
+    old = sys.argv
+    sys.argv = [str(sp)]
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            try:
+                runpy.run_path(str(sp), run_name="__main__")
+            except SystemExit:
+                pass
+    finally:
+        sys.argv = old
+    return True
+
+
 def _print_missing(missing):
     """--allow-missing：汇总跳过的本地不存在项目（不算失败）。"""
     if missing:
@@ -352,7 +421,16 @@ def cmd_queue(args):
 
     if args.check:
         if not diffs:
+            board_probs = _board_problems(root, rows)
+            if board_probs:
+                print("🔴 生产并行看板已过期（scripts/slots.py 只在主动跑时刷新）：")
+                for pr in board_probs:
+                    print(f"   - {pr}")
+                print("   → 运行 wf queue --sync（回写队列并自动重建看板），或 py -3.11 scripts/slots.py --archive")
+                _print_missing(missing)
+                sys.exit(1)
             print("🟢 队列事实列与看板/门禁一致。")
+            print("🟢 生产并行看板与队列一致（无旧快照）。")
             _print_missing(missing)
             sys.exit(0)
         print("🔴 队列事实列已过期（状态/完成日期/当前卡点禁止手改）：")
@@ -368,6 +446,10 @@ def cmd_queue(args):
         print(f"✅ 队列已回写：{path.name}（事实列 {len(diffs)} 处更新）")
         for name, changed in diffs:
             print(f"   - {name}：" + "；".join(f"{f}: {o} → {n}" for f, o, n in changed))
+        if _regenerate_board(root):
+            print("✅ 生产并行看板已按队列重建（projects/_生产并行看板.md）")
+        else:
+            print("⚠️ 未找到 scripts/slots.py，看板未重建")
         _print_missing(missing)
         return
 
